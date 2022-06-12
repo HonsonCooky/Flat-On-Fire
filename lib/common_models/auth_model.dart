@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flat_on_fire/core/flutter/view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+import 'view_model.dart';
 
 enum AuthState { signIn, signUp }
 
@@ -13,8 +14,9 @@ class AuthModel extends ViewModel {
   /// Authentication Methods
   /// -----------------------------------------------------------------------------------------------------
   AuthState get authState => _authState;
+
   User? get user => firebaseAuth.currentUser;
-  
+
   setAuthState(AuthState authState) {
     _authState = authState;
     notifyListeners();
@@ -42,6 +44,10 @@ class AuthModel extends ViewModel {
     );
     await firebaseAuth.signInWithCredential(credential);
     setViewState(ViewState.ideal);
+  }
+
+  bool signedIn() {
+    return user != null;
   }
 
   logOut() async {

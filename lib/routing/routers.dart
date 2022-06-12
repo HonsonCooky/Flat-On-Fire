@@ -1,10 +1,10 @@
-import 'package:flat_on_fire/theme_consistency_components/widgets/templates/unfocus_wrapper.dart';
+import 'package:flat_on_fire/common_widgets/unfocus_wrapper.dart';
+import 'package:flat_on_fire/features/authentication/presentation/login_page.dart';
+import 'package:flat_on_fire/features/home/home_page.dart';
 import 'package:flutter/material.dart';
 
-import '../../screens/home/home_page.dart';
-import '../../screens/landing/landing_page.dart';
+enum Routes { home, landing }
 
-enum Routes {home, landing}
 extension ParseToString on Routes {
   String toShortString() {
     return toString().split('.').last;
@@ -13,15 +13,18 @@ extension ParseToString on Routes {
 
 class Routers {
   static Route<dynamic>? generateRoute(RouteSettings settings) {
+    // Home
     if (settings.name == Routes.home.toShortString()) {
       return MaterialPageRoute(builder: (_) => const UnFocusWrapper(child: HomePage()));
-    } else if (settings.name == Routes.landing.toShortString()) {
-      return MaterialPageRoute(builder: (_) => const UnFocusWrapper(child: LandingPage()));
+    }
+    // Login
+    else if (settings.name == Routes.landing.toShortString()) {
+      return MaterialPageRoute(builder: (_) => const UnFocusWrapper(child: LoginPage()));
     }
     return null;
   }
-  
-  static Route<dynamic> unknownRoute(RouteSettings settings){
+
+  static Route<dynamic> unknownRoute(RouteSettings settings) {
     return MaterialPageRoute(builder: (_) {
       return Scaffold(
         body: Center(

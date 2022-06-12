@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "381231754472",
+    "project_id": "flat-on-fire-services",
+    "storage_bucket": "flat-on-fire-services.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381231754472:android:7b879185d9c822a481ad5d",
+        "android_client_info": {
+          "package_name": "com.honsoncooky.flat_on_fire"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "381231754472-0tf125saej5jbn4g0bs9tid50gpk5ci3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.honsoncooky.flat_on_fire",
+            "certificate_hash": "fee2f5ac6d5ee5d80c421dc99bf72fee57fba923"
+          }
+        },
+        {
+          "client_id": "381231754472-sh4hmurdrrd02cd62se6pngnaupqfb7n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAomGUFNv_Re7tYblQBewi2hlMCg8teTO4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "381231754472-sh4hmurdrrd02cd62se6pngnaupqfb7n.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "381231754472-dqppaa200kn4slqlnnd7nr00cuuhehq2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.honsoncooky.flatOnFire"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

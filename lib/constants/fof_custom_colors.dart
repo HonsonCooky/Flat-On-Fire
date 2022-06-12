@@ -18,7 +18,7 @@ class ColorAlter {
 
     return hslLight.toColor();
   }
-  
+
   static Color alpha(Color color, [double decPercent = .5]) {
     assert(decPercent >= 0 && decPercent <= 1);
     return color.withAlpha((256 * decPercent.clamp(0.0, 1.0)).round());

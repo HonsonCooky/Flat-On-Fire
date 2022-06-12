@@ -1,5 +1,6 @@
 name: flat_on_fire
-description: A new Flutter project.
+description: A new Flutter project to create the Flat Out Management application, using Firebase.
+
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 environment:
@@ -9,13 +10,11 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   firebase_core: ^1.17.1
+  get_it: ^7.2.0
   firebase_auth: ^3.3.19
   google_sign_in: ^5.3.3
-  google_fonts: ^3.0.1
-  json_annotation: ^4.5.0
-  path_provider: ^2.0.11
-  provider: ^6.0.3
-  get_it: ^7.2.0
+  get_it_mixin: ^3.1.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -24,4 +23,3 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
-

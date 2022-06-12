@@ -1,6 +1,7 @@
-import 'package:flat_on_fire/theme_consistency_components/objects/fof_buttons/fof_button_style.dart';
-import 'package:flat_on_fire/theme_consistency_components/objects/fof_custom_colors.dart';
 import 'package:flutter/material.dart';
+
+import 'fof_button_style.dart';
+import 'fof_custom_colors.dart';
 
 FofButtonStyle primaryButtonStyle(BuildContext context) {
   FofCustomColors fcc = Theme.of(context).extension<FofCustomColors>()!;

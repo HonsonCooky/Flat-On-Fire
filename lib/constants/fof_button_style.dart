@@ -8,8 +8,8 @@ class FofButtonStyle extends ButtonStyle {
   final double _paddingHorizontal;
   final double _paddingVertical;
 
-  const FofButtonStyle(this._overlay, this._background, this._foreground, this._paddingHorizontal,
-      this._paddingVertical);
+  const FofButtonStyle(
+      this._overlay, this._background, this._foreground, this._paddingHorizontal, this._paddingVertical);
 
   FofButtonStyle factory({
     Color? overlay,
@@ -23,8 +23,7 @@ class FofButtonStyle extends ButtonStyle {
   }
 
   @override
-  get elevation =>
-      MaterialStateProperty.resolveWith<double?>((Set<MaterialState> states) {
+  get elevation => MaterialStateProperty.resolveWith<double?>((Set<MaterialState> states) {
         if (_background == null) return 0;
         if (states.contains(MaterialState.pressed)) {
           return 1;
@@ -42,7 +41,6 @@ class FofButtonStyle extends ButtonStyle {
   get foregroundColor => MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) => _foreground);
 
   @override
-  get padding =>
-      MaterialStateProperty.resolveWith<EdgeInsetsGeometry?>(
-              (states) => EdgeInsets.symmetric(horizontal: _paddingHorizontal, vertical: _paddingVertical));
+  get padding => MaterialStateProperty.resolveWith<EdgeInsetsGeometry?>(
+      (states) => EdgeInsets.symmetric(horizontal: _paddingHorizontal, vertical: _paddingVertical));
 }
