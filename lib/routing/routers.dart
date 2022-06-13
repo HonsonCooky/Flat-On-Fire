@@ -19,7 +19,7 @@ class Routers {
     }
     // Login
     else if (settings.name == Routes.landing.toShortString()) {
-      return MaterialPageRoute(builder: (_) => const UnFocusWrapper(child: LoginPage()));
+      return MaterialPageRoute(builder: (_) => UnFocusWrapper(child: LoginPage()));
     }
     return null;
   }

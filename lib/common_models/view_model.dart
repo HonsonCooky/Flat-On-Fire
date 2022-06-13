@@ -23,7 +23,9 @@ class ViewModel extends ChangeNotifier {
   }
 
   switchTheme() {
+    print(_themeMode);
     _themeMode = (_themeMode == ThemeMode.light) ? ThemeMode.dark : ThemeMode.light;
+    print(_themeMode);
     notifyListeners();
   }
 }
