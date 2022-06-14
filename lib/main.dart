@@ -13,7 +13,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseAppCheck.instance.activate();
-  
+
   GetIt.I.registerSingleton<AuthModel>(AuthModel());
   GetIt.I.registerSingleton<ViewModel>(ViewModel());
 

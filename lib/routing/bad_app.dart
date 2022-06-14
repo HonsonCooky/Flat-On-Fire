@@ -7,7 +7,7 @@ import '../theme_helpers/theme.dart';
 /// application from running.
 class BadApp extends StatelessWidget {
   const BadApp({Key? key}) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,7 +22,11 @@ class BadApp extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error, color: AppColors.lightError, size: 50,),
+              Icon(
+                Icons.error,
+                color: AppColors.lightError,
+                size: 50,
+              ),
               const Text(
                 "Flat On Fire Unavailable",
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),

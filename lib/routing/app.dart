@@ -1,5 +1,5 @@
-import 'package:flat_on_fire/theme_helpers/theme.dart';
 import 'package:flat_on_fire/routing/routers.dart';
+import 'package:flat_on_fire/theme_helpers/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
@@ -13,7 +13,7 @@ class App extends StatelessWidget with GetItMixin {
   @override
   Widget build(BuildContext context) {
     watchOnly((ViewModel vm) => vm.themeMode);
-    
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
