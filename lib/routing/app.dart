@@ -1,6 +1,7 @@
 import 'package:flat_on_fire/routing/routers.dart';
 import 'package:flat_on_fire/theme_helpers/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 
@@ -8,11 +9,14 @@ import '../common_models/view_model.dart';
 
 class App extends StatelessWidget with GetItMixin {
   App({Key? key}) : super(key: key);
+  
+  
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     watchOnly((ViewModel vm) => vm.themeMode);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);  // to hide only bottom bar
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -21,7 +25,6 @@ class App extends StatelessWidget with GetItMixin {
       themeMode: GetIt.I<ViewModel>().themeMode,
       initialRoute: GetIt.I<ViewModel>().initialRoute,
       onGenerateRoute: Routers.generateRoute,
-      onUnknownRoute: Routers.unknownRoute,
     );
   }
 }

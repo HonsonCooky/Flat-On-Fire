@@ -6,7 +6,7 @@ enum ViewState { ideal, busy }
 class ViewModel extends ChangeNotifier {
   late ViewState _viewState;
   late ThemeMode _themeMode;
-  final initialRoute = Routes.landing.toShortString();
+  final initialRoute = Routes.landing.routeName();
 
   ViewModel() {
     _viewState = ViewState.busy;
@@ -23,9 +23,7 @@ class ViewModel extends ChangeNotifier {
   }
 
   switchTheme() {
-    print(_themeMode);
     _themeMode = (_themeMode == ThemeMode.light) ? ThemeMode.dark : ThemeMode.light;
-    print(_themeMode);
     notifyListeners();
   }
 }

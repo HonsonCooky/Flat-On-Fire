@@ -1,34 +1,45 @@
-import 'package:flutter/painting.dart';
+import 'package:flutter/material.dart';
 
 class FofLogoDecoration extends Decoration {
   final Color color;
+  final Offset? offset;
+  final double? size;
 
-  const FofLogoDecoration(this.color);
+  const FofLogoDecoration(this.color, this.offset, this.size);
 
   @override
   BoxPainter createBoxPainter([VoidCallback? onChanged]) {
-    return _FofLogoPainter(color);
+    return _FofLogoPainter(color, offset, size);
   }
 }
 
 class _FofLogoPainter extends BoxPainter {
   final Color color;
+  final Offset? offset;
+  final double? size;
 
-  _FofLogoPainter(this.color);
+  _FofLogoPainter(this.color, this.offset, this.size);
 
   @override
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
-    Paint paint = Paint()
-      ..color = color
-      ..strokeWidth = 5;
+    TextPainter textPainter = TextPainter(textDirection: TextDirection.rtl);
 
-    var width = configuration.size?.width ?? 100;
-    var height = configuration.size?.height ?? 100;
+    var icon = Icons.perm_contact_calendar_rounded;
+    textPainter.text = TextSpan(
+      text: String.fromCharCode(icon.codePoint),
+      style: TextStyle(
+        fontSize: size ?? configuration.size?.height,
+        fontFamily: icon.fontFamily,
+        color: color,
+      ),
+    );
 
-    Path path = Path();
-    path.moveTo(width / 2, height / 2);
-    path.lineTo(width, height);
-
-    canvas.drawPath(path, paint);
+    textPainter.layout();
+    textPainter.paint(
+        canvas,
+        Offset(
+          offset.dx + (this.offset?.dx ?? 0),
+          offset.dy + (this.offset?.dy ?? 0),
+        ));
   }
 }

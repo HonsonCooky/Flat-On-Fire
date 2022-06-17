@@ -30,8 +30,8 @@ class ColorAlter {
 class AppColors {
   // LIGHT
   static Color lightBackground = const Color(0xffe8e5e0);
-  static Color lightPrimary = const Color(0xffe94174);
-  static Color lightSecondary = const Color(0xffdead5c);
+  static Color lightPrimary = const Color(0xffdead5c);
+  static Color lightSecondary = const Color(0xffe94174);
   static Color lightTertiary = const Color(0xff383e64);
   static Color lightCard = const Color(0xffc2bfbc);
   static Color lightSuccess = const Color(0xff57e941);
