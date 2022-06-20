@@ -2,89 +2,167 @@ import 'package:flutter/material.dart';
 
 import 'color_handler.dart';
 
+const double titleLargeFontSize = 32;
 class AppTheme {
   static final _base = ThemeData(
     textTheme: const TextTheme(
-      headline1: TextStyle(
+      displayLarge: TextStyle(
         fontSize: 50,
         fontWeight: FontWeight.w900,
-        fontFamily: "Raleway",
+        fontFamily: "Roboto",
       ),
-      headline2: TextStyle(
-        fontSize: 38,
+      displayMedium: TextStyle(
+        fontSize: 42,
         fontWeight: FontWeight.w900,
-        fontFamily: "Raleway",
+        fontFamily: "Roboto",
       ),
-      headline3: TextStyle(
+      displaySmall: TextStyle(
         fontSize: 26,
-        fontWeight: FontWeight.w900,
-        fontFamily: "Raleway",
+        fontFamily: "Roboto",
+      ),
+      headlineMedium: TextStyle(
+        fontSize: 10,
+        fontFamily: "Ubuntu",
+      ),
+      headlineSmall: TextStyle(
+        fontSize: 10,
+        fontFamily: "Ubuntu",
+      ),
+
+      /// Tab Bar
+      titleLarge: TextStyle(
+        fontSize: titleLargeFontSize,
+        fontFamily: "Ubuntu",
+      ),
+
+      /// Text Field
+      titleMedium: TextStyle(
+        fontSize: 20,
+        fontFamily: "Ubuntu",
+      ),
+      titleSmall: TextStyle(
+        fontSize: 10,
+        fontFamily: "Ubuntu",
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 10,
+        fontFamily: "Ubuntu",
+      ),
+      bodyMedium: TextStyle(
+        fontSize: 10,
+        fontFamily: "Ubuntu",
+      ),
+      bodySmall: TextStyle(
+        fontSize: 10,
+        fontFamily: "Ubuntu",
+      ),
+
+      /// Elevated Buttons
+      labelLarge: TextStyle(
+        fontSize: 24,
+        fontFamily: "Ubuntu",
       ),
       labelMedium: TextStyle(
-        fontSize: 20
+        fontSize: 10,
+        fontFamily: "Ubuntu",
       ),
-      button: TextStyle(
-        fontSize: 18
+      labelSmall: TextStyle(
+        fontSize: 10,
+        fontFamily: "Ubuntu",
       ),
-      subtitle1: TextStyle(
-        fontSize: 22
+    ),
+    tabBarTheme: const TabBarTheme(
+      labelStyle: TextStyle(
+        fontSize: titleLargeFontSize,
+        fontWeight: FontWeight.bold,
+      ),
+      unselectedLabelStyle: TextStyle(
+        fontSize: titleLargeFontSize - 10,
       ),
     ),
   );
 
   static ThemeData light = _base.copyWith(
     scaffoldBackgroundColor: AppColors.lightBackground,
+    brightness: Brightness.light,
     colorScheme: ColorScheme(
       brightness: Brightness.light,
       primary: AppColors.lightPrimary,
-      onPrimary: AppColors.lightTextLight,
-      primaryContainer: AppColors.lightPrimary,
+      onPrimary: AppColors.lightOnPrimary,
       secondary: AppColors.lightSecondary,
-      onSecondary: AppColors.lightTextDark,
-      secondaryContainer: AppColors.lightSecondary,
+      onSecondary: AppColors.lightOnSecondary,
       tertiary: AppColors.lightTertiary,
-      onTertiary: AppColors.lightTextLight,
-      tertiaryContainer: AppColors.lightTertiary,
+      onTertiary: AppColors.lightOnTertiary,
       error: AppColors.lightError,
-      onError: AppColors.lightTextLight,
+      onError: AppColors.lightOnError,
       background: AppColors.lightBackground,
-      onBackground: AppColors.lightTextDark,
-      surface: AppColors.lightCard,
-      onSurface: AppColors.lightTextDark,
+      onBackground: AppColors.lightOnBackground,
+      surface: AppColors.lightSurface,
+      onSurface: AppColors.lightOnSurface,
     ),
-    hintColor: AppColors.lightTextDark,
+    hintColor: AppColors.lightOnSurface,
+    textSelectionTheme: TextSelectionThemeData(
+        cursorColor: AppColors.lightOnSurface,
+        selectionColor: ColorAlter.alpha(AppColors.lightPrimary, 0.4),
+        selectionHandleColor: AppColors.lightSecondary),
     inputDecorationTheme: InputDecorationTheme(
-      alignLabelWithHint: true,
+      border: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.lightOnSurface)),
+      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.lightOnSurface)),
+      iconColor: AppColors.lightOnSurface,
       isDense: true,
-      labelStyle: TextStyle(color: AppColors.lightTextDark, fontSize: _base.textTheme.labelMedium?.fontSize),
     ),
-    textButtonTheme: TextButtonThemeData(
-      style: ButtonStyle(
-        foregroundColor: MaterialStateProperty.resolveWith((states) => AppColors.lightTextDark),
+    textTheme: _base.textTheme.copyWith(
+      labelMedium: _base.textTheme.labelMedium?.copyWith(color: AppColors.lightTertiary),
+      labelLarge: _base.textTheme.labelLarge?.copyWith(color: AppColors.lightOnSurface),
+      titleMedium: _base.textTheme.titleMedium?.copyWith(color: AppColors.lightOnSurface),
+    ),
+    tabBarTheme: _base.tabBarTheme.copyWith(
+      indicator: UnderlineTabIndicator(
+        borderSide: BorderSide(width: 5.0, color: AppColors.lightSecondary),
       ),
     ),
   );
 
   static ThemeData dark = _base.copyWith(
     scaffoldBackgroundColor: AppColors.darkBackground,
+    brightness: Brightness.dark,
     colorScheme: ColorScheme(
       brightness: Brightness.dark,
       primary: AppColors.darkPrimary,
-      onPrimary: AppColors.darkTextLight,
-      primaryContainer: AppColors.darkPrimary,
+      onPrimary: AppColors.darkOnPrimary,
       secondary: AppColors.darkSecondary,
-      onSecondary: AppColors.darkTextDark,
+      onSecondary: AppColors.darkOnSecondary,
       secondaryContainer: AppColors.darkSecondary,
       tertiary: AppColors.darkTertiary,
-      onTertiary: AppColors.darkTextDark,
+      onTertiary: AppColors.darkOnTertiary,
       tertiaryContainer: AppColors.darkTertiary,
       error: AppColors.darkError,
-      onError: AppColors.darkTextDark,
+      onError: AppColors.darkOnError,
       background: AppColors.darkBackground,
-      onBackground: AppColors.darkTextLight,
-      surface: AppColors.darkCard,
-      onSurface: AppColors.darkTextDark,
+      onBackground: AppColors.darkOnBackground,
+      surface: AppColors.darkSurface,
+      onSurface: AppColors.darkOnSurface,
     ),
-    hintColor: AppColors.darkSecondary,
+    hintColor: AppColors.darkOnSurface,
+    textSelectionTheme: TextSelectionThemeData(
+        cursorColor: AppColors.darkOnSurface,
+        selectionColor: ColorAlter.alpha(AppColors.darkPrimary, 0.4),
+        selectionHandleColor: AppColors.darkSecondary),
+    inputDecorationTheme: InputDecorationTheme(
+      border: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.darkOnSurface)),
+      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.darkOnSurface)),
+      iconColor: AppColors.darkOnSurface,
+      isDense: true,
+    ),
+    textTheme: _base.textTheme.copyWith(
+      labelMedium: _base.textTheme.labelMedium?.copyWith(color: AppColors.darkTertiary),
+      labelLarge: _base.textTheme.labelLarge?.copyWith(color: AppColors.darkOnSurface),
+      titleMedium: _base.textTheme.titleMedium?.copyWith(color: AppColors.darkOnSurface),
+    ),
+    tabBarTheme: _base.tabBarTheme.copyWith(
+      indicator: UnderlineTabIndicator(
+        borderSide: BorderSide(width: 5.0, color: AppColors.darkSecondary),
+      ),
+    ),
   );
 }

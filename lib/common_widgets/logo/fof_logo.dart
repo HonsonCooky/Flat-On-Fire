@@ -13,8 +13,8 @@ class FofLogo extends StatelessWidget {
     this.color,
     this.offset,
     this.size,
-    this.duration = const Duration(milliseconds: 200),
-    this.curve = Curves.fastOutSlowIn,
+    this.duration = const Duration(milliseconds: 0),
+    this.curve = Curves.linear,
   }) : super(key: key);
 
   @override
