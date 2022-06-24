@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class ColoredTabBar extends StatelessWidget {
+class ColoredTabBarWidget extends StatelessWidget {
   final TabBar tabBar;
 
-  const ColoredTabBar({Key? key, required this.tabBar}) : super(key: key);
+  const ColoredTabBarWidget({Key? key, required this.tabBar}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

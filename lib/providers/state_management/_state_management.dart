@@ -1,2 +1,2 @@
-export 'auth_model.dart';
-export 'view_model.dart';
+export 'auth_provider.dart';
+export 'view_provider.dart';

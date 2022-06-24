@@ -1,15 +1,14 @@
 import 'package:flat_on_fire/_app.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it_mixin/get_it_mixin.dart';
 
-class LandingPage extends StatefulWidget with GetItStatefulWidgetMixin {
-  LandingPage({Key? key}) : super(key: key);
+class LandingPage extends StatefulWidget {
+  const LandingPage({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _LandingPageState();
 }
 
-class _LandingPageState extends State<LandingPage> with GetItStateMixin {
+class _LandingPageState extends State<LandingPage> {
   final email = TextEditingController();
   final password = TextEditingController();
 
@@ -29,81 +28,80 @@ class _LandingPageState extends State<LandingPage> with GetItStateMixin {
       child: DefaultTabController(
         length: 2,
         child: Scaffold(
-          body: AnimatedContainer(
-            duration: const Duration(milliseconds: 0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: Container(
-                    color: Theme.of(context).colorScheme.primary,
-                    child: Stack(
-                      children: [
-                        FofLogo(
-                          size: height / 3,
-                          offset: Offset(MediaQuery.of(context).size.width / 2.5, ((barHeight / height) * 100)),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "FLAT",
-                                style: Theme.of(context).textTheme.headline1?.copyWith(
-                                      color: Theme.of(context).colorScheme.onPrimary,
-                                      fontSize: barHeight / 3,
-                                    ),
-                              ),
-                              Text(
-                                "ON",
-                                style: Theme.of(context).textTheme.headline1?.copyWith(
-                                      color: Theme.of(context).colorScheme.onPrimary,
-                                      fontSize: barHeight / 6,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                              ),
-                              Text(
-                                "FIRE",
-                                style: Theme.of(context).textTheme.headline1?.copyWith(
-                                      color: Theme.of(context).colorScheme.onPrimary,
-                                      fontSize: barHeight / 3,
-                                    ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const ColoredTabBar(
-                  tabBar: TabBar(
-                    tabs: [
-                      Tab(
-                        text: "Login",
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Container(
+                  color: Theme.of(context).colorScheme.primary,
+                  child: Stack(
+                    children: [
+                      FofLogo(
+                        size: height / 2.5,
+                        offset: Offset(MediaQuery.of(context).size.width / 2.5, barHeight / 10),
                       ),
-                      Tab(text: "Signup"),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "FLAT",
+                              style: Theme.of(context).textTheme.headline1?.copyWith(
+                                    color: Theme.of(context).colorScheme.onPrimary,
+                                    fontSize: barHeight / 3,
+                                  ),
+                            ),
+                            Text(
+                              "ON",
+                              style: Theme.of(context).textTheme.headline1?.copyWith(
+                                    color: Theme.of(context).colorScheme.onPrimary,
+                                    fontSize: barHeight / 6,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                            ),
+                            Text(
+                              "FIRE",
+                              style: Theme.of(context).textTheme.headline1?.copyWith(
+                                    color: Theme.of(context).colorScheme.onPrimary,
+                                    fontSize: barHeight / 3,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                Expanded(
-                  child: NotificationListener<OverscrollIndicatorNotification>(
-                    onNotification: (OverscrollIndicatorNotification overscroll) {
-                      overscroll.disallowIndicator();
-                      return true;
-                    },
-                    child: TabBarView(
-                      children: [
-                        SidePaddedWidget(LoginWidgets(email, password)),
-                        SidePaddedWidget(SignupWidgets(email, password)),
-                      ],
+              ),
+              const ColoredTabBarWidget(
+                tabBar: TabBar(
+                  tabs: [
+                    Tab(
+                      text: "Login",
                     ),
+                    Tab(
+                      text: "Signup",
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: NotificationListener<OverscrollIndicatorNotification>(
+                  onNotification: (OverscrollIndicatorNotification overscroll) {
+                    overscroll.disallowIndicator();
+                    return true;
+                  },
+                  child: TabBarView(
+                    children: [
+                      SidePaddedWidget(LoginWidget(email, password)),
+                      SidePaddedWidget(SignupWidget(email, password)),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 enum ViewState { ideal, busy }
 
-class ViewModel extends ChangeNotifier {
+class ViewProvider extends ChangeNotifier {
   late ViewState _viewState;
   late ThemeMode _themeMode;
 
-  ViewModel() {
+  ViewProvider() {
     _viewState = ViewState.busy;
     _themeMode = ThemeMode.light;
   }

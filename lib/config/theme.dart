@@ -6,6 +6,7 @@ const double titleLargeFontSize = 30;
 const double textFieldLabelSize = 22;
 
 class AppTheme {
+  /// GLOBAL THEME CONSTANTS
   static final _base = ThemeData(
       textTheme: const TextTheme(
         displayLarge: TextStyle(
@@ -78,17 +79,19 @@ class AppTheme {
         labelStyle: TextStyle(
           fontSize: titleLargeFontSize,
           fontFamily: "Ubuntu",
+          fontWeight: FontWeight.bold,
         ),
         unselectedLabelStyle: TextStyle(
-          fontSize: titleLargeFontSize - 10,
+          fontSize: titleLargeFontSize - 7,
           fontFamily: "Ubuntu",
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
         elevation: MaterialStateProperty.resolveWith((states) => 0),
-      )));
+      ),),);
 
+  /// LIGHT THEME
   static ThemeData light = _base.copyWith(
     scaffoldBackgroundColor: AppColors.lightBackground,
     brightness: Brightness.light,
@@ -128,6 +131,8 @@ class AppTheme {
     ),
     tabBarTheme: _base.tabBarTheme.copyWith(
       indicator: UnderlineTabIndicator(borderSide: BorderSide(width: 4, color: AppColors.lightSecondary)),
+      labelColor: AppColors.lightOnPrimary,
+      unselectedLabelColor: PaletteAssistant.alpha(AppColors.lightOnPrimary),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: _base.elevatedButtonTheme.style?.copyWith(
@@ -138,6 +143,7 @@ class AppTheme {
     ),
   );
 
+  /// DARK THEME
   static ThemeData dark = _base.copyWith(
     scaffoldBackgroundColor: AppColors.darkBackground,
     brightness: Brightness.dark,
@@ -179,6 +185,8 @@ class AppTheme {
     ),
     tabBarTheme: _base.tabBarTheme.copyWith(
       indicator: UnderlineTabIndicator(borderSide: BorderSide(width: 4, color: AppColors.darkSecondary)),
+      labelColor: AppColors.darkOnPrimary,
+      unselectedLabelColor: PaletteAssistant.alpha(AppColors.darkOnPrimary),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: _base.elevatedButtonTheme.style?.copyWith(

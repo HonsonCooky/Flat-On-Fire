@@ -1,23 +1,25 @@
 import 'package:flat_on_fire/_app.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:get_it_mixin/get_it_mixin.dart';
+import 'package:provider/provider.dart';
 
-class LoginWidgets extends StatefulWidget with GetItStatefulWidgetMixin, ToastWrapper {
+class LoginWidget extends StatefulWidget {
   final TextEditingController email;
   final TextEditingController password;
 
-  LoginWidgets(this.email, this.password, {Key? key}) : super(key: key);
+  const LoginWidget(this.email, this.password, {Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _LoginWidgetClass();
 }
 
-class _LoginWidgetClass extends State<LoginWidgets> with GetItStateMixin, ToastWrapper {
+class _LoginWidgetClass extends State<LoginWidget> with ToastWrapper {
   bool _isObscure = true;
 
   @override
   Widget build(BuildContext context) {
+    final googleImage = context.read<ViewProvider>().themeMode == ThemeMode.light
+        ? 'assets/google_logo_light.png'
+        : 'assets/google_logo_dark.png';
     return ListView(
       physics: const BouncingScrollPhysics(),
       clipBehavior: Clip.antiAlias,
@@ -46,25 +48,18 @@ class _LoginWidgetClass extends State<LoginWidgets> with GetItStateMixin, ToastW
         ),
 
         SizedBox(
-          height: MediaQuery.of(context).size.height / 10,
+          height: MediaQuery.of(context).size.height / 8,
         ),
 
         /// Sign In Button
         ElevatedButton(
           child: const Text("LOGIN"),
           onPressed: () async {
-            try {
-              await GetIt.I<AuthModel>().signIn(widget.email.text, widget.password.text);
-            } catch (e, s) {
-              print(e);
-              if (e.toString().contains("firebase_auth/unknown")) {
-                errorToast("Unknown user, or invalid email/password. Try signing up?", context);
-              }
-            }
+            await context.read<AuthProvider>().login(email: widget.email.text, password: widget.password.text);
           },
         ),
 
-        HorizontalOrLine(
+        HorizontalOrLineWidget(
           label: "OR",
           padding: 20,
           color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
@@ -77,9 +72,7 @@ class _LoginWidgetClass extends State<LoginWidgets> with GetItStateMixin, ToastW
           style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
               backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.tertiary)),
           icon: Image.asset(
-            GetIt.I<ViewModel>().themeMode == ThemeMode.light
-                ? 'assets/google_logo_light.png'
-                : 'assets/google_logo_dark.png',
+            googleImage,
             height: (Theme.of(context).textTheme.button?.fontSize ?? 10) + 5,
             fit: BoxFit.fitHeight,
           ),

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class HorizontalOrLine extends StatelessWidget {
+class HorizontalOrLineWidget extends StatelessWidget {
   final String label;
   final double padding;
   final Color color;
 
-  const HorizontalOrLine({
+  const HorizontalOrLineWidget({
     Key? key,
     required this.label,
     required this.padding,

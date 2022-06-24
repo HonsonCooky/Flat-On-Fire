@@ -1,19 +1,18 @@
 import 'package:flat_on_fire/_app.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:get_it_mixin/get_it_mixin.dart';
+import 'package:provider/provider.dart';
 
-class SignupWidgets extends StatefulWidget with GetItStatefulWidgetMixin {
+class SignupWidget extends StatefulWidget {
   final TextEditingController email;
   final TextEditingController password;
 
-  SignupWidgets(this.email, this.password, {Key? key}) : super(key: key);
+  const SignupWidget(this.email, this.password, {Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _SignupWidgetsClass();
 }
 
-class _SignupWidgetsClass extends State<SignupWidgets> with GetItStateMixin, ToastWrapper {
+class _SignupWidgetsClass extends State<SignupWidget> with ToastWrapper {
   final _name = TextEditingController();
   final _confirm = TextEditingController();
   String? emailErrMsg, nameErrMsg, passwordErrMsg;
@@ -40,6 +39,10 @@ class _SignupWidgetsClass extends State<SignupWidgets> with GetItStateMixin, Toa
 
   @override
   Widget build(BuildContext context) {
+    final googleImage = context.read<ViewProvider>().themeMode == ThemeMode.light
+        ? 'assets/google_logo_light.png'
+        : 'assets/google_logo_dark.png';
+
     return ListView(
       physics: const BouncingScrollPhysics(),
       children: [
@@ -78,33 +81,27 @@ class _SignupWidgetsClass extends State<SignupWidgets> with GetItStateMixin, Toa
         ),
 
         SizedBox(
-          height: MediaQuery.of(context).size.height / 20,
+          height: MediaQuery.of(context).size.height / 19.2,
         ),
 
         /// Sign In Button
         ElevatedButton(
           child: const Text("CREATE ACCOUNT"),
           onPressed: () async {
-            try {
-              preFlightCheck();
-              await GetIt.I<AuthModel>().createNewUser(widget.email.text, _name.text, widget.password.text);
-            } on Exception catch (e, s) {
-              if (e.toString().contains("permission-denied")) {
-                errorToast("Lacking permission to create account", context);
-              } else if (e.toString().contains("weak-password")) {
-                errorToast(e.toString().replaceAll("[firebase_auth/weak-password]", ""), context);
-              } else if (e.toString().contains("email-already-in-use")) {
-                errorToast("User already exists. Try logging in?", context);
-              } else {
-                errorToast(e.toString(), context);
-              }
-              print(s);
-              print(e);
+            var signup = await context
+                .read<AuthProvider>()
+                .signup(email: widget.email.text, name: _name.text, password: widget.password.text);
+            
+            if (!mounted) return;
+            if (signup == signedUp) {
+              successToast(signedUp, context);
+            } else {
+              errorToast(signedUp, context);
             }
           },
         ),
 
-        HorizontalOrLine(
+        HorizontalOrLineWidget(
           label: "OR",
           padding: 20,
           color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
@@ -117,9 +114,7 @@ class _SignupWidgetsClass extends State<SignupWidgets> with GetItStateMixin, Toa
           style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
               backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.tertiary)),
           icon: Image.asset(
-            GetIt.I<ViewModel>().themeMode == ThemeMode.light
-                ? 'assets/google_logo_light.png'
-                : 'assets/google_logo_dark.png',
+            googleImage,
             height: (Theme.of(context).textTheme.button?.fontSize ?? 10) + 5,
             fit: BoxFit.fitHeight,
           ),
