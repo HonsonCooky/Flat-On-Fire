@@ -14,10 +14,6 @@ class App extends StatelessWidget {
         providers: [
           ChangeNotifierProvider(create: (_) => ViewProvider()),
           ChangeNotifierProvider(create: (_) => AuthProvider(FirebaseAuth.instance)),
-          StreamProvider(
-            create: (context) => context.read<AuthProvider>().authStateChanges,
-            initialData: FirebaseAuth.instance.currentUser,
-          ),
         ],
         builder: (context, child) {
           final themeMode = context.watch<ViewProvider>().themeMode;

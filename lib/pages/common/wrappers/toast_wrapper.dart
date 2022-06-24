@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-abstract class ToastWrapper {
+abstract class ToastMixin {
   void successToast(String msg, BuildContext context) {
     final s = ScaffoldMessenger.of(context);
     s.showSnackBar(
@@ -9,6 +9,9 @@ abstract class ToastWrapper {
         margin: const EdgeInsets.all(20.0),
         content: Text(
           msg,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
@@ -23,15 +26,21 @@ abstract class ToastWrapper {
         margin: const EdgeInsets.all(20.0),
         content: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.warning,
               size: 20,
+              color: Theme.of(context).colorScheme.onSecondary,
             ),
             const SizedBox(
               width: 10,
             ),
             Expanded(
-              child: Text(msg, style: Theme.of(context).textTheme.bodyLarge),
+              child: Text(
+                msg,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onSecondary,
+                    ),
+              ),
             ),
           ],
         ),
@@ -48,15 +57,21 @@ abstract class ToastWrapper {
       dismissDirection: DismissDirection.horizontal,
       content: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.error,
             size: 20,
+            color: Theme.of(context).colorScheme.onError,
           ),
           const SizedBox(
             width: 10,
           ),
           Expanded(
-            child: Text(msg, style: Theme.of(context).textTheme.bodyLarge),
+            child: Text(
+              msg,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onError,
+                  ),
+            ),
           ),
         ],
       ),
@@ -72,16 +87,21 @@ abstract class ToastWrapper {
       dismissDirection: DismissDirection.horizontal,
       content: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.error,
             size: 20,
+            color: Theme.of(context).colorScheme.onError,
           ),
           const SizedBox(
             width: 10,
           ),
           Expanded(
-            child: Text("The developer of this app did an oopsie\nReference: ${id}",
-                style: Theme.of(context).textTheme.bodyLarge),
+            child: Text(
+              "The developer of this app did an oopsie\nReference: ${id}",
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onError,
+                  ),
+            ),
           ),
         ],
       ),

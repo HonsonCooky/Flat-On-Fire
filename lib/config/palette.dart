@@ -6,7 +6,7 @@ class AppColors {
   static Color lightPrimary = const Color(0xffF7B733);
   static Color lightSecondary = const Color(0xffFC4A1A);
   static Color lightTertiary = const Color(0xff4ABDAC);
-  static Color lightError = const Color(0xffe94f41);
+  static Color lightError = const Color(0xffffffff);
   static Color lightSurface = const Color(0xffc2bfbc);
 
   // LIGHT ON
@@ -14,7 +14,7 @@ class AppColors {
   static Color lightOnPrimary = const Color(0xcc000000);
   static Color lightOnSecondary = const Color(0xccffffff);
   static Color lightOnTertiary = const Color(0xcc000000);
-  static Color lightOnError = const Color(0xcc000000);
+  static Color lightOnError = const Color(0xffFC4A1A);
   static Color lightOnSurface = const Color(0xcc000000);
 
   // DARK

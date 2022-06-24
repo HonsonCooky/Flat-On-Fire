@@ -2,17 +2,17 @@ import 'package:flat_on_fire/_app.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SignupWidget extends StatefulWidget {
+class SignupTab extends StatefulWidget {
   final TextEditingController email;
   final TextEditingController password;
 
-  const SignupWidget(this.email, this.password, {Key? key}) : super(key: key);
+  const SignupTab(this.email, this.password, {Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _SignupWidgetsClass();
+  State<StatefulWidget> createState() => _SignupTabState();
 }
 
-class _SignupWidgetsClass extends State<SignupWidget> with ToastWrapper {
+class _SignupTabState extends State<SignupTab> with ToastMixin {
   final _name = TextEditingController();
   final _confirm = TextEditingController();
   String? emailErrMsg, nameErrMsg, passwordErrMsg;
@@ -25,16 +25,38 @@ class _SignupWidgetsClass extends State<SignupWidget> with ToastWrapper {
     super.dispose();
   }
 
-  void preFlightCheck() {
+  void preFlightCheck([bool isBasic = true]) {
     setState(() {
-      emailErrMsg = widget.email.text.isEmpty ? "No Email Provided" : null;
+      emailErrMsg = (isBasic && widget.email.text.isEmpty) ? "No Email Provided" : null;
       nameErrMsg = _name.text.isEmpty ? "No Name Provided" : null;
-      passwordErrMsg = widget.password.text.isEmpty ? "No Password Provided" : null;
+      passwordErrMsg = (isBasic && widget.password.text.isEmpty) ? "No Password Provided" : null;
     });
 
     if (emailErrMsg != null || nameErrMsg != null || passwordErrMsg != null) {
       throw Exception("Invalid User Credentials");
     }
+  }
+
+  void signup(Future<String> Function() cb, [bool isBasic = true]) async {
+    try {
+      preFlightCheck(isBasic);
+    } catch (e) {
+      errorToast(e.toString(), context);
+      return;
+    }
+
+    var signupText = await cb();
+
+    if (!mounted) return;
+    if (signupText != signedUpText) {
+      errorToast(signupText, context);
+    }
+  }
+
+  void resetErrors() {
+    emailErrMsg = null;
+    nameErrMsg = null;
+    passwordErrMsg = null;
   }
 
   @override
@@ -48,6 +70,7 @@ class _SignupWidgetsClass extends State<SignupWidget> with ToastWrapper {
       children: [
         /// Email Text Box
         TextField(
+          onTap: resetErrors,
           decoration: InputDecoration(
             labelText: "Email",
             errorText: emailErrMsg,
@@ -57,6 +80,7 @@ class _SignupWidgetsClass extends State<SignupWidget> with ToastWrapper {
 
         /// Name Text Box
         TextField(
+          onTap: resetErrors,
           decoration: InputDecoration(
             labelText: "Name",
             errorText: nameErrMsg,
@@ -66,6 +90,7 @@ class _SignupWidgetsClass extends State<SignupWidget> with ToastWrapper {
 
         /// Password Text Box
         TextField(
+          onTap: resetErrors,
           controller: widget.password,
           obscureText: _isObscure,
           decoration: InputDecoration(
@@ -87,18 +112,11 @@ class _SignupWidgetsClass extends State<SignupWidget> with ToastWrapper {
         /// Sign In Button
         ElevatedButton(
           child: const Text("CREATE ACCOUNT"),
-          onPressed: () async {
-            var signup = await context
+          onPressed: () => signup(
+            () => context
                 .read<AuthProvider>()
-                .signup(email: widget.email.text, name: _name.text, password: widget.password.text);
-            
-            if (!mounted) return;
-            if (signup == signedUp) {
-              successToast(signedUp, context);
-            } else {
-              errorToast(signedUp, context);
-            }
-          },
+                .signup(email: widget.email.text, name: _name.text, password: widget.password.text),
+          ),
         ),
 
         HorizontalOrLineWidget(
@@ -110,7 +128,10 @@ class _SignupWidgetsClass extends State<SignupWidget> with ToastWrapper {
         /// Google Sign In Button
         ElevatedButton.icon(
           label: const Text("SIGNUP WITH GOOGLE"),
-          onPressed: () {},
+          onPressed: () => signup(
+            () => context.read<AuthProvider>().signupWithGoogle(name: _name.text),
+            false,
+          ),
           style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
               backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.tertiary)),
           icon: Image.asset(

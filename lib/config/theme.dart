@@ -56,7 +56,7 @@ class AppTheme {
           fontFamily: "Ubuntu",
         ),
         bodySmall: TextStyle(
-          fontSize: 8,
+          fontSize: 10,
           fontFamily: "Ubuntu",
         ),
 

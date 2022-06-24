@@ -2,18 +2,51 @@ import 'package:flat_on_fire/_app.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class LoginWidget extends StatefulWidget {
+class LoginTab extends StatefulWidget {
   final TextEditingController email;
   final TextEditingController password;
 
-  const LoginWidget(this.email, this.password, {Key? key}) : super(key: key);
+  const LoginTab(this.email, this.password, {Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _LoginWidgetClass();
+  State<StatefulWidget> createState() => _LoginTabState();
 }
 
-class _LoginWidgetClass extends State<LoginWidget> with ToastWrapper {
+class _LoginTabState extends State<LoginTab> with ToastMixin {
   bool _isObscure = true;
+  String? emailErrMsg, passwordErrMsg;
+
+  void preFlightCheck([bool isBasic = true]) {
+    setState(() {
+      emailErrMsg = (isBasic && widget.email.text.isEmpty) ? "No Email Provided" : null;
+      passwordErrMsg = (isBasic && widget.password.text.isEmpty) ? "No Password Provided" : null;
+    });
+
+    if (emailErrMsg != null || passwordErrMsg != null) {
+      throw Exception("Invalid User Credentials");
+    }
+  }
+
+  void login(Future<String> Function() cb, [bool isBasic = true]) async {
+    try {
+      preFlightCheck(isBasic);
+    } catch (e) {
+      errorToast(e.toString(), context);
+      return;
+    }
+
+    var login = await cb();
+
+    if (!mounted) return;
+    if (login != loggedInText) {
+      errorToast(login, context);
+    }
+  }
+
+  void resetErrors() {
+    emailErrMsg = null;
+    passwordErrMsg = null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,18 +59,22 @@ class _LoginWidgetClass extends State<LoginWidget> with ToastWrapper {
       children: [
         /// Email Text Box
         TextField(
-          decoration: const InputDecoration(
+          onTap: resetErrors,
+          decoration: InputDecoration(
             labelText: "Email",
+            errorText: emailErrMsg,
           ),
           controller: widget.email,
         ),
 
         /// Password Text Box
         TextField(
+          onTap: resetErrors,
           controller: widget.password,
           obscureText: _isObscure,
           decoration: InputDecoration(
             labelText: 'Password',
+            errorText: passwordErrMsg,
             suffixIcon: IconButton(
               icon: Icon(_isObscure ? Icons.visibility : Icons.visibility_off),
               onPressed: () {
@@ -54,9 +91,9 @@ class _LoginWidgetClass extends State<LoginWidget> with ToastWrapper {
         /// Sign In Button
         ElevatedButton(
           child: const Text("LOGIN"),
-          onPressed: () async {
-            await context.read<AuthProvider>().login(email: widget.email.text, password: widget.password.text);
-          },
+          onPressed: () => login(
+            () => context.read<AuthProvider>().login(email: widget.email.text, password: widget.password.text),
+          ),
         ),
 
         HorizontalOrLineWidget(
@@ -68,7 +105,10 @@ class _LoginWidgetClass extends State<LoginWidget> with ToastWrapper {
         /// Google Sign In Button
         ElevatedButton.icon(
           label: const Text("LOGIN WITH GOOGLE"),
-          onPressed: () {},
+          onPressed: () => login(
+            () => context.read<AuthProvider>().loginWithGoogle(),
+            false,
+          ),
           style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
               backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.tertiary)),
           icon: Image.asset(
