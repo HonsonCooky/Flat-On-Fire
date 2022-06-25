@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class SidePaddedWidget extends StatelessWidget {
+class PaddedWidget extends StatelessWidget {
   final Widget child;
 
-  const SidePaddedWidget({Key? key, required this.child}) : super(key: key);
+  const PaddedWidget({Key? key, required this.child}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

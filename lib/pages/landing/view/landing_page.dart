@@ -95,8 +95,8 @@ class _LandingPageState extends State<LandingPage> {
                   },
                   child: TabBarView(
                     children: [
-                      SidePaddedWidget(child: LoginTab(email, password)),
-                      SidePaddedWidget(child: SignupTab(email, password)),
+                      PaddedWidget(child: LoginTab(email, password)),
+                      PaddedWidget(child: SignupTab(email, password)),
                     ],
                   ),
                 ),

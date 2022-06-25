@@ -4,6 +4,7 @@ class HorizontalOrLineWidget extends StatelessWidget {
   final String label;
   final double padding;
   final Color color;
+  
 
   const HorizontalOrLineWidget({
     Key? key,
@@ -17,7 +18,7 @@ class HorizontalOrLineWidget extends StatelessWidget {
     return Row(children: <Widget>[
       Expanded(
         child: Container(
-            margin: const EdgeInsets.only(left: 10, right: 15),
+            margin: const EdgeInsets.only(right: 15),
             child: Divider(
               color: color,
               height: padding,
@@ -30,7 +31,7 @@ class HorizontalOrLineWidget extends StatelessWidget {
       ),
       Expanded(
         child: Container(
-            margin: const EdgeInsets.only(left: 15, right: 10),
+            margin: const EdgeInsets.only(left: 15),
             child: Divider(
               color: color,
               height: padding,

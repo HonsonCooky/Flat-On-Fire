@@ -39,6 +39,7 @@ class AppTheme {
       /// Tab Bar
       titleLarge: TextStyle(
         fontSize: titleLargeFontSize,
+        fontWeight: FontWeight.w900,
       ),
 
       /// Text Field Contents
@@ -92,6 +93,20 @@ class AppTheme {
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
         elevation: MaterialStateProperty.resolveWith((states) => 0),
+        textStyle: MaterialStateProperty.resolveWith(
+          (states) => const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: "Ubuntu"),
+        ),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: ButtonStyle(
+        textStyle: MaterialStateProperty.resolveWith(
+          (states) => const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            fontFamily: "Ubuntu",
+          ),
+        ),
       ),
     ),
   );
@@ -145,6 +160,10 @@ class AppTheme {
               MaterialStateProperty.resolveWith((states) => PaletteAssistant.alpha(AppColors.lightOnSecondary, 0.3)),
           foregroundColor: MaterialStateProperty.resolveWith((states) => AppColors.lightOnSecondary),
           backgroundColor: MaterialStateProperty.resolveWith((states) => AppColors.lightSecondary)),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: _base.textButtonTheme.style
+          ?.copyWith(foregroundColor: MaterialStateProperty.resolveWith((states) => AppColors.lightOnBackground)),
     ),
   );
 

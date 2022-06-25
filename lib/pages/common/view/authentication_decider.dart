@@ -7,12 +7,9 @@ class AuthenticationDecider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<AuthProvider>().user;
-
-    if (user != null) {
-      return HomePage();
+    if (context.watch<AuthProvider>().user != null) {
+      return AppRouter.getPageFromName(initialAppRoute);
     }
-
     return const LandingPage();
   }
 }

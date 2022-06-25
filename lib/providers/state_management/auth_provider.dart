@@ -131,7 +131,6 @@ class AuthProvider extends ChangeNotifier {
       await onCreate(uc: uc, name: uc.user!.displayName!);
       return signedUpText;
     } on FirebaseAuthException catch (e) {
-      await _firebaseAuth.currentUser!.delete();
       return e.message ?? authErrorBackup;
     } on FirebaseException catch (e) {
       await _firebaseAuth.currentUser!.delete();

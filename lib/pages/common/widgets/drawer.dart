@@ -2,7 +2,7 @@ import 'package:flat_on_fire/_app.dart';
 import 'package:flutter/material.dart';
 
 // Is there a better way to maintain this state?
-int selectedIndex = 0;
+int selectedIndex = indexOfDefaultRoute();
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -12,29 +12,29 @@ class AppDrawer extends StatefulWidget {
 }
 
 class _AppDrawerState extends State<AppDrawer> {
-  final listItemNames = [routeHome, routeChores, routeGroups, routeTables];
-
   Widget getLeadingIcon(String name) {
     var icon = Icons.perm_contact_calendar_rounded;
-    if (name == listItemNames[0]) {
+    if (name == appRoutes[0]) {
       icon = Icons.home;
-    } else if (name == listItemNames[1]) {
+    } else if (name == appRoutes[1]) {
       icon = Icons.dry_cleaning;
-    } else if (name == listItemNames[2]) {
+    } else if (name == appRoutes[2]) {
       icon = Icons.workspaces;
-    } else if (name == listItemNames[3]) {
+    } else if (name == appRoutes[3]) {
       icon = Icons.table_view;
+    } else if (name == appRoutes[4]) {
+      icon = Icons.settings;
     }
     return Icon(icon);
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {    
     return Drawer(
       backgroundColor: Theme.of(context).colorScheme.surface,
       child: ListView.builder(
         padding: EdgeInsets.zero,
-        itemCount: listItemNames.length + 1,
+        itemCount: appRoutes.length + 1,
         itemBuilder: (context, index) {
           if (index == 0) {
             return DrawerHeader(
@@ -80,7 +80,7 @@ class _AppDrawerState extends State<AppDrawer> {
               ),
             );
           }
-          var name = listItemNames[index - 1];
+          var name = appRoutes[index - 1];
           var i = index - 1;
           return ListTile(
             title: Text(

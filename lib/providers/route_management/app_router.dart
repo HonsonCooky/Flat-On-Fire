@@ -1,35 +1,24 @@
 import 'package:flat_on_fire/_app.dart';
-import 'package:flat_on_fire/pages/common/widgets/drawer.dart';
+import 'package:flat_on_fire/pages/app/view/settings_page.dart';
 import 'package:flutter/material.dart';
 
 class AppRouter {
-  static Route<dynamic>? generateRoute(RouteSettings settings) {
-    late Widget page;
-    switch (settings.name) {
+  static Widget getPageFromName(String? name) {
+    switch (name) {
       case routeLoading:
-        page = const LoadingPage();
-        break;
+        return const LoadingPage();
       case routeLanding:
-        page = const LandingPage();
-        break;
+        return const LandingPage();
       case routeHome:
-        page = const HomePage();
-        break;
+        return const HomePage();
+      case routeSettings:
+        return const SettingsPage();
       default:
-        return MaterialPageRoute(builder: (BuildContext context) {
-          return Scaffold(
-            appBar: AppBar(title: const Text('Oh no!'), elevation: 0,),
-            drawer: const AppDrawer(),
-            body: Center(
-              child: Text(
-                'No route defined for "${settings.name}"',
-                style: Theme.of(context).textTheme.headline3,
-                textAlign: TextAlign.center,
-              ),
-            ),
-          );
-        });
+        return UnknownPageRoute(name: name ?? "...");
     }
-    return MaterialPageRoute(builder: (_) => page);
+  }
+
+  static Route<dynamic>? generateRoute(RouteSettings settings) {
+    return MaterialPageRoute(builder: (_) => getPageFromName(settings.name));
   }
 }
