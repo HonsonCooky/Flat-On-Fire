@@ -17,6 +17,7 @@ class _SignupTabState extends State<SignupTab> with ToastMixin {
   final _confirm = TextEditingController();
   String? emailErrMsg, nameErrMsg, passwordErrMsg;
   bool _isObscure = true;
+  bool _loading = false;
 
   @override
   void dispose() {
@@ -28,7 +29,7 @@ class _SignupTabState extends State<SignupTab> with ToastMixin {
   void preFlightCheck([bool isBasic = true]) {
     setState(() {
       emailErrMsg = (isBasic && widget.email.text.isEmpty) ? "No Email Provided" : null;
-      nameErrMsg = _name.text.isEmpty ? "No Name Provided" : null;
+      nameErrMsg = (isBasic && _name.text.isEmpty) ? "No Name Provided" : null;
       passwordErrMsg = (isBasic && widget.password.text.isEmpty) ? "No Password Provided" : null;
     });
 
@@ -38,18 +39,21 @@ class _SignupTabState extends State<SignupTab> with ToastMixin {
   }
 
   void signup(Future<String> Function() cb, [bool isBasic = true]) async {
+    setState(() => _loading = true);
     try {
       preFlightCheck(isBasic);
+
+      var signupText = await cb();
+
+      if (!mounted) return;
+      if (signupText != signedUpText) {
+        errorToast(signupText, context);
+      }
     } catch (e) {
       errorToast(e.toString(), context);
       return;
-    }
-
-    var signupText = await cb();
-
-    if (!mounted) return;
-    if (signupText != signedUpText) {
-      errorToast(signupText, context);
+    } finally {
+      setState(() => _loading = false);
     }
   }
 
@@ -109,37 +113,45 @@ class _SignupTabState extends State<SignupTab> with ToastMixin {
           height: MediaQuery.of(context).size.height / 19.2,
         ),
 
-        /// Sign In Button
-        ElevatedButton(
-          child: const Text("CREATE ACCOUNT"),
-          onPressed: () => signup(
-            () => context
-                .read<AuthProvider>()
-                .signup(email: widget.email.text, name: _name.text, password: widget.password.text),
-          ),
-        ),
+        _loading
+            ? LoadingSpinner(MediaQuery.of(context).size.width / 5)
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  /// Sign In Button
+                  ElevatedButton(
+                    child: const Text("CREATE ACCOUNT"),
+                    onPressed: () => signup(
+                      () => context
+                          .read<AuthProvider>()
+                          .signup(email: widget.email.text, name: _name.text, password: widget.password.text),
+                    ),
+                  ),
 
-        HorizontalOrLineWidget(
-          label: "OR",
-          padding: 20,
-          color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
-        ),
+                  HorizontalOrLineWidget(
+                    label: "OR",
+                    padding: 20,
+                    color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
+                  ),
 
-        /// Google Sign In Button
-        ElevatedButton.icon(
-          label: const Text("SIGNUP WITH GOOGLE"),
-          onPressed: () => signup(
-            () => context.read<AuthProvider>().signupWithGoogle(name: _name.text),
-            false,
-          ),
-          style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
-              backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.tertiary)),
-          icon: Image.asset(
-            googleImage,
-            height: (Theme.of(context).textTheme.button?.fontSize ?? 10) + 5,
-            fit: BoxFit.fitHeight,
-          ),
-        ),
+                  /// Google Sign In Button
+                  ElevatedButton.icon(
+                    label: const Text("SIGNUP WITH GOOGLE"),
+                    onPressed: () => signup(
+                      () => context.read<AuthProvider>().signupWithGoogle(name: _name.text),
+                      false,
+                    ),
+                    style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+                        backgroundColor:
+                            MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.tertiary)),
+                    icon: Image.asset(
+                      googleImage,
+                      height: (Theme.of(context).textTheme.button?.fontSize ?? 10) + 5,
+                      fit: BoxFit.fitHeight,
+                    ),
+                  ),
+                ],
+              ),
 
         const SizedBox(
           height: 20,

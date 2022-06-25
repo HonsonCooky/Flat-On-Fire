@@ -7,7 +7,7 @@ class ViewProvider extends ChangeNotifier {
   late ThemeMode _themeMode;
 
   ViewProvider() {
-    _viewState = ViewState.busy;
+    _viewState = ViewState.ideal;
     _themeMode = ThemeMode.light;
   }
 

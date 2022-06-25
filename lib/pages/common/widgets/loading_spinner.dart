@@ -27,16 +27,17 @@ class _LoadingSpinnerState extends State<LoadingSpinner> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(widget.size / 5),
-      width: widget.size,
-      height: widget.size,
-      child: CircularProgressIndicator(
-        strokeWidth: widget.size / 7,
-        valueColor: _controller.drive(
-          ColorTween(
-            begin: Theme.of(context).colorScheme.primary,
-            end: Theme.of(context).colorScheme.secondary,
+    return Center(
+      child: SizedBox(
+        width: widget.size,
+        height: widget.size,
+        child: CircularProgressIndicator(
+          strokeWidth: widget.size / 7,
+          valueColor: _controller.drive(
+            ColorTween(
+              begin: Theme.of(context).colorScheme.primary,
+              end: Theme.of(context).colorScheme.secondary,
+            ),
           ),
         ),
       ),

@@ -8,88 +8,93 @@ const double textFieldLabelSize = 22;
 class AppTheme {
   /// GLOBAL THEME CONSTANTS
   static final _base = ThemeData(
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(
-          fontSize: 50,
-          fontWeight: FontWeight.w900,
-          fontFamily: "Ubuntu",
-        ),
-        displayMedium: TextStyle(
-          fontSize: 42,
-          fontWeight: FontWeight.w900,
-          fontFamily: "Ubuntu",
-        ),
-        displaySmall: TextStyle(
-          fontSize: 26,
-          fontFamily: "Ubuntu",
-        ),
-        headlineLarge: TextStyle(
-          fontSize: 10,
-          fontFamily: "Ubuntu",
-        ),
-        headlineMedium: TextStyle(
-          fontSize: 10,
-          fontFamily: "Ubuntu",
-        ),
-        headlineSmall: TextStyle(
-          fontSize: 10,
-          fontFamily: "Ubuntu",
-        ),
-
-        /// Tab Bar
-        titleLarge: TextStyle(
-          fontSize: titleLargeFontSize,
-        ),
-
-        /// Text Field Contents
-        titleMedium: TextStyle(
-          fontSize: 20,
-          fontFamily: "Ubuntu",
-        ),
-        titleSmall: TextStyle(
-          fontSize: 10,
-          fontFamily: "Ubuntu",
-        ),
-        bodyLarge: TextStyle(fontSize: 16, fontFamily: "Ubuntu", fontWeight: FontWeight.w400),
-        bodyMedium: TextStyle(
-          fontSize: 12,
-          fontFamily: "Ubuntu",
-        ),
-        bodySmall: TextStyle(
-          fontSize: 10,
-          fontFamily: "Ubuntu",
-        ),
-
-        /// Unspecified Buttons
-        labelLarge: TextStyle(
-          fontSize: 16,
-          fontFamily: "Ubuntu",
-        ),
-
-        labelMedium: TextStyle(
-          fontSize: 20,
-          fontFamily: "Ubuntu",
-        ),
-        labelSmall: TextStyle(
-          fontSize: 10,
-          fontFamily: "Ubuntu",
-        ),
+    textTheme: const TextTheme(
+      displayLarge: TextStyle(
+        fontSize: 50,
+        fontWeight: FontWeight.w900,
+        fontFamily: "Ubuntu",
       ),
-      tabBarTheme: const TabBarTheme(
-        labelStyle: TextStyle(
-          fontSize: titleLargeFontSize,
-          fontFamily: "Ubuntu",
-          fontWeight: FontWeight.bold,
-        ),
-        unselectedLabelStyle: TextStyle(
-          fontSize: titleLargeFontSize - 7,
-          fontFamily: "Ubuntu",
-        ),
+      displayMedium: TextStyle(
+        fontSize: 42,
+        fontWeight: FontWeight.w900,
+        fontFamily: "Ubuntu",
       ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ButtonStyle(
+      displaySmall: TextStyle(
+        fontSize: 26,
+        fontFamily: "Ubuntu",
+      ),
+      headlineLarge: TextStyle(
+        fontSize: 10,
+        fontFamily: "Ubuntu",
+      ),
+      headlineMedium: TextStyle(
+        fontSize: 10,
+        fontFamily: "Ubuntu",
+      ),
+      headlineSmall: TextStyle(
+        fontSize: 10,
+        fontFamily: "Ubuntu",
+      ),
+
+      /// Tab Bar
+      titleLarge: TextStyle(
+        fontSize: titleLargeFontSize,
+      ),
+
+      /// Text Field Contents
+      titleMedium: TextStyle(
+        fontSize: 20,
+        fontFamily: "Ubuntu",
+      ),
+      titleSmall: TextStyle(
+        fontSize: 10,
+        fontFamily: "Ubuntu",
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 16,
+        fontFamily: "Ubuntu",
+      ),
+      bodyMedium: TextStyle(
+        fontSize: 12,
+        fontFamily: "Ubuntu",
+      ),
+      bodySmall: TextStyle(
+        fontSize: 10,
+        fontFamily: "Ubuntu",
+      ),
+
+      /// Unspecified Buttons
+      labelLarge: TextStyle(
+        fontSize: 16,
+        fontFamily: "Ubuntu",
+      ),
+
+      labelMedium: TextStyle(
+        fontSize: 20,
+        fontFamily: "Ubuntu",
+      ),
+      labelSmall: TextStyle(
+        fontSize: 10,
+        fontFamily: "Ubuntu",
+      ),
+    ),
+    tabBarTheme: const TabBarTheme(
+      labelStyle: TextStyle(
+        fontSize: titleLargeFontSize,
+        fontFamily: "Ubuntu",
+        fontWeight: FontWeight.bold,
+      ),
+      unselectedLabelStyle: TextStyle(
+        fontSize: titleLargeFontSize - 7,
+        fontFamily: "Ubuntu",
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ButtonStyle(
         elevation: MaterialStateProperty.resolveWith((states) => 0),
-      ),),);
+      ),
+    ),
+  );
 
   /// LIGHT THEME
   static ThemeData light = _base.copyWith(

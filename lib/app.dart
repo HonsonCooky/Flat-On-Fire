@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class App extends StatelessWidget {
-  App({Key? key}) : super(key: key);
+  const App({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
@@ -24,7 +24,6 @@ class App extends StatelessWidget {
             darkTheme: AppTheme.dark,
             themeMode: themeMode,
             onGenerateRoute: AppRouter.generateRoute,
-            onUnknownRoute: AppRouter.unknownRoute,
             home: const AuthenticationDecider(),
             builder: (context, child) {
               // Setup the system UI overlay components to match the theme

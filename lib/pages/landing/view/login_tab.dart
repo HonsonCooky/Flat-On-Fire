@@ -15,6 +15,7 @@ class LoginTab extends StatefulWidget {
 class _LoginTabState extends State<LoginTab> with ToastMixin {
   bool _isObscure = true;
   String? emailErrMsg, passwordErrMsg;
+  bool _loading = false;
 
   void preFlightCheck([bool isBasic = true]) {
     setState(() {
@@ -28,18 +29,21 @@ class _LoginTabState extends State<LoginTab> with ToastMixin {
   }
 
   void login(Future<String> Function() cb, [bool isBasic = true]) async {
+    setState(() => _loading = true);
     try {
       preFlightCheck(isBasic);
+
+      var login = await cb();
+
+      if (!mounted) return;
+      if (login != loggedInText) {
+        errorToast(login, context);
+      }
     } catch (e) {
       errorToast(e.toString(), context);
       return;
-    }
-
-    var login = await cb();
-
-    if (!mounted) return;
-    if (login != loggedInText) {
-      errorToast(login, context);
+    } finally {
+      setState(() => _loading = false);
     }
   }
 
@@ -53,6 +57,7 @@ class _LoginTabState extends State<LoginTab> with ToastMixin {
     final googleImage = context.read<ViewProvider>().themeMode == ThemeMode.light
         ? 'assets/google_logo_light.png'
         : 'assets/google_logo_dark.png';
+
     return ListView(
       physics: const BouncingScrollPhysics(),
       clipBehavior: Clip.antiAlias,
@@ -89,34 +94,43 @@ class _LoginTabState extends State<LoginTab> with ToastMixin {
         ),
 
         /// Sign In Button
-        ElevatedButton(
-          child: const Text("LOGIN"),
-          onPressed: () => login(
-            () => context.read<AuthProvider>().login(email: widget.email.text, password: widget.password.text),
-          ),
-        ),
+        _loading
+            ? LoadingSpinner(MediaQuery.of(context).size.width / 5)
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ElevatedButton(
+                    child: const Text("LOGIN"),
+                    onPressed: () => login(
+                      () =>
+                          context.read<AuthProvider>().login(email: widget.email.text, password: widget.password.text),
+                    ),
+                  ),
 
-        HorizontalOrLineWidget(
-          label: "OR",
-          padding: 20,
-          color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
-        ),
+                  HorizontalOrLineWidget(
+                    label: "OR",
+                    padding: 20,
+                    color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
+                  ),
 
-        /// Google Sign In Button
-        ElevatedButton.icon(
-          label: const Text("LOGIN WITH GOOGLE"),
-          onPressed: () => login(
-            () => context.read<AuthProvider>().loginWithGoogle(),
-            false,
-          ),
-          style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
-              backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.tertiary)),
-          icon: Image.asset(
-            googleImage,
-            height: (Theme.of(context).textTheme.button?.fontSize ?? 10) + 5,
-            fit: BoxFit.fitHeight,
-          ),
-        ),
+                  /// Google Sign In Button
+                  ElevatedButton.icon(
+                    label: const Text("LOGIN WITH GOOGLE"),
+                    onPressed: () => login(
+                      () => context.read<AuthProvider>().loginWithGoogle(),
+                      false,
+                    ),
+                    style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+                        backgroundColor:
+                            MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.tertiary)),
+                    icon: Image.asset(
+                      googleImage,
+                      height: (Theme.of(context).textTheme.button?.fontSize ?? 10) + 5,
+                      fit: BoxFit.fitHeight,
+                    ),
+                  ),
+                ],
+              ),
 
         const SizedBox(
           height: 20,

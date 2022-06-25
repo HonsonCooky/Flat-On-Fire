@@ -1,11 +1,20 @@
+import 'package:flat_on_fire/domain/models/profile_model.dart';
+
 class UserModel {
-  final String name;
+  final String uid;
+  final bool isAdmin;
+  final ProfileModel profile;
 
-  UserModel(this.name);
+  UserModel(this.uid, this.isAdmin, this.profile);
 
-  UserModel.fromJson(Map<String, dynamic> json) : name = json['name'];
+  UserModel.fromJson(Map<String, dynamic> json)
+      : uid = json["uid"],
+        isAdmin = json["isAdmin"],
+        profile = ProfileModel.fromJson(json["profile"]);
 
   Map<String, dynamic> toJson() => {
-        'name': name,
+        "uid": uid,
+        "isAdmin": isAdmin,
+        "profile": profile.toJson(),
       };
 }

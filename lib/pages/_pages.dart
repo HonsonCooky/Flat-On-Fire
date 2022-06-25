@@ -1,3 +1,3 @@
 export 'common/_common.dart';
-export 'home/_home.dart';
+export 'app/_app.dart';
 export 'landing/_landing.dart';
