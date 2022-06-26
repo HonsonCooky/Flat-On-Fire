@@ -1,14 +1,14 @@
 import 'package:flat_on_fire/_app.dart';
 import 'package:flutter/material.dart';
 
-class LandingPage extends StatefulWidget {
-  const LandingPage({Key? key}) : super(key: key);
+class AuthPage extends StatefulWidget {
+  const AuthPage({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _LandingPageState();
+  State<StatefulWidget> createState() => _AuthPageState();
 }
 
-class _LandingPageState extends State<LandingPage> {
+class _AuthPageState extends State<AuthPage> {
   final email = TextEditingController();
   final password = TextEditingController();
 

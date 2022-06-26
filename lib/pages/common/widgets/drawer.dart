@@ -100,8 +100,8 @@ class _AppDrawerState extends State<AppDrawer> {
               setState(() {
                 selectedIndex = i;
               });
-              Navigator.pop(context);
-              Navigator.popAndPushNamed(context, name);
+              Navigator.popUntil(context, (route) => false);
+              Navigator.pushNamed(context, name);
             },
           );
         },

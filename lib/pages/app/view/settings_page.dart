@@ -63,6 +63,8 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
                   if (signOutText != signedOutText) {
                     errorToast(signOutText, context);
                   }
+                  Navigator.popUntil(context, (route) => false);
+                  Navigator.pushNamed(context, routeAuth);
                 },
                 child: const Text("Logout"),
               ),
