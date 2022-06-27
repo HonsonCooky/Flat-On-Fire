@@ -25,8 +25,8 @@ class _AppState extends State<App> {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
+      theme: ThemeModel.light,
+      darkTheme: ThemeModel.dark,
       themeMode: themeMode,
       initialRoute: userExists ? initialAppRoute : routeAuth,
       routes: routes,

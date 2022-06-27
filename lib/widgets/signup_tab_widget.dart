@@ -49,9 +49,6 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
       if (!mounted) return;
       if (signupText != signedUpText) {
         errorToast(signupText, context);
-      } else {
-        Navigator.popUntil(context, (route) => false);
-        Navigator.pushNamed(context, initialAppRoute);
       }
     } catch (e) {
       errorToast(e.toString(), context);

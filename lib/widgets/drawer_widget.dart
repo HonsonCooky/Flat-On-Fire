@@ -44,7 +44,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ),
               child: Stack(
                 children: [
-                  FofLogo(
+                  FofLogoWidget(
                     offset: Offset(MediaQuery.of(context).size.width / 3, 10),
                   ),
                   Padding(
@@ -100,8 +100,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               setState(() {
                 selectedIndex = i;
               });
-              Navigator.popUntil(context, (route) => false);
-              Navigator.pushNamed(context, name);
             },
           );
         },

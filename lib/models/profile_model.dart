@@ -1,3 +1,4 @@
+/// Profile outlines the public information of a user
 class ProfileModel {
   final String name;
 

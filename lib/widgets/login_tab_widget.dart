@@ -39,9 +39,6 @@ class _LoginTabWidgetState extends State<LoginTabWidget> with ToastMixin {
       if (!mounted) return;
       if (login != loggedInText) {
         errorToast(login, context);
-      } else {
-        Navigator.popUntil(context, (route) => false);
-        Navigator.pushNamed(context, initialAppRoute);
       }
     } catch (e) {
       errorToast(e.toString(), context);

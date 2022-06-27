@@ -10,7 +10,7 @@ const routeGroups = 'Groups';
 const routeTables = 'Tables';
 const routeSettings = 'Settings';
 
-const initialAppRoute = routeSettings;
+const initialAppRoute = routeHome;
 const appRoutes = [
   routeHome,
   routeChores,

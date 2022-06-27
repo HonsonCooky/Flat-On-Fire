@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AppColors {
+class PaletteModel {
   // LIGHT
   static Color lightBackground = const Color(0xffDFDCE3);
   static Color lightPrimary = const Color(0xffF7B733);

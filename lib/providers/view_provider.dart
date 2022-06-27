@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 enum ViewState { ideal, busy }
 
+/// A change notifier that maintains state, and state manipulations about the theme and current UI processing state.
 class ViewProvider extends ChangeNotifier {
   late ViewState _viewState;
   late ThemeMode _themeMode;

@@ -5,7 +5,7 @@ class FofLogoDecoration extends Decoration {
   final Offset? offset;
   final double? size;
 
-  const FofLogoDecoration(this.color, this.offset, this.size);
+  const FofLogoDecoration({required this.color, this.offset, this.size});
 
   @override
   BoxPainter createBoxPainter([VoidCallback? onChanged]) {
