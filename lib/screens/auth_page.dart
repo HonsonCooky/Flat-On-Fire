@@ -116,11 +116,7 @@ class _AuthPageState extends State<AuthPage> {
 
   Widget _tabPages() {
     return Expanded(
-      child: NotificationListener<OverscrollIndicatorNotification>(
-        onNotification: (OverscrollIndicatorNotification overscroll) {
-          overscroll.disallowIndicator();
-          return true;
-        },
+      child: WrapperOverflowRemoved(
         child: TabBarView(
           children: [
             WrapperPadding(child: LoginTabWidget(email, password)),

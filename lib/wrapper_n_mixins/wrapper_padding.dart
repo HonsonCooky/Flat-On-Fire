@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// A Wrapper that ensures contents on some page, are padded with consistent values.
 class WrapperPadding extends StatelessWidget {
   final Widget child;
 

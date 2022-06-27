@@ -18,12 +18,10 @@ class LoadingPage extends StatelessWidget {
               style: Theme.of(context).textTheme.displayLarge,
               textAlign: TextAlign.center,
             ),
-            Text(
-              "... is loading",
+            LoadingTextWidget(
+              text: "... is loading",
               style: Theme.of(context).textTheme.displaySmall,
-              textAlign: TextAlign.center,
             ),
-            LoadingSpinnerWidget(MediaQuery.of(context).size.width / 5)
           ],
         ),
       ),

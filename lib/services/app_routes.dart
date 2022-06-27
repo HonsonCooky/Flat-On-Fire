@@ -1,29 +1,62 @@
-import 'package:flat_on_fire/_app_bucket.dart';
-
-import 'package:flutter/material.dart';
-
-const routeLoading = 'Loading';
-const routeAuth = 'Auth';
-const routeHome = 'Home';
-const routeChores = 'Chores';
-const routeGroups = 'Groups';
-const routeTables = 'Tables';
-const routeSettings = 'Settings';
-
-const initialAppRoute = routeHome;
-const appRoutes = [
-  routeHome,
-  routeChores,
-  routeGroups,
-  routeTables,
-  routeSettings,
-];
-
-Map<String, Widget Function(BuildContext)> routes = {
-  routeLoading: (context) => const LoadingPage(),
-  routeAuth: (context) => const AuthPage(),
-  routeHome: (context) => const HomePage(),
-  routeSettings: (context) => const SettingsPage(),
-};
-
-indexOfDefaultRoute () => appRoutes.indexOf(initialAppRoute);
+enum AppPages {
+  splash,
+  auth,
+  home,
+  chores,
+  groups,
+  tables,
+  settings,
+  error,
+  onBoarding,
+}
+extension AppPageExtension on AppPages {
+  String get toPath {
+    switch (this){
+      case AppPages.splash:
+        return '/splash';
+      case AppPages.auth:
+        return '/auth';
+      case AppPages.home:
+        return '/home';
+      case AppPages.chores:
+        return '/chores';
+      case AppPages.groups:
+        return '/groups';
+      case AppPages.tables:
+        return '/tables';
+      case AppPages.settings:
+        return '/settings';
+      case AppPages.error:
+        return '/error';
+      case AppPages.onBoarding:
+        return '/start';
+      default:
+        return '/';
+    }
+  }
+  
+  String get toName {
+    switch (this) {
+      case AppPages.splash:
+        return "SPLASH";
+      case AppPages.auth:
+        return "AUTH";
+      case AppPages.home:
+        return "HOME";
+      case AppPages.chores:
+        return "CHORES";
+      case AppPages.groups:
+        return "GROUPS";
+      case AppPages.tables:
+        return "TABLES";
+      case AppPages.settings:
+        return "SETTINGS";
+      case AppPages.error:
+        return "ERROR";
+      case AppPages.onBoarding:
+        return "WELCOME";
+      default:
+        return "UNKNOWN";
+    }
+  }
+}

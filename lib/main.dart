@@ -23,8 +23,7 @@ Future main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ViewProvider()),
-        ChangeNotifierProvider(create: (_) => AuthProvider(FirebaseAuth.instance)),
+        ChangeNotifierProvider(create: (_) => AuthService(FirebaseAuth.instance)),
       ],
       child: const App(),
     ),

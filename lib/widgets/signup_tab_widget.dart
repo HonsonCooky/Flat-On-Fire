@@ -66,7 +66,7 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
 
   @override
   Widget build(BuildContext context) {
-    final googleImage = context.read<ViewProvider>().themeMode == ThemeMode.light
+    final googleImage = context.read<AppService>().themeMode == ThemeMode.light
         ? 'assets/google_logo_light.png'
         : 'assets/google_logo_dark.png';
 
@@ -124,7 +124,7 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
                     child: const Text("CREATE ACCOUNT"),
                     onPressed: () => signup(
                       () => context
-                          .read<AuthProvider>()
+                          .read<AuthService>()
                           .signup(email: widget.email.text, name: _name.text, password: widget.password.text),
                     ),
                   ),
@@ -139,7 +139,7 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
                   ElevatedButton.icon(
                     label: const Text("SIGNUP WITH GOOGLE"),
                     onPressed: () => signup(
-                      () => context.read<AuthProvider>().signupWithGoogle(name: _name.text),
+                      () => context.read<AuthService>().signupWithGoogle(name: _name.text),
                       false,
                     ),
                     style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
