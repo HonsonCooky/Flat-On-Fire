@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -33,7 +32,7 @@ class _AppState extends State<App> {
       ],
       child: Builder(
         builder: (context) {
-          var themeMode = context.read<AppService>().themeMode;
+          var themeMode = Provider.of<AppService>(context, listen: true).themeMode;
           final GoRouter goRouter = Provider.of<AppRouter>(context, listen: false).router;
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
@@ -43,26 +42,8 @@ class _AppState extends State<App> {
             routeInformationProvider: goRouter.routeInformationProvider,
             routeInformationParser: goRouter.routeInformationParser,
             routerDelegate: goRouter.routerDelegate,
-            builder: (context, child) {
-              _setSystemUi(context);
-              return child!;
-            },
           );
         },
-      ),
-    );
-  }
-
-  void _setSystemUi(BuildContext context) {
-    var isLightMode = Theme.of(context).brightness == Brightness.light;
-    var brightness = isLightMode ? Brightness.dark : Brightness.light;
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        systemNavigationBarColor: Theme.of(context).colorScheme.primary,
-        statusBarColor: Theme.of(context).colorScheme.primary,
-        statusBarBrightness: brightness,
-        statusBarIconBrightness: brightness,
-        systemNavigationBarIconBrightness: brightness,
       ),
     );
   }

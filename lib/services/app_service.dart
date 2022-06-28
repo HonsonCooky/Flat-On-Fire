@@ -29,13 +29,40 @@ class AppService extends ChangeNotifier {
 
   bool get onBoarded => _onBoarded;
 
+  reset() {
+    _viewState = ViewState.ideal;
+    _themeMode = ThemeMode.light;
+    _loginState = false;
+    _initialized = false;
+    _onBoarded = false;
+    notifyListeners();
+  }
+
+  batch({ViewState? viewState, ThemeMode? themeMode, bool? loginState, bool? initialized, bool? onBoarded}) {
+    _viewState = viewState ?? _viewState;
+    _themeMode = themeMode ?? _themeMode;
+    _loginState = loginState ?? _loginState;
+    _initialized = initialized ?? _initialized;
+    _onBoarded = onBoarded ?? _onBoarded;
+    notifyListeners();
+  }
+
   /// Set the theme of the application
   switchTheme() {
     _themeMode = (_themeMode == ThemeMode.light) ? ThemeMode.dark : ThemeMode.light;
     notifyListeners();
   }
 
-  /// Set the current state of the application
+  set themeMode(ThemeMode value) {
+    _themeMode = value;
+    notifyListeners();
+  }
+
+  set onBoarded(bool value) {
+    _onBoarded = value;
+    notifyListeners();
+  }
+
   set viewState(ViewState viewState) {
     _viewState = viewState;
     notifyListeners();

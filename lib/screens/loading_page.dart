@@ -1,5 +1,4 @@
 import 'package:flat_on_fire/_app_bucket.dart';
-
 import 'package:flutter/material.dart';
 
 class LoadingPage extends StatelessWidget {

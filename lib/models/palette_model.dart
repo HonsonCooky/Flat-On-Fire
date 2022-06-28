@@ -27,11 +27,11 @@ class PaletteModel {
 
   // DARK ON
   static Color darkOnBackground = const Color(0xccf8f8f2);
-  static Color darkOnPrimary = const Color(0xccf8f8f2);
-  static Color darkOnSecondary = const Color(0xccf8f8f2);
+  static Color darkOnPrimary = const Color(0xcc282a36);
+  static Color darkOnSecondary = const Color(0xcc282a36);
   static Color darkOnTertiary = const Color(0xcc282a36);
   static Color darkOnError = const Color(0xcc282a36);
-  static Color darkOnSurface = const Color(0xccf8f8f2);
+  static Color darkOnSurface = const Color(0xcc282a36);
 
   // CONSTANT
   static Color googleBlue = const Color(0xff4285F4);

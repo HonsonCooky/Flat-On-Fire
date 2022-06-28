@@ -13,15 +13,32 @@ class AuthService extends ChangeNotifier {
   final String storeErrorBackup = "Encountered a backend storage error";
 
   AuthService(this._firebaseAuth, this._appService) {
-    _appService.loginState = _firebaseAuth.currentUser != null;
+    initAuthSettings();
+  }
+
+  Future<void> initAuthSettings() async {
+    _appService.initialized = false;
+    try {
+      var userDocument = await userInfo().get();
+      var userSettings = userDocument.data()?.userSettings;
+      if (userSettings != null) {
+        _appService.batch(
+          themeMode: userSettings.themeMode == ThemeMode.light.name ? ThemeMode.light : ThemeMode.dark,
+          onBoarded: userSettings.onBoarded,
+        );
+      }
+    } catch (_) {
+      _appService.reset();
+    } finally {
+      _appService.batch(
+        loginState: _firebaseAuth.currentUser != null,
+        initialized: true,
+      );
+    }
   }
 
   /// Access the Firebase User object
   User? get user => _firebaseAuth.currentUser;
-
-  void setLoginState() {
-    _appService.loginState = _firebaseAuth.currentUser != null;
-  }
 
   void errorToastExecutor({final void Function(String str)? errorToast, required String str}) {
     if (errorToast != null) {
@@ -30,19 +47,29 @@ class AuthService extends ChangeNotifier {
   }
 
   /// Access to the PRIVATE user information
-  DocumentReference userInfo() {
+  DocumentReference<UserModel> userInfo() {
     if (_firebaseAuth.currentUser == null) {
       throw Exception("No user to extract information from");
     }
-    return FirebaseFirestore.instance.doc("$userCollectionName/${_firebaseAuth.currentUser!.uid}");
+    return FirebaseFirestore.instance
+        .doc("$userCollectionName/${_firebaseAuth.currentUser!.uid}")
+        .withConverter<UserModel>(
+          fromFirestore: (snapshot, _) => UserModel.fromJson(snapshot.data()!),
+          toFirestore: (UserModel userModel, _) => userModel.toJson(),
+        );
   }
 
   /// Access to the PUBLIC user information
-  DocumentReference profileInfo() {
-    if (_firebaseAuth.currentUser == null) {
+  DocumentReference<ProfileModel> profileInfo(String? uid) {
+    if (uid == null && _firebaseAuth.currentUser == null) {
       throw Exception("No user to extract information from");
     }
-    return FirebaseFirestore.instance.doc("$profileCollectionName/${_firebaseAuth.currentUser!.uid}");
+    return FirebaseFirestore.instance
+        .doc("$profileCollectionName/${uid ?? _firebaseAuth.currentUser!.uid}")
+        .withConverter<ProfileModel>(
+          fromFirestore: (snapshot, _) => ProfileModel.fromJson(snapshot.data()!),
+          toFirestore: (ProfileModel profileModel, _) => profileModel.toJson(),
+        );
   }
 
   /// Update the user state, and CREATE the PRIVATE and PUBLIC user information in the Firestore
@@ -59,9 +86,9 @@ class AuthService extends ChangeNotifier {
       // Batch create
       var batch = FirebaseFirestore.instance.batch();
       batch.set(userInfo(), userModel.toJson());
-      batch.set(profileInfo(), profileModel.toJson());
+      batch.set(profileInfo(null), profileModel.toJson());
       await batch.commit();
-    } catch (_){
+    } catch (_) {
       // Failed attempt. Remove user from firebase authentication
       await uc.user?.delete();
     }
@@ -75,7 +102,7 @@ class AuthService extends ChangeNotifier {
   }) async {
     try {
       await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
-      setLoginState();
+      await initAuthSettings();
     } on FirebaseException catch (e) {
       errorToastExecutor(errorToast: errorToast, str: e.message ?? authErrorBackup);
     } catch (_) {
@@ -93,7 +120,7 @@ class AuthService extends ChangeNotifier {
     try {
       var uc = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       await _createNewUser(uc: uc, name: name);
-      setLoginState();
+      await initAuthSettings();
     } on FirebaseException catch (e) {
       errorToastExecutor(errorToast: errorToast, str: e.message ?? authErrorBackup);
     } catch (_) {
@@ -117,12 +144,12 @@ class AuthService extends ChangeNotifier {
       // Create/Get access to the user credentials inside firebase
       var uc = await _firebaseAuth.signInWithCredential(credential);
 
-      // If this is a new user, then we should try sign them up 
+      // If this is a new user, then we should try sign them up
       if (uc.additionalUserInfo!.isNewUser) {
         _createNewUser(uc: uc, name: uc.user!.displayName!);
       }
-      
-      setLoginState();
+
+      await initAuthSettings();
     } on FirebaseException catch (e) {
       if (errorToast != null) errorToast(e.message ?? authErrorBackup);
     } catch (_) {
@@ -142,7 +169,7 @@ class AuthService extends ChangeNotifier {
 
     try {
       await _firebaseAuth.signOut();
-      setLoginState();
+      await initAuthSettings();
     } catch (e, s) {
       await FirebaseCrashlytics.instance.recordError(e, s);
       errorToast("Something went wrong. Unable to sign-out.");

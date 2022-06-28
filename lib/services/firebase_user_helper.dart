@@ -6,10 +6,14 @@ import 'package:provider/provider.dart';
 const userCollectionName = "users";
 const profileCollectionName = "profiles";
 
-Future<DocumentSnapshot<UserModel>> getFutureUser(BuildContext context) {
-  var userInfo = context.read<AuthService>().userInfo().withConverter<UserModel>(
-        fromFirestore: (snapshot, _) => UserModel.fromJson(snapshot.data()!),
-        toFirestore: (UserModel userModel, _) => userModel.toJson(),
-      );
-  return userInfo.get(const GetOptions(source: Source.cache));
+Future<DocumentSnapshot<UserModel>>? getFutureUser(BuildContext context) {
+  try {
+    var userInfo = context.read<AuthService>().userInfo().withConverter<UserModel>(
+          fromFirestore: (snapshot, _) => UserModel.fromJson(snapshot.data()!),
+          toFirestore: (UserModel userModel, _) => userModel.toJson(),
+        );
+    return userInfo.get(const GetOptions(source: Source.cache));
+  } catch (_) {
+    return null;
+  }
 }

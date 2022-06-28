@@ -71,12 +71,21 @@ class AppRouter {
     ],
     errorBuilder: (context, state) => ErrorPage(error: state.error.toString()),
     redirect: (state) {
+      // If the app is not initialized, then run loading screen
+      final initialized = appService.initialized;
+      final splashPage = AppPageEnum.splash.toPath;
+      if (!initialized && state.location != splashPage) {
+        return splashPage;
+      } else if (!initialized) {
+        return null;
+      }
+
       final loggedIn = appService.loginState;
       final authPagePath = AppPageEnum.auth.toPath;
       final homePagePath = AppPageEnum.home.toPath;
 
       if (!loggedIn && state.location != authPagePath) return authPagePath;
-      if (loggedIn && state.location == authPagePath) return homePagePath;
+      if (loggedIn && (state.location == authPagePath || state.location == splashPage)) return homePagePath;
       return null;
     },
   );

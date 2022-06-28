@@ -1,11 +1,11 @@
+export 'abstracts/_abstracts_bucket.dart';
 export 'colored_tab_bar_widget.dart';
 export 'drawer_widget.dart';
-export 'fof_logo_widget.dart';
 export 'fof_logo_decoration.dart';
+export 'fof_logo_widget.dart';
 export 'horizontal_or_line_widget.dart';
 export 'loading_spinner_widget.dart';
 export 'loading_text_widget.dart';
 export 'login_tab_widget.dart';
-export 'signup_tab_widget.dart';
 export 'map_to_list_widget.dart';
-export 'abstracts/_abstracts_bucket.dart';
+export 'signup_tab_widget.dart';

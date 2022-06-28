@@ -86,3 +86,11 @@ int currentAppRouteIndex(BuildContext context) {
   var page = visibleAppRoutes.firstWhere((element) => element.toPath == loc, orElse: () => AppPageEnum.splash);
   return visibleAppRoutes.indexOf(page);
 }
+
+String fromPath(String path) {
+  try {
+    return AppPageEnum.values.singleWhere((element) => element.toPath == path).toTitle;
+  } catch (_) {
+    return "Unknown Route";
+  }
+}

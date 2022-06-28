@@ -1,5 +1,6 @@
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class WrapperAppPage extends StatelessWidget {
   final Widget child;
@@ -7,7 +8,7 @@ class WrapperAppPage extends StatelessWidget {
   const WrapperAppPage({Key? key, required this.child}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {    
+  Widget build(BuildContext context) {
     return WrapperFocusShift(
       child: Scaffold(
         appBar: _appBar(context),
@@ -17,10 +18,9 @@ class WrapperAppPage extends StatelessWidget {
     );
   }
 
-
   PreferredSizeWidget _appBar(BuildContext context) {
     return AppBar(
-      title: Text(ModalRoute.of(context)?.settings.name ?? ""),
+      title: Text(fromPath(GoRouter.of(context).location)),
       elevation: 0,
     );
   }

@@ -1,9 +1,9 @@
 import 'package:flat_on_fire/_app_bucket.dart';
-
 import 'package:flutter/material.dart';
 
 class UnknownPageRoute extends StatelessWidget {
   final String name;
+
   const UnknownPageRoute({Key? key, required this.name}) : super(key: key);
 
   @override

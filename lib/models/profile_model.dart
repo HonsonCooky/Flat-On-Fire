@@ -4,8 +4,9 @@ class ProfileModel {
 
   ProfileModel({required this.name});
 
-  ProfileModel.fromJson(Map<String, dynamic> json): name = json["name"];
+  ProfileModel.fromJson(Map<String, dynamic> json) : name = json["name"];
+
   Map<String, dynamic> toJson() => {
-    "name": name,
-  };
+        "name": name,
+      };
 }

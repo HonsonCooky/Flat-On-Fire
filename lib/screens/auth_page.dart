@@ -222,6 +222,10 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
               fit: BoxFit.fitHeight,
             ),
           ),
+
+          const SizedBox(
+            height: 20,
+          )
         ],
       ),
     );

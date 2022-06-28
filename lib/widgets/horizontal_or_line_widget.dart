@@ -4,7 +4,6 @@ class HorizontalOrLineWidget extends StatelessWidget {
   final String label;
   final double padding;
   final Color color;
-  
 
   const HorizontalOrLineWidget({
     Key? key,

@@ -23,7 +23,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   Widget _drawerContent() {
     List<AppPageEnum> pages = visibleAppRoutes;
-    
+
     return ListView.builder(
       padding: EdgeInsets.zero,
       itemCount: pages.length + 1,
@@ -116,7 +116,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   }
 
   Widget _getLeadingIcon(AppPageEnum page) {
-    switch (page){
+    switch (page) {
       case AppPageEnum.home:
         return const Icon(Icons.home);
       case AppPageEnum.chores:

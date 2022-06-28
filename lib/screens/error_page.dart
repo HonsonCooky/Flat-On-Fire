@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 class ErrorPage extends StatelessWidget {
   final String? error;
+
   const ErrorPage({
     Key? key,
     this.error,
@@ -22,9 +23,7 @@ class ErrorPage extends StatelessWidget {
               onPressed: () {
                 GoRouter.of(context).goNamed(AppPageEnum.home.toName);
               },
-              child: const Text(
-                  "Back to Home"
-              ),
+              child: const Text("Back to Home"),
             ),
           ],
         ),
