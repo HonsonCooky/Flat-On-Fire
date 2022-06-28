@@ -1,8 +1,6 @@
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
-
-// Is there a better way to maintain this state?
-// int selectedIndex = indexOfDefaultRoute();
+import 'package:go_router/go_router.dart';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({Key? key}) : super(key: key);
@@ -12,28 +10,32 @@ class DrawerWidget extends StatefulWidget {
 }
 
 class _DrawerWidgetState extends State<DrawerWidget> {
+  late int selectedIndex;
+
   @override
   Widget build(BuildContext context) {
+    selectedIndex = currentAppRouteIndex(context);
     return Drawer(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      // child: _drawerContent(),
+      child: _drawerContent(),
     );
   }
 
-  // Widget _drawerContent() {
-  //   return ListView.builder(
-  //     padding: EdgeInsets.zero,
-  //     itemCount: appRoutesList.length + 1,
-  //     itemBuilder: (context, index) {
-  //       if (index == 0) {
-  //         return _header();
-  //       }
-  //       var name = appRoutesList[index - 1];
-  //       var i = index - 1;
-  //       return _drawerItem(name, i);
-  //     },
-  //   );
-  // }
+  Widget _drawerContent() {
+    List<AppPageEnum> pages = visibleAppRoutes;
+    
+    return ListView.builder(
+      padding: EdgeInsets.zero,
+      itemCount: pages.length + 1,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return _header();
+        }
+        var i = index - 1;
+        return _drawerItem(pages[i], i, context);
+      },
+    );
+  }
 
   Widget _header() {
     return DrawerHeader(
@@ -92,43 +94,41 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     );
   }
 
-  // Widget _drawerItem(String name, int i) {
-  //   return ListTile(
-  //     title: Text(
-  //       name,
-  //       style: Theme.of(context).textTheme.labelMedium?.copyWith(
-  //             color: selectedIndex == i
-  //                 ? Theme.of(context).colorScheme.onSecondary
-  //                 : Theme.of(context).colorScheme.onSurface,
-  //           ),
-  //     ),
-  //     leading: _getLeadingIcon(name),
-  //     tileColor: selectedIndex == i ? Theme.of(context).colorScheme.secondary : null,
-  //     iconColor:
-  //         selectedIndex == i ? Theme.of(context).colorScheme.onSecondary : Theme.of(context).colorScheme.onSurface,
-  //     onTap: () {
-  //       setState(() {
-  //         selectedIndex = i;
-  //       });
-  //       Navigator.of(context).pop();
-  //       Navigator.of(context).popAndPushNamed(name);
-  //     },
-  //   );
-  // }
-  //
-  // Widget _getLeadingIcon(String name) {
-  //   var icon = Icons.perm_contact_calendar_rounded;
-  //   if (name == appRoutesList[0]) {
-  //     icon = Icons.home;
-  //   } else if (name == appRoutesList[1]) {
-  //     icon = Icons.dry_cleaning;
-  //   } else if (name == appRoutesList[2]) {
-  //     icon = Icons.workspaces;
-  //   } else if (name == appRoutesList[3]) {
-  //     icon = Icons.table_view;
-  //   } else if (name == appRoutesList[4]) {
-  //     icon = Icons.settings;
-  //   }
-  //   return Icon(icon);
-  // }
+  Widget _drawerItem(AppPageEnum page, int i, BuildContext context) {
+    return ListTile(
+      title: Text(
+        page.toTitle,
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: selectedIndex == i
+                  ? Theme.of(context).colorScheme.onSecondary
+                  : Theme.of(context).colorScheme.onSurface,
+            ),
+      ),
+      leading: _getLeadingIcon(page),
+      tileColor: selectedIndex == i ? Theme.of(context).colorScheme.secondary : null,
+      iconColor:
+          selectedIndex == i ? Theme.of(context).colorScheme.onSecondary : Theme.of(context).colorScheme.onSurface,
+      onTap: () {
+        Navigator.pop(context);
+        GoRouter.of(context).go(page.toPath);
+      },
+    );
+  }
+
+  Widget _getLeadingIcon(AppPageEnum page) {
+    switch (page){
+      case AppPageEnum.home:
+        return const Icon(Icons.home);
+      case AppPageEnum.chores:
+        return const Icon(Icons.dry_cleaning);
+      case AppPageEnum.groups:
+        return const Icon(Icons.workspaces);
+      case AppPageEnum.tables:
+        return const Icon(Icons.table_view);
+      case AppPageEnum.settings:
+        return const Icon(Icons.settings);
+      default:
+        return const Icon(Icons.perm_contact_calendar_rounded);
+    }
+  }
 }

@@ -1,11 +1,9 @@
 import 'package:firebase_app_check/firebase_app_check.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
 
@@ -20,14 +18,7 @@ Future main() async {
     const platform = MethodChannel('honsoncooky.flutter.dev/appcheck');
     await platform.invokeMethod("installDebug");
   }
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthService(FirebaseAuth.instance)),
-      ],
-      child: const App(),
-    ),
-  );
+  runApp(const App());
 }
 
 extension StringExtension on String {

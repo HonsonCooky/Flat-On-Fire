@@ -71,12 +71,9 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
   Widget _logoutBtn() {
     return TextButton(
       onPressed: () async {
-        var signOutText = await context.read<AuthService>().signOut();
-
-        if (!mounted) return;
-        if (signOutText != signedOutText) {
-          errorToast(signOutText, context);
-        }
+        await context.read<AuthService>().signOut(
+              errorToast: (str) => errorToast(str, context),
+            );
       },
       child: const Text("Logout"),
     );

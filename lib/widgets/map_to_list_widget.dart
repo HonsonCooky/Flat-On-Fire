@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class MapToListWidget extends StatelessWidget {
   final TextStyle textStyle;
-  final Map<String, String> values;
+  final Map<String, String?> values;
 
   const MapToListWidget({Key? key, required this.values, required this.textStyle}) : super(key: key);
 
@@ -15,6 +15,9 @@ class MapToListWidget extends StatelessWidget {
       itemBuilder: (BuildContext context, int index) {
         var k = values.keys.elementAt(index);
         var v = values.values.elementAt(index);
+        if (v == null) {
+          return const SizedBox.shrink();
+        }
         return ListTile(
           dense: true,
           horizontalTitleGap: 20,

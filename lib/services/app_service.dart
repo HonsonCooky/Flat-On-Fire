@@ -10,9 +10,9 @@ enum ViewState { ideal, busy }
 class AppService extends ChangeNotifier {
   late ViewState _viewState;
   late ThemeMode _themeMode;
-  final bool _loginState = false;
-  final bool _initialized = false;
-  final bool _onboarding = false;
+  late bool _loginState = false;
+  late bool _initialized = false;
+  late bool _onBoarded = false;
 
   AppService() {
     _viewState = ViewState.ideal;
@@ -27,17 +27,32 @@ class AppService extends ChangeNotifier {
 
   bool get initialized => _initialized;
 
-  bool get onboarding => _onboarding;
-
-  /// Set the current state of the application
-  setViewState(ViewState viewState) {
-    _viewState = viewState;
-    notifyListeners();
-  }
+  bool get onBoarded => _onBoarded;
 
   /// Set the theme of the application
   switchTheme() {
     _themeMode = (_themeMode == ThemeMode.light) ? ThemeMode.dark : ThemeMode.light;
+    notifyListeners();
+  }
+
+  /// Set the current state of the application
+  set viewState(ViewState viewState) {
+    _viewState = viewState;
+    notifyListeners();
+  }
+
+  set initialized(bool value) {
+    _initialized = value;
+    notifyListeners();
+  }
+
+  set onboarding(bool value) {
+    _onBoarded = value;
+    notifyListeners();
+  }
+
+  set loginState(bool value) {
+    _loginState = value;
     notifyListeners();
   }
 }

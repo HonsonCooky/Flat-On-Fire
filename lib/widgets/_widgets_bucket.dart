@@ -8,3 +8,4 @@ export 'loading_text_widget.dart';
 export 'login_tab_widget.dart';
 export 'signup_tab_widget.dart';
 export 'map_to_list_widget.dart';
+export 'abstracts/_abstracts_bucket.dart';

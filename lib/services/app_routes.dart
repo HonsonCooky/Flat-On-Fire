@@ -1,4 +1,9 @@
-enum AppPages {
+import 'package:flat_on_fire/main.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+/// ALL POTENTIAL APP PAGES
+enum AppPageEnum {
   splash,
   auth,
   home,
@@ -9,54 +14,75 @@ enum AppPages {
   error,
   onBoarding,
 }
-extension AppPageExtension on AppPages {
+
+/// PAGE ENUMS TO STRING INTERPRETATIONS FOR DIFFERENT THINGS
+extension AppPageExtension on AppPageEnum {
   String get toPath {
-    switch (this){
-      case AppPages.splash:
+    switch (this) {
+      case AppPageEnum.splash:
         return '/splash';
-      case AppPages.auth:
+      case AppPageEnum.auth:
         return '/auth';
-      case AppPages.home:
+      case AppPageEnum.home:
         return '/home';
-      case AppPages.chores:
+      case AppPageEnum.chores:
         return '/chores';
-      case AppPages.groups:
+      case AppPageEnum.groups:
         return '/groups';
-      case AppPages.tables:
+      case AppPageEnum.tables:
         return '/tables';
-      case AppPages.settings:
+      case AppPageEnum.settings:
         return '/settings';
-      case AppPages.error:
+      case AppPageEnum.error:
         return '/error';
-      case AppPages.onBoarding:
+      case AppPageEnum.onBoarding:
         return '/start';
       default:
         return '/';
     }
   }
-  
+
   String get toName {
     switch (this) {
-      case AppPages.splash:
-        return "SPLASH";
-      case AppPages.auth:
-        return "AUTH";
-      case AppPages.home:
-        return "HOME";
-      case AppPages.chores:
-        return "CHORES";
-      case AppPages.groups:
-        return "GROUPS";
-      case AppPages.tables:
-        return "TABLES";
-      case AppPages.settings:
-        return "SETTINGS";
-      case AppPages.error:
-        return "ERROR";
-      case AppPages.onBoarding:
-        return "WELCOME";
+      case AppPageEnum.splash:
+        return "splash";
+      case AppPageEnum.auth:
+        return "auth";
+      case AppPageEnum.home:
+        return "home";
+      case AppPageEnum.chores:
+        return "chores";
+      case AppPageEnum.groups:
+        return "groups";
+      case AppPageEnum.tables:
+        return "tables";
+      case AppPageEnum.settings:
+        return "settings";
+      case AppPageEnum.error:
+        return "error";
+      case AppPageEnum.onBoarding:
+        return "welcome";
       default:
-        return "UNKNOWN";
+        return "unknown";
     }
   }
+
+  String get toTitle {
+    return toName.capitalize();
+  }
+}
+
+List<AppPageEnum> get visibleAppRoutes {
+  return [AppPageEnum.home, AppPageEnum.chores, AppPageEnum.groups, AppPageEnum.tables, AppPageEnum.settings];
+}
+
+List<String> routeNamesFromList(List<AppPageEnum>? from) {
+  from ??= visibleAppRoutes;
+  return from.map((e) => e.toTitle).toList();
+}
+
+int currentAppRouteIndex(BuildContext context) {
+  var loc = GoRouter.of(context).location;
+  var page = visibleAppRoutes.firstWhere((element) => element.toPath == loc, orElse: () => AppPageEnum.splash);
+  return visibleAppRoutes.indexOf(page);
 }
