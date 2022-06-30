@@ -1,4 +1,5 @@
 import 'package:flat_on_fire/_app_bucket.dart';
+import 'package:flat_on_fire/screens/groups_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -44,7 +45,7 @@ class AppRouter {
         name: AppPageEnum.groups.toName,
         pageBuilder: (context, state) => MaterialPage(
           key: state.pageKey,
-          child: const UnknownPageRoute(name: "Groups"),
+          child: const GroupsPage(),
         ),
       ),
       // TABLES

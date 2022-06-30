@@ -26,27 +26,42 @@ class _HomePageState extends State<HomePage> with ToastMixin {
           const SizedBox(
             height: 20,
           ),
-          _welcomeText(),
+          _userFutures(),
         ],
       ),
     );
   }
 
-  Widget _welcomeText() {
+  Widget _userFutures() {
     return FutureBuilder(
-      future: getFutureUser(context),
-      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
-        if (snapshot.hasData) {
-          return Text(
-            "Welcome!\n${snapshot.data!.data()!.profile.name}",
-            style: Theme.of(context).textTheme.displayMedium,
+        future: getFutureUser(context),
+        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
+          if (snapshot.hasData) {
+            UserModel? userModel = snapshot.data!.data();
+            if (userModel != null) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _welcomeText(userModel),
+                ],
+              );
+            }
+            return Text(
+              "Unable to retrieve user information at this time",
+              style: Theme.of(context).textTheme.bodyLarge,
+            );
+          }
+          return LoadingTextWidget(
+            text: "Loading home page ...",
+            style: Theme.of(context).textTheme.bodyLarge,
           );
-        }
-        return Text(
-          "Welcome ...",
-          style: Theme.of(context).textTheme.titleLarge,
-        );
-      },
+        });
+  }
+
+  Widget _welcomeText(UserModel userModel) {
+    return Text(
+      "Welcome!\n${userModel.profile.name}",
+      style: Theme.of(context).textTheme.displayMedium,
     );
   }
 }

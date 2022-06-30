@@ -64,7 +64,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    double barHeight = (height - MediaQuery.of(context).viewInsets.bottom) / 3;
+    double barHeight = (height - MediaQuery.of(context).viewInsets.bottom) / 3.2;
 
     return WrapperFocusShift(
       child: Scaffold(
@@ -224,7 +224,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
           ),
 
           const SizedBox(
-            height: 20,
+            height: 40,
           )
         ],
       ),

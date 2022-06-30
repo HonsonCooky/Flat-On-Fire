@@ -8,7 +8,12 @@ class UserModel {
   final ProfileModel profile;
   final UserSettingsModel userSettings;
 
-  UserModel({this.uid, required this.isAdmin, required this.profile, required this.userSettings});
+  UserModel({
+    this.uid,
+    required this.isAdmin,
+    required this.profile,
+    required this.userSettings,
+  });
 
   UserModel.fromJson(Map<String, dynamic> json)
       : uid = json["uid"],

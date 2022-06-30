@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "381231754472-pr8mvchqttbl4p2hi6dlq6fr7k2j0kca.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.honsoncooky.flat_on_fire",
+            "certificate_hash": "d634956ca7088e91f1174022952bded10fd630dc"
+          }
+        },
+        {
           "client_id": "381231754472-sh4hmurdrrd02cd62se6pngnaupqfb7n.apps.googleusercontent.com",
           "client_type": 3
         }
