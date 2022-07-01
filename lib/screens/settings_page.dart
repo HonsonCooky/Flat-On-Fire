@@ -19,14 +19,14 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
   Widget build(BuildContext context) {
     titleStyles = Theme.of(context).textTheme.bodyLarge!;
     final viewState = context.watch<AppService>().viewState;
-    print(viewState);
 
-    return  WrapperAppPage(
+    return WrapperAppPage(
+      resizeToAvoidBottomInset: false,
       child: viewState == ViewState.busy ? _loading() : _settingsBody(),
     );
   }
-  
-  Widget _loading(){
+
+  Widget _loading() {
     return LoadingSpinnerWidget(MediaQuery.of(context).size.width / 4);
   }
 
@@ -42,21 +42,17 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
                 children: [
                   _accountInformation(),
                   _spacer(),
-                  _userSettingsColumn(),
+                  _userSettings(),
                 ],
               ),
             ),
-            Expanded(
-              flex: 2,
-              child: ListView(
-                physics: const BouncingScrollPhysics(),
-                reverse: true,
-                children: [
-                  _spacer(),
-                  _logoutBtn(),
-                  _saveButton(),
-                ],
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _saveButton(),
+                _logoutBtn(),
+                _spacer(),
+              ],
             ),
           ],
         ),
@@ -81,25 +77,29 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
     return FutureBuilder(
       future: getFutureUser(context),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
-        if (snapshot.hasData) {
-          return _userInformationColumn(snapshot.data!.data()!);
-        }
-        return LoadingTextWidget(
-          text: "... finding account information",
-          style: Theme.of(context).textTheme.bodyLarge,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _subHeader("Account"),
+            snapshot.hasData
+                ? _userInformationFromModel(snapshot.data!.data()!)
+                : LoadingTextWidget(
+                    text: "... finding account information",
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  )
+          ],
         );
       },
     );
   }
 
-  Widget _userInformationColumn(UserModel um) {
+  Widget _userInformationFromModel(UserModel um) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _subHeader("Account"),
-        MapToListWidget(
+        MapToEditableListWidget(
           values: {
-            "UID": um.uid,
+            "UID": "//${um.uid}",
             "Name": um.profile.name,
             "On Boarding": um.userSettings.onBoarded ? "Complete" : "In-Complete"
           },
@@ -109,7 +109,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
     );
   }
 
-  Widget _userSettingsColumn() {
+  Widget _userSettings() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class MapToListWidget extends StatelessWidget {
+class MapToEditableListWidget extends StatelessWidget {
   final TextStyle textStyle;
   final Map<String, String?> values;
 
-  const MapToListWidget({Key? key, required this.values, required this.textStyle}) : super(key: key);
+  const MapToEditableListWidget({Key? key, required this.values, required this.textStyle}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +25,16 @@ class MapToListWidget extends StatelessWidget {
               k,
               style: textStyle.copyWith(fontWeight: FontWeight.bold),
             ),
-            Text(
-              v,
+            TextField(
+              enabled: !v.startsWith("//"),
+              decoration: InputDecoration(
+                hintText: v,
+                border: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+              ),
               style: textStyle.copyWith(fontWeight: FontWeight.normal),
             ),
             SizedBox(

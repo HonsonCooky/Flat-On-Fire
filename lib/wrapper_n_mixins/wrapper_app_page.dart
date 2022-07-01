@@ -4,8 +4,9 @@ import 'package:go_router/go_router.dart';
 
 class WrapperAppPage extends StatelessWidget {
   final Widget child;
+  final bool? resizeToAvoidBottomInset;
 
-  const WrapperAppPage({Key? key, required this.child}) : super(key: key);
+  const WrapperAppPage({Key? key, required this.child, this.resizeToAvoidBottomInset}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +17,7 @@ class WrapperAppPage extends StatelessWidget {
         drawerEdgeDragWidth: MediaQuery.of(context).size.width / 3,
         drawerScrimColor: Theme.of(context).colorScheme.tertiary,
         body: child,
+        resizeToAvoidBottomInset: resizeToAvoidBottomInset,
       ),
     );
   }
