@@ -7,9 +7,6 @@ class ColoredTabBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).colorScheme.primary,
-      child: tabBar,
-    );
+    return tabBar;
   }
 }

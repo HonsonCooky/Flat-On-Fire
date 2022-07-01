@@ -28,7 +28,7 @@ class ThemeModel {
         fontFamily: "Ubuntu",
       ),
       headlineMedium: TextStyle(
-        fontSize: 10,
+        fontSize: 24,
         fontFamily: "Ubuntu",
       ),
       headlineSmall: TextStyle(
@@ -136,14 +136,16 @@ class ThemeModel {
       titleMedium: _base.textTheme.titleMedium?.copyWith(color: PaletteModel.lightOnPrimary),
     ),
     textSelectionTheme: TextSelectionThemeData(
-      cursorColor: PaletteModel.lightPrimary,
+      cursorColor: PaletteModel.lightSecondary,
       selectionColor: PaletteAssistant.alpha(PaletteModel.lightPrimary, 0.4),
-      selectionHandleColor: PaletteModel.lightPrimary,
+      selectionHandleColor: PaletteModel.lightTertiary,
     ),
     inputDecorationTheme: InputDecorationTheme(
-      labelStyle:
-          _base.textTheme.labelMedium?.copyWith(color: PaletteModel.lightOnBackground, fontSize: textFieldLabelSize),
-      floatingLabelStyle: _base.textTheme.labelMedium?.copyWith(color: PaletteModel.lightPrimary),
+      labelStyle: _base.textTheme.labelMedium?.copyWith(
+        color: PaletteModel.lightOnBackground,
+        fontSize: textFieldLabelSize,
+      ),
+      floatingLabelStyle: _base.textTheme.labelMedium?.copyWith(color: PaletteModel.lightSecondary),
       focusColor: PaletteModel.lightOnBackground,
       focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: PaletteModel.lightOnBackground)),
       iconColor: PaletteModel.lightOnBackground,

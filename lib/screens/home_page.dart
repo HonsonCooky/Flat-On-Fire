@@ -48,19 +48,19 @@ class _HomePageState extends State<HomePage> with ToastMixin {
             }
             return Text(
               "Unable to retrieve user information at this time",
-              style: Theme.of(context).textTheme.bodyLarge,
+              style: Theme.of(context).textTheme.titleLarge,
             );
           }
           return LoadingTextWidget(
             text: "Loading home page ...",
-            style: Theme.of(context).textTheme.bodyLarge,
+            style: Theme.of(context).textTheme.titleLarge,
           );
         });
   }
 
   Widget _welcomeText(UserModel userModel) {
     return Text(
-      "Welcome!\n${userModel.profile.name}",
+      "Welcome\n${userModel.profile.name}!",
       style: Theme.of(context).textTheme.displayMedium,
     );
   }

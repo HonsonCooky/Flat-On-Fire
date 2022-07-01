@@ -18,10 +18,16 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
   @override
   Widget build(BuildContext context) {
     titleStyles = Theme.of(context).textTheme.bodyLarge!;
+    final viewState = context.watch<AppService>().viewState;
+    print(viewState);
 
-    return WrapperAppPage(
-      child: _settingsBody(),
+    return  WrapperAppPage(
+      child: viewState == ViewState.busy ? _loading() : _settingsBody(),
     );
+  }
+  
+  Widget _loading(){
+    return LoadingSpinnerWidget(MediaQuery.of(context).size.width / 4);
   }
 
   Widget _settingsBody() {
@@ -35,9 +41,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
                 physics: const BouncingScrollPhysics(),
                 children: [
                   _accountInformation(),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  _spacer(),
                   _userSettingsColumn(),
                 ],
               ),
@@ -48,20 +52,28 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
                 physics: const BouncingScrollPhysics(),
                 reverse: true,
                 children: [
+                  _spacer(),
                   _logoutBtn(),
                   _saveButton(),
                 ],
               ),
             ),
-            const Expanded(
-              flex: 1,
-              child: SizedBox(
-                height: 20,
-              ),
-            ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _subHeader(String text) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height / 40),
+      child: Text(text, style: Theme.of(context).textTheme.displaySmall),
+    );
+  }
+
+  Widget _spacer() {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height / 20,
     );
   }
 
@@ -74,7 +86,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
         }
         return LoadingTextWidget(
           text: "... finding account information",
-          style: Theme.of(context).textTheme.displayMedium,
+          style: Theme.of(context).textTheme.bodyLarge,
         );
       },
     );
@@ -82,12 +94,9 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
 
   Widget _userInformationColumn(UserModel um) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        HorizontalOrLineWidget(
-          label: "Account",
-          padding: MediaQuery.of(context).size.height / 20,
-          color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
-        ),
+        _subHeader("Account"),
         MapToListWidget(
           values: {
             "UID": um.uid,
@@ -102,12 +111,9 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
 
   Widget _userSettingsColumn() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        HorizontalOrLineWidget(
-          label: "Settings",
-          padding: MediaQuery.of(context).size.height / 20,
-          color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
-        ),
+        _subHeader("App"),
         _themeChanger(),
       ],
     );
@@ -131,6 +137,8 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
           ],
         ),
         contentPadding: EdgeInsets.zero,
+        dense: true,
+        visualDensity: VisualDensity.compact,
         value: isDark,
         onChanged: (b) => appService.switchTheme(),
       );
@@ -138,7 +146,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
   }
 
   Widget _saveButton() {
-    return TextButton(
+    return ElevatedButton(
       onPressed: () async {
         await context.read<AuthService>().userInfo().update({
           "userSettings": UserSettingsModel(
@@ -152,13 +160,21 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
   }
 
   Widget _logoutBtn() {
-    return TextButton(
+    return ElevatedButton(
       onPressed: () async {
         await context.read<AuthService>().signOut(
               errorToast: (str) => errorToast(str, context),
             );
       },
-      child: const Text("Logout"),
+      style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+            backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.tertiary),
+          ),
+      child: Text(
+        "Logout",
+        style: Theme.of(context).elevatedButtonTheme.style?.textStyle?.resolve({})?.copyWith(
+          color: Theme.of(context).colorScheme.onTertiary,
+        ),
+      ),
     );
   }
 }

@@ -21,15 +21,12 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
     super.dispose();
   }
 
-  void mandatoryCheck() {
+  bool _mandatoryCheck() {
     setState(() {
       emailErrMsg = _email.text.isEmpty ? "No Email Provided" : null;
       passwordErrMsg = _password.text.isEmpty ? "No Password Provided" : null;
     });
-
-    if (emailErrMsg != null || passwordErrMsg != null) {
-      throw Exception("Invalid User Credentials");
-    }
+    return emailErrMsg == null && passwordErrMsg == null;
   }
 
   void resetErrors() {
@@ -40,31 +37,34 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
   }
 
   void attempt({
-    required Future<void> Function() attemptCallback,
+    required Future<String> Function() attemptCallback,
     bool requiresCheck = true,
-    VoidCallback? optionalCheck,
+    bool Function()? optionalCheck,
   }) async {
-    try {
-      // Don't bother checking the backend if the information is known to be wrong.
-      if (requiresCheck) {
-        mandatoryCheck();
-        // Some screens have more than email and password, so execute their other checks
-        if (optionalCheck != null) {
-          optionalCheck();
-        }
+    // Don't bother checking the backend if the information is known to be wrong.
+    bool checkPass = true;
+    if (requiresCheck) {
+      checkPass &= _mandatoryCheck();
+      // Some screens have more than email and password, so execute their other checks
+      if (optionalCheck != null) {
+        checkPass &= optionalCheck();
       }
-
-      await attemptCallback();
-    } catch (e) {
-      errorToast(e.toString(), context);
+    }
+    
+    if (!checkPass){
+      errorToast("Invalid user credentials", context);
       return;
+    }
+
+    var res = await attemptCallback();
+    if (mounted && res != AuthService.successfulOperation){
+      errorToast(res, context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double barHeight = (height - MediaQuery.of(context).viewInsets.bottom) / 3.2;
+    double fontSize = (MediaQuery.of(context).size.height - MediaQuery.of(context).viewInsets.bottom) / 3;
 
     return WrapperFocusShift(
       child: Scaffold(
@@ -72,8 +72,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
           length: 2,
           child: Column(
             children: [
-              _header(height, barHeight),
-              _tabBar(),
+              _header(fontSize),
               _tabViews(),
               _googleSignIn(),
             ],
@@ -85,15 +84,20 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
   }
 
   /// An expanded container, with the Logo and Title stacked inside.
-  Widget _header(double height, double barHeight) {
-    return Expanded(
-      flex: 10,
-      child: Container(
-        color: Theme.of(context).colorScheme.primary,
-        child: Stack(
+  Widget _header(double fontSize) {
+    return Container(
+      color: Theme.of(context).colorScheme.primary,
+      child: WrapperOverflowRemoved(
+        child: ListView(
+          shrinkWrap: true,
           children: [
-            _headerLogo(height, barHeight),
-            _headerText(height, barHeight),
+            Stack(
+              children: [
+                _headerLogo(fontSize),
+                _headerText(fontSize),
+              ],
+            ),
+            _tabBar(),
           ],
         ),
       ),
@@ -101,33 +105,42 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
   }
 
   /// An implementation of the FofLogoWidget
-  Widget _headerLogo(double height, double barHeight) {
+  Widget _headerLogo(double fontSize) {
+    double alpha = fontSize / (MediaQuery.of(context).size.height / 3) - 0.01;
+
     return FofLogoWidget(
-      size: barHeight,
-      offset: Offset(MediaQuery.of(context).size.width - barHeight, barHeight / 10),
+      color: PaletteAssistant.alpha(
+        Theme.of(context).colorScheme.background,
+        alpha,
+      ),
+      size: fontSize,
+      offset: Offset(MediaQuery.of(context).size.width - fontSize, 0),
     );
   }
 
   /// A padded column that represents the title of the application.
-  Widget _headerText(double height, double barHeight) {
-    return Padding(
+  Widget _headerText(double fontSize) {
+    return Container(
       padding: const EdgeInsets.only(left: 20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      width: fontSize + (MediaQuery.of(context).viewInsets.bottom),
+      alignment: Alignment.bottomLeft,
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        runAlignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           Text(
             "FLAT",
             style: Theme.of(context).textTheme.headline1?.copyWith(
                   color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: barHeight / 3,
+                  fontSize: fontSize / 3,
                 ),
           ),
           Text(
             "ON",
             style: Theme.of(context).textTheme.headline1?.copyWith(
                   color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: barHeight / 6,
+                  fontSize: fontSize / 6,
                   fontWeight: FontWeight.w400,
                 ),
           ),
@@ -135,7 +148,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
             "FIRE",
             style: Theme.of(context).textTheme.headline1?.copyWith(
                   color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: barHeight / 3,
+                  fontSize: fontSize / 3,
                 ),
           ),
         ],
@@ -144,23 +157,20 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
   }
 
   Widget _tabBar() {
-    return const ColoredTabBarWidget(
-      tabBar: TabBar(
-        tabs: [
-          Tab(
-            text: "Login",
-          ),
-          Tab(
-            text: "Signup",
-          ),
-        ],
-      ),
+    return const TabBar(
+      tabs: [
+        Tab(
+          text: "Login",
+        ),
+        Tab(
+          text: "Signup",
+        ),
+      ],
     );
   }
 
   Widget _tabViews() {
     return Expanded(
-      flex: 12,
       child: WrapperOverflowRemoved(
         child: TabBarView(
           children: [
@@ -207,12 +217,15 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
 
           /// Google Sign In Button
           ElevatedButton.icon(
-            label: const Text("SIGN IN WITH GOOGLE"),
+            label: Text(
+              "SIGN IN WITH GOOGLE",
+              style: Theme.of(context).elevatedButtonTheme.style?.textStyle?.resolve({})?.copyWith(
+                color: Theme.of(context).colorScheme.onTertiary,
+              ),
+            ),
             onPressed: () => attempt(
               requiresCheck: false,
-              attemptCallback: () => context.read<AuthService>().googleSignupLogin(
-                    errorToast: (str) => errorToast(str, context),
-                  ),
+              attemptCallback: () => context.read<AuthService>().googleSignupLogin(),
             ),
             style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
                 backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.tertiary)),
@@ -223,9 +236,9 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
             ),
           ),
 
-          const SizedBox(
-            height: 40,
-          )
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 20,
+          ),
         ],
       ),
     );

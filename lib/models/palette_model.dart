@@ -13,7 +13,7 @@ class PaletteModel {
   static Color lightOnBackground = const Color(0xcc000000);
   static Color lightOnPrimary = const Color(0xcc000000);
   static Color lightOnSecondary = const Color(0xccffffff);
-  static Color lightOnTertiary = const Color(0xcc000000);
+  static Color lightOnTertiary = const Color(0xccffffff);
   static Color lightOnError = const Color(0xffFC4A1A);
   static Color lightOnSurface = const Color(0xcc000000);
 

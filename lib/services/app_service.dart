@@ -34,7 +34,6 @@ class AppService extends ChangeNotifier {
     _themeMode = ThemeMode.light;
     _loginState = false;
     _initialized = false;
-    _onBoarded = false;
     notifyListeners();
   }
 

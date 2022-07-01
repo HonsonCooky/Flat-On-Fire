@@ -13,14 +13,18 @@ class WrapperAppPage extends StatelessWidget {
       child: Scaffold(
         appBar: _appBar(context),
         drawer: const DrawerWidget(),
+        drawerEdgeDragWidth: MediaQuery.of(context).size.width / 3,
+        drawerScrimColor: Theme.of(context).colorScheme.tertiary,
         body: child,
       ),
     );
   }
 
   PreferredSizeWidget _appBar(BuildContext context) {
+    TextStyle? textStyle = Theme.of(context).textTheme.titleLarge;
     return AppBar(
-      title: Text(fromPath(GoRouter.of(context).location)),
+      toolbarHeight: (textStyle?.fontSize ?? 10) * 2,
+      title: Text(fromPath(GoRouter.of(context).location), style: textStyle),
       elevation: 0,
     );
   }

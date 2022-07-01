@@ -19,7 +19,7 @@ class SignupTabWidget extends AuthenticationTab {
 
 class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
   final _name = TextEditingController();
-  String? emailErrMsg, nameErrMsg, passwordErrMsg;
+  String? nameErrMsg;
   bool _isObscure = true;
 
   @override
@@ -28,14 +28,11 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
     super.dispose();
   }
 
-  void preFlightCheck() {
+  bool preFlightCheck() {
     setState(() {
       nameErrMsg = _name.text.isEmpty ? "No Name Provided" : null;
     });
-
-    if (nameErrMsg != null) {
-      throw Exception("Invalid User Credentials");
-    }
+    return nameErrMsg == null;
   }
 
   void resetErrors() {
@@ -47,6 +44,16 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
 
   @override
   Widget build(BuildContext context) {
+    final viewState = context.watch<AppService>().viewState;
+    return viewState == ViewState.busy ? _loading() : _signupTabContents();
+  }
+
+
+  Widget _loading(){
+    return LoadingSpinnerWidget(MediaQuery.of(context).size.width / 4);
+  }
+  
+  Widget _signupTabContents(){
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -59,7 +66,7 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
                 onTap: resetErrors,
                 decoration: InputDecoration(
                   labelText: "Email",
-                  errorText: emailErrMsg,
+                  errorText: widget.emailErrMsg,
                 ),
                 controller: widget.email,
               ),
@@ -81,7 +88,7 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
                 obscureText: _isObscure,
                 decoration: InputDecoration(
                   labelText: 'Password',
-                  errorText: passwordErrMsg,
+                  errorText: widget.passwordErrMsg,
                   suffixIcon: IconButton(
                     icon: Icon(_isObscure ? Icons.visibility : Icons.visibility_off),
                     onPressed: () {
@@ -102,12 +109,12 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
         ElevatedButton(
           child: const Text("CREATE ACCOUNT"),
           onPressed: () => widget.attempt(
-            attemptCallback: () => context.read<AuthService>().signup(
-                  email: widget.email.text,
-                  name: _name.text,
-                  password: widget.password.text,
-                  errorToast: (str) => errorToast(str, context),
-                ),
+              attemptCallback: () => context.read<AuthService>().signup(
+                email: widget.email.text,
+                name: _name.text,
+                password: widget.password.text,
+              ),
+              optionalCheck: preFlightCheck
           ),
         ),
       ],

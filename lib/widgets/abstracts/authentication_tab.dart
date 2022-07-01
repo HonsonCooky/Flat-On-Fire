@@ -6,9 +6,9 @@ abstract class AuthenticationTab extends StatefulWidget {
   final String? emailErrMsg, passwordErrMsg;
   final VoidCallback resetErrors;
   final void Function({
-    required Future<void> Function() attemptCallback,
+    required Future<String> Function() attemptCallback,
     bool requiresCheck,
-    VoidCallback? optionalCheck,
+    bool Function()? optionalCheck,
   }) attempt;
 
   const AuthenticationTab({

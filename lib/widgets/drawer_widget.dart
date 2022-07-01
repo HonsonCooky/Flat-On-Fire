@@ -64,27 +64,27 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   Widget _headerText() {
     return Padding(
-      padding: const EdgeInsets.only(left: 20),
+      padding: const EdgeInsets.only(left: 10),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             "FLAT",
-            style: Theme.of(context).textTheme.headline2?.copyWith(
+            style: Theme.of(context).textTheme.displayMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onPrimary,
                   fontWeight: FontWeight.w900,
                 ),
           ),
           Text(
             "ON",
-            style: Theme.of(context).textTheme.headline3?.copyWith(
+            style: Theme.of(context).textTheme.displaySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
           ),
           Text(
             "FIRE",
-            style: Theme.of(context).textTheme.headline2?.copyWith(
+            style: Theme.of(context).textTheme.displayMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onPrimary,
                   fontWeight: FontWeight.w900,
                 ),
@@ -95,16 +95,17 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   }
 
   Widget _drawerItem(AppPageEnum page, int i, BuildContext context) {
+    TextStyle? textStyle = Theme.of(context).textTheme.labelMedium;
     return ListTile(
+      dense: true,
       title: Text(
         page.toTitle,
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: selectedIndex == i
-                  ? Theme.of(context).colorScheme.onSecondary
-                  : Theme.of(context).colorScheme.onSurface,
-            ),
+        style: textStyle?.copyWith(
+          color:
+              selectedIndex == i ? Theme.of(context).colorScheme.onSecondary : Theme.of(context).colorScheme.onSurface,
+        ),
       ),
-      leading: _getLeadingIcon(page),
+      leading: _getLeadingIcon(page, textStyle?.fontSize),
       tileColor: selectedIndex == i ? Theme.of(context).colorScheme.secondary : null,
       iconColor:
           selectedIndex == i ? Theme.of(context).colorScheme.onSecondary : Theme.of(context).colorScheme.onSurface,
@@ -115,20 +116,31 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     );
   }
 
-  Widget _getLeadingIcon(AppPageEnum page) {
+  Widget _getLeadingIcon(AppPageEnum page, double? size) {
+    late IconData icon;
     switch (page) {
       case AppPageEnum.home:
-        return const Icon(Icons.home);
+        icon = Icons.home;
+        break;
       case AppPageEnum.chores:
-        return const Icon(Icons.dry_cleaning);
+        icon = Icons.dry_cleaning;
+        break;
       case AppPageEnum.groups:
-        return const Icon(Icons.workspaces);
+        icon = Icons.workspaces;
+        break;
       case AppPageEnum.tables:
-        return const Icon(Icons.table_view);
+        icon = Icons.table_view;
+        break;
       case AppPageEnum.settings:
-        return const Icon(Icons.settings);
+        icon = Icons.settings;
+        break;
       default:
-        return const Icon(Icons.perm_contact_calendar_rounded);
+        icon = Icons.perm_contact_calendar_rounded;
+        break;
     }
+    return Icon(
+      icon,
+      size: size,
+    );
   }
 }

@@ -24,7 +24,7 @@ class _FofLogoPainter extends BoxPainter {
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
     TextPainter textPainter = TextPainter(textDirection: TextDirection.rtl);
 
-    var icon = Icons.perm_contact_calendar_rounded;
+    var icon = Icons.perm_contact_calendar;
     textPainter.text = TextSpan(
       text: String.fromCharCode(icon.codePoint),
       style: TextStyle(

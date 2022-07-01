@@ -81,6 +81,7 @@ class AppRouter {
         return null;
       }
 
+
       final loggedIn = appService.loginState;
       final authPagePath = AppPageEnum.auth.toPath;
       final homePagePath = AppPageEnum.home.toPath;

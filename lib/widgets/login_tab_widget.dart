@@ -22,6 +22,15 @@ class _LoginTabWidgetState extends State<LoginTabWidget> with ToastMixin {
 
   @override
   Widget build(BuildContext context) {
+    final viewState = context.watch<AppService>().viewState;
+    return viewState == ViewState.busy ? _loading() : _loginTabContents();
+  }
+  
+  Widget _loading(){
+    return LoadingSpinnerWidget(MediaQuery.of(context).size.width / 4);
+  }
+  
+  Widget _loginTabContents(){
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -29,7 +38,7 @@ class _LoginTabWidgetState extends State<LoginTabWidget> with ToastMixin {
           child: ListView(
             physics: const BouncingScrollPhysics(),
             children: [
-              /// Email Text Boxc
+              /// Email Text Box
               TextField(
                 onTap: widget.resetErrors,
                 decoration: InputDecoration(
@@ -68,10 +77,9 @@ class _LoginTabWidgetState extends State<LoginTabWidget> with ToastMixin {
           child: const Text("LOGIN"),
           onPressed: () => widget.attempt(
             attemptCallback: () => context.read<AuthService>().login(
-                  email: widget.email.text,
-                  password: widget.password.text,
-                  errorToast: (str) => errorToast(str, context),
-                ),
+              email: widget.email.text,
+              password: widget.password.text,
+            ),
           ),
         ),
       ],

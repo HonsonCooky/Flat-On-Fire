@@ -18,20 +18,21 @@ class MapToListWidget extends StatelessWidget {
         if (v == null) {
           return const SizedBox.shrink();
         }
-        return ListTile(
-          dense: true,
-          horizontalTitleGap: 20,
-          leading: Text(
-            k,
-            style: textStyle.copyWith(fontWeight: FontWeight.bold),
-            textAlign: TextAlign.left,
-          ),
-          title: Text(
-            v,
-            style: textStyle.copyWith(fontWeight: FontWeight.normal),
-            textAlign: TextAlign.right,
-          ),
-          contentPadding: EdgeInsets.zero,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              k,
+              style: textStyle.copyWith(fontWeight: FontWeight.bold),
+            ),
+            Text(
+              v,
+              style: textStyle.copyWith(fontWeight: FontWeight.normal),
+            ),
+            SizedBox(
+              height: textStyle.fontSize,
+            )
+          ],
         );
       },
     );

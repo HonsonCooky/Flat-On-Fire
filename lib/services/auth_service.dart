@@ -10,8 +10,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 class AuthService extends ChangeNotifier {
   final FirebaseAuth _firebaseAuth;
   final AppService _appService;
-  final String authErrorBackup = "Encountered an authentication error";
-  final String storeErrorBackup = "Encountered a backend storage error";
+  static const String successfulOperation = "Success";
+  static const String authErrorBackup = "Encountered an authentication error";
+  static const String storeErrorBackup = "Encountered a backend storage error";
 
   AuthService(this._firebaseAuth, this._appService) {
     _initAuthSettings();
@@ -19,12 +20,6 @@ class AuthService extends ChangeNotifier {
 
   /// Access the Firebase User object
   User? get user => _firebaseAuth.currentUser;
-
-  void errorToastExecutor({final void Function(String str)? errorToast, required String str}) {
-    if (errorToast != null) {
-      errorToast(str);
-    }
-  }
 
   /// Access to the PRIVATE user information
   DocumentReference<UserModel> userInfo() {
@@ -68,6 +63,7 @@ class AuthService extends ChangeNotifier {
       _appService.batch(
         loginState: _firebaseAuth.currentUser != null,
         initialized: true,
+        viewState: ViewState.ideal,
       );
     }
   }
@@ -95,37 +91,47 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  _failedAttempt(){
+    _appService.viewState = ViewState.ideal;
+  }
+
   /// Login with email and password
-  Future<void> login({
+  Future<String> login({
     required String email,
     required String password,
-    final void Function(String str)? errorToast,
   }) async {
+    _appService.viewState = ViewState.busy;
     try {
       await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
       await _initAuthSettings();
+      return successfulOperation;
     } on FirebaseException catch (e) {
-      errorToastExecutor(errorToast: errorToast, str: e.message ?? authErrorBackup);
+      _failedAttempt();
+      return e.message ?? authErrorBackup;
     } catch (_) {
-      errorToastExecutor(errorToast: errorToast, str: "Authentication Failed");
+      _failedAttempt();
+      return "Authentication Failed";
     }
   }
 
   /// Signup with email and password
-  Future<void> signup({
+  Future<String> signup({
     required String email,
     required String name,
     required String password,
-    final void Function(String str)? errorToast,
   }) async {
+    _appService.viewState = ViewState.busy;
     try {
       var uc = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       await _createNewUser(uc: uc, name: name);
       await _initAuthSettings();
+      return successfulOperation;
     } on FirebaseException catch (e) {
-      errorToastExecutor(errorToast: errorToast, str: e.message ?? authErrorBackup);
+      _failedAttempt();
+      return e.message ?? authErrorBackup;
     } catch (_) {
-      errorToastExecutor(errorToast: errorToast, str: "Signup Failed");
+      _failedAttempt();
+      return "Signup Failed";
     }
   }
 
@@ -140,7 +146,8 @@ class AuthService extends ChangeNotifier {
   }
 
   /// Login with Google
-  Future<void> googleSignupLogin({final void Function(String str)? errorToast}) async {
+  Future<String> googleSignupLogin() async {
+    _appService.viewState = ViewState.busy;
     await _attemptGoogleSignOut();
 
     try {
@@ -163,21 +170,26 @@ class AuthService extends ChangeNotifier {
       }
 
       await _initAuthSettings();
+      return successfulOperation;
     } on FirebaseException catch (e) {
-      if (errorToast != null) errorToast(e.message ?? authErrorBackup);
+      _failedAttempt();
+      return e.message ?? authErrorBackup;
     } catch (_) {
-      if (errorToast != null) errorToast("Google Authentication Failed");
+      _failedAttempt();
+      return "Google Authentication Failed";
     }
   }
 
   /// Sign out and (attempt google sign out)
   Future<void> signOut({required final void Function(String str) errorToast}) async {
+    _appService.viewState = ViewState.busy;
     await _attemptGoogleSignOut();
 
     try {
       await _firebaseAuth.signOut();
       await _initAuthSettings();
     } catch (e, s) {
+      _failedAttempt();
       await FirebaseCrashlytics.instance.recordError(e, s);
       errorToast("Something went wrong. Unable to sign-out.");
     }

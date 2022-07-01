@@ -5,8 +5,7 @@ abstract class ToastMixin {
     final s = ScaffoldMessenger.of(context);
     s.showSnackBar(
       SnackBar(
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(20.0),
+        behavior: SnackBarBehavior.fixed,
         content: Text(
           msg,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -22,27 +21,12 @@ abstract class ToastMixin {
     final s = ScaffoldMessenger.of(context);
     s.showSnackBar(
       SnackBar(
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(20.0),
-        content: Row(
-          children: [
-            Icon(
-              Icons.warning,
-              size: 20,
-              color: Theme.of(context).colorScheme.onSecondary,
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            Expanded(
-              child: Text(
-                msg,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.onSecondary,
-                    ),
+        behavior: SnackBarBehavior.fixed,
+        content: Text(
+          msg,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSecondary,
               ),
-            ),
-          ],
         ),
         backgroundColor: Theme.of(context).colorScheme.secondary,
       ),
@@ -52,28 +36,13 @@ abstract class ToastMixin {
   void errorToast(String msg, BuildContext context) {
     final s = ScaffoldMessenger.of(context);
     s.showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.all(20.0),
+      behavior: SnackBarBehavior.fixed,
       dismissDirection: DismissDirection.horizontal,
-      content: Row(
-        children: [
-          Icon(
-            Icons.error,
-            size: 20,
-            color: Theme.of(context).colorScheme.onError,
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          Expanded(
-            child: Text(
-              msg,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onError,
-                  ),
+      content: Text(
+        msg,
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Theme.of(context).colorScheme.onError,
             ),
-          ),
-        ],
       ),
       backgroundColor: Theme.of(context).colorScheme.error,
     ));
@@ -82,28 +51,13 @@ abstract class ToastMixin {
   void devErrorToast(String id, BuildContext context) {
     final s = ScaffoldMessenger.of(context);
     s.showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.all(20.0),
+      behavior: SnackBarBehavior.fixed,
       dismissDirection: DismissDirection.horizontal,
-      content: Row(
-        children: [
-          Icon(
-            Icons.error,
-            size: 20,
-            color: Theme.of(context).colorScheme.onError,
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          Expanded(
-            child: Text(
-              "The developer of this app did an oopsie\nReference: ${id}",
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onError,
-                  ),
+      content: Text(
+        "The developer of this app did an oopsie\nReference: ${id}",
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Theme.of(context).colorScheme.onError,
             ),
-          ),
-        ],
       ),
       backgroundColor: Theme.of(context).colorScheme.error,
     ));
