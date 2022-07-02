@@ -12,16 +12,16 @@ class ThemeModel {
       displayLarge: TextStyle(
         fontSize: 50,
         fontWeight: FontWeight.w900,
-        fontFamily: "Ubuntu",
+        fontFamily: "Merriweather",
       ),
       displayMedium: TextStyle(
         fontSize: 42,
         fontWeight: FontWeight.w900,
-        fontFamily: "Ubuntu",
+        fontFamily: "Merriweather",
       ),
       displaySmall: TextStyle(
         fontSize: 26,
-        fontFamily: "Ubuntu",
+        fontFamily: "Merriweather",
       ),
       headlineLarge: TextStyle(
         fontSize: 10,
@@ -66,17 +66,19 @@ class ThemeModel {
 
       /// Unspecified Buttons
       labelLarge: TextStyle(
-        fontSize: 16,
+        fontSize: 20,
         fontFamily: "Ubuntu",
       ),
 
       labelMedium: TextStyle(
-        fontSize: 20,
+        fontSize: 18,
         fontFamily: "Ubuntu",
+        fontWeight: FontWeight.normal,
       ),
       labelSmall: TextStyle(
-        fontSize: 10,
+        fontSize: 12,
         fontFamily: "Ubuntu",
+        fontWeight: FontWeight.normal,
       ),
     ),
     tabBarTheme: const TabBarTheme(
@@ -102,8 +104,8 @@ class ThemeModel {
       style: ButtonStyle(
         textStyle: MaterialStateProperty.resolveWith(
           (states) => const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
             fontFamily: "Ubuntu",
           ),
         ),
@@ -189,37 +191,6 @@ class ThemeModel {
       onBackground: PaletteModel.darkOnBackground,
       surface: PaletteModel.darkSurface,
       onSurface: PaletteModel.darkOnSurface,
-    ),
-    textTheme: _base.textTheme.copyWith(
-      labelMedium: _base.textTheme.labelMedium?.copyWith(color: PaletteModel.darkOnPrimary),
-      labelLarge: _base.textTheme.labelLarge?.copyWith(color: PaletteModel.darkOnPrimary),
-      titleMedium: _base.textTheme.titleMedium?.copyWith(color: PaletteModel.darkOnPrimary),
-    ),
-    textSelectionTheme: TextSelectionThemeData(
-      cursorColor: PaletteModel.darkSecondary,
-      selectionColor: PaletteAssistant.alpha(PaletteModel.darkSecondary, 0.4),
-      selectionHandleColor: PaletteModel.darkSecondary,
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      labelStyle:
-          _base.textTheme.labelMedium?.copyWith(color: PaletteModel.darkOnBackground, fontSize: textFieldLabelSize),
-      floatingLabelStyle: _base.textTheme.labelMedium?.copyWith(color: PaletteModel.darkSecondary),
-      focusColor: PaletteModel.darkOnBackground,
-      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: PaletteModel.darkOnBackground)),
-      iconColor: PaletteModel.darkOnBackground,
-      isDense: true,
-    ),
-    tabBarTheme: _base.tabBarTheme.copyWith(
-      indicator: UnderlineTabIndicator(borderSide: BorderSide(width: 4, color: PaletteModel.darkSecondary)),
-      labelColor: PaletteModel.darkOnPrimary,
-      unselectedLabelColor: PaletteAssistant.alpha(PaletteModel.darkOnPrimary),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: _base.elevatedButtonTheme.style?.copyWith(
-          overlayColor:
-              MaterialStateProperty.resolveWith((states) => PaletteAssistant.alpha(PaletteModel.darkOnSecondary, 0.3)),
-          foregroundColor: MaterialStateProperty.resolveWith((states) => PaletteModel.darkOnSecondary),
-          backgroundColor: MaterialStateProperty.resolveWith((states) => PaletteModel.darkSecondary)),
     ),
   );
 }

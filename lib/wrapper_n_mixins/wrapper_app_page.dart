@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 class WrapperAppPage extends StatelessWidget {
   final Widget child;
   final bool? resizeToAvoidBottomInset;
-
-  const WrapperAppPage({Key? key, required this.child, this.resizeToAvoidBottomInset}) : super(key: key);
+  
+  const WrapperAppPage({Key? key, required this.child, this.resizeToAvoidBottomInset = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

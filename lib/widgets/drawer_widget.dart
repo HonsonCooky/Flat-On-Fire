@@ -58,7 +58,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   Widget _headerIcon() {
     return FofLogoWidget(
-      offset: Offset(MediaQuery.of(context).size.width / 3, 10),
+      offset: Offset(MediaQuery.of(context).size.width / 3, 0),
     );
   }
 
@@ -72,9 +72,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           Text(
             "FLAT",
             style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontWeight: FontWeight.w900,
-                ),
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontWeight: FontWeight.w900,
+                fontSize: (Theme.of(context).textTheme.displayMedium?.fontSize ?? 20) - 5),
           ),
           Text(
             "ON",
@@ -85,9 +85,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           Text(
             "FIRE",
             style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontWeight: FontWeight.w900,
-                ),
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontWeight: FontWeight.w900,
+                fontSize: (Theme.of(context).textTheme.displayMedium?.fontSize ?? 20) - 5),
           ),
         ],
       ),

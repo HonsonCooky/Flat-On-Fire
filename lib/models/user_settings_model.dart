@@ -2,7 +2,7 @@ class UserSettingsModel {
   final String themeMode;
   final bool onBoarded;
 
-  UserSettingsModel(this.themeMode, this.onBoarded);
+  UserSettingsModel({required this.themeMode, required this.onBoarded});
 
   UserSettingsModel.fromJson(Map<String, dynamic> json)
       : themeMode = json["themeMode"],

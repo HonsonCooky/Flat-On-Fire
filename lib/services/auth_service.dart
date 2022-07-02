@@ -47,6 +47,24 @@ class AuthService extends ChangeNotifier {
         );
   }
 
+  updateUser({UserSettingsModel? userSettingsModel, ProfileModel? profileModel}) async {
+    var batch = FirebaseFirestore.instance.batch();
+    Map<String, dynamic> userUpdate = {};
+    Map<String, dynamic> profileUpdate = {};
+
+    if (userSettingsModel != null) {
+      userUpdate.putIfAbsent("userSettings", () => userSettingsModel.toJson());
+    }
+    if (profileModel != null) {
+      userUpdate.putIfAbsent("profile", () => profileModel.toJson());
+      profileUpdate = profileModel.toJson();
+    }
+
+    batch.update(userInfo(), userUpdate);
+    batch.update(profileInfo(null), profileUpdate);
+    await batch.commit();
+  }
+
   Future<void> _initAuthSettings() async {
     try {
       var userDocument = await userInfo().getCacheFirst();
@@ -58,7 +76,7 @@ class AuthService extends ChangeNotifier {
         );
       }
     } catch (_) {
-      _appService.reset();
+      // Finally will ensure the UI components react accordingly in all scenarios
     } finally {
       _appService.batch(
         loginState: _firebaseAuth.currentUser != null,
@@ -76,7 +94,7 @@ class AuthService extends ChangeNotifier {
         uid: uc.user?.uid,
         isAdmin: false,
         profile: profileModel,
-        userSettings: UserSettingsModel(_appService.themeMode.name, onBoarded),
+        userSettings: UserSettingsModel(themeMode: _appService.themeMode.name, onBoarded: onBoarded),
       );
 
       // Batch create
@@ -91,7 +109,7 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  _failedAttempt(){
+  _failedAttempt() {
     _appService.viewState = ViewState.ideal;
   }
 
@@ -180,18 +198,34 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  Future<String> deleteUser() async {
+    _appService.viewState = ViewState.busy;
+    try {
+      await userInfo().delete();
+      await profileInfo(null).delete();
+      await _firebaseAuth.currentUser?.delete();
+      await _initAuthSettings();
+      return successfulOperation;
+    } catch (e, s) {
+      _failedAttempt();
+      await FirebaseCrashlytics.instance.recordError(e, s);
+      return "Something went wrong. Unable to delete user. $e";
+    }
+  }
+
   /// Sign out and (attempt google sign out)
-  Future<void> signOut({required final void Function(String str) errorToast}) async {
+  Future<String> signOut() async {
     _appService.viewState = ViewState.busy;
     await _attemptGoogleSignOut();
 
     try {
       await _firebaseAuth.signOut();
       await _initAuthSettings();
+      return successfulOperation;
     } catch (e, s) {
       _failedAttempt();
       await FirebaseCrashlytics.instance.recordError(e, s);
-      errorToast("Something went wrong. Unable to sign-out.");
+      return "Something went wrong. Unable to sign-out.";
     }
   }
 }

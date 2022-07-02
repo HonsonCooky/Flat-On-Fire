@@ -121,8 +121,8 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
   /// A padded column that represents the title of the application.
   Widget _headerText(double fontSize) {
     return Container(
-      padding: const EdgeInsets.only(left: 20),
-      width: fontSize + (MediaQuery.of(context).viewInsets.bottom),
+      padding: const EdgeInsets.only(left: 20, right: 20),
+      width: (fontSize + MediaQuery.of(context).viewInsets.bottom),
       alignment: Alignment.bottomLeft,
       child: Wrap(
         alignment: WrapAlignment.spaceBetween,
@@ -133,7 +133,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
             "FLAT",
             style: Theme.of(context).textTheme.headline1?.copyWith(
                   color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: fontSize / 3,
+                  fontSize: fontSize / 3.5,
                 ),
           ),
           Text(
@@ -148,7 +148,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
             "FIRE",
             style: Theme.of(context).textTheme.headline1?.copyWith(
                   color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: fontSize / 3,
+                  fontSize: fontSize / 3.5,
                 ),
           ),
         ],
