@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -14,20 +13,19 @@ class SettingsPage extends StatefulWidget {
 class _SettingPageState extends State<SettingsPage> with ToastMixin {
   final _name = TextEditingController();
 
+  // ----------------------------------------------------------------------------------------------------------------
+  // MAIN
+  // ----------------------------------------------------------------------------------------------------------------
+
   @override
   Widget build(BuildContext context) {
-    final viewState = context.watch<AppService>().viewState;
-
     return WrapperAppPage(
-      child: viewState == ViewState.busy ? _loading() : _settingsBody(),
+      child: _settingsBody(),
     );
   }
 
-  Widget _loading() {
-    return LoadingSpinnerWidget(MediaQuery.of(context).size.width / 4);
-  }
-
   Widget _settingsBody() {
+    var textStyle = Theme.of(context).textTheme.labelMedium;
     return WrapperPadding(
       child: WrapperOverflowRemoved(
         child: Column(
@@ -37,10 +35,10 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
                 physics: const BouncingScrollPhysics(),
                 children: [
                   _spacer(),
-                  _accountInformation(Theme.of(context).textTheme.labelMedium),
-                  _themeChanger(Theme.of(context).textTheme.labelMedium),
+                  _accountSettings(textStyle),
+                  _appSettings(textStyle),
                   _spacer(),
-                  _futureSaveButton(),
+                  _futureSaveButton(textStyle),
                 ],
               ),
             ),
@@ -58,100 +56,56 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
     );
   }
 
+  // ----------------------------------------------------------------------------------------------------------------
+  // HELPERS
+  // ----------------------------------------------------------------------------------------------------------------
+
   Widget _spacer() {
     return SizedBox(
       height: MediaQuery.of(context).size.height / 20,
     );
   }
 
-  Widget _accountInformation(TextStyle? textStyle) {
+  // ----------------------------------------------------------------------------------------------------------------
+  // ACCOUNT SETTINGS
+  // ----------------------------------------------------------------------------------------------------------------
+
+  Widget _accountSettings(TextStyle? textStyle) {
     return FutureBuilder(
-      future: getFutureUser(context),
+      future: getUser(context),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
-        return snapshot.hasData
-            ? _userInformationFromModel(snapshot.data!.data()!, textStyle)
-            : LoadingTextWidget(
-                text: "... finding account information",
-                style: textStyle,
-              );
+        if (snapshot.hasError) return _accountError(textStyle);
+        if (snapshot.hasData) return _accountSuccess(snapshot.data!.data()!, textStyle);
+        return _awaitingAccountInformation(textStyle);
       },
     );
   }
 
-  Widget _userInformationFromModel(UserModel um, TextStyle? textStyle) {
+  Widget _accountError(TextStyle? textStyle) {
+    return Text(
+      "Unable to retrieve account information at this time",
+      style: textStyle,
+    );
+  }
+
+  Widget _awaitingAccountInformation(TextStyle? textStyle) {
+    return LoadingTextWidget(
+      text: "... finding account information",
+      style: textStyle,
+    );
+  }
+
+  Widget _accountSuccess(UserModel um, TextStyle? textStyle) {
     return ListView(
       padding: EdgeInsets.zero,
       shrinkWrap: true,
       children: [
-        _uneditableTextEntry("Account Number", um.uid!, textStyle),
+        UneditableTextEntryWidget(title: "Account Number", value: um.uid!, textStyle: textStyle),
         SizedBox(height: textStyle?.fontSize),
-        _editableTextEntry("Name", um.profile.name, _name, textStyle),
+        EditableTextEntryWidget(title: "Name", value: um.profile.name, controller: _name, textStyle: textStyle),
         SizedBox(height: textStyle?.fontSize),
         _onBoardedChanger(textStyle),
         SizedBox(height: textStyle?.fontSize),
-      ],
-    );
-  }
-
-  Widget _uneditableTextEntry(String title, String value, TextStyle? textStyle) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          title,
-          style: textStyle?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                value,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: textStyle?.copyWith(
-                  fontWeight: FontWeight.normal,
-                  color: PaletteAssistant.alpha(textStyle.color ?? Colors.black, 0.4),
-                ),
-              ),
-            ),
-            IconButton(
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              splashRadius: textStyle?.fontSize,
-              iconSize: textStyle?.fontSize,
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: value)).then((value) => successToast("Copied Text", context));
-              },
-              icon: const Icon(Icons.copy),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _editableTextEntry(String title, String value, TextEditingController controller, TextStyle? textStyle) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          title,
-          style: textStyle?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: value,
-            border: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            errorBorder: InputBorder.none,
-            disabledBorder: InputBorder.none,
-            contentPadding: EdgeInsets.zero,
-          ),
-          style: textStyle?.copyWith(fontWeight: FontWeight.normal),
-        ),
       ],
     );
   }
@@ -160,9 +114,9 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
     return Consumer<AppService>(
       builder: (context, AppService appService, child) {
         bool isOnboarded = appService.onBoarded;
-        return _booleanSwitch(
+        return BooleanSwitcherWidget(
           title: "On Boarded",
-          hints: ["(Completed)", "(Redo)"],
+          hints: const ["(Completed)", "(Redo)"],
           isOn: isOnboarded,
           explanation: "Deselecting this value, will take you back through the tutorial when you login again.",
           onChanged: (b) => appService.onBoarded = b,
@@ -172,13 +126,23 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
     );
   }
 
+  // ----------------------------------------------------------------------------------------------------------------
+  // APP SETTINGS
+  // ----------------------------------------------------------------------------------------------------------------
+
+  Widget _appSettings(TextStyle? textStyle) {
+    return Column(
+      children: [_themeChanger(textStyle)],
+    );
+  }
+
   Widget _themeChanger(TextStyle? textStyle) {
     return Consumer<AppService>(
       builder: (context, AppService appService, child) {
         bool isDark = ThemeMode.dark == appService.themeMode;
-        return _booleanSwitch(
+        return BooleanSwitcherWidget(
           title: "Theme",
-          hints: ["(Dark)", "(Light)"],
+          hints: const ["(Dark)", "(Light)"],
           explanation:
               "The theme sets the user interface colors. Dark mode uses dark colors. Light mode used light colors. "
               "Currently, your are in ${isDark ? "dark" : "light"} mode.",
@@ -190,51 +154,25 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
     );
   }
 
-  Widget _booleanSwitch({
-    required String title,
-    required List<String> hints,
-    required bool isOn,
-    required String explanation,
-    void Function(bool)? onChanged,
-    TextStyle? textStyle,
-  }) {
-    assert(hints.length == 2);
-    return Tooltip(
-      message: explanation,
-      margin: const EdgeInsets.only(left: 20, right: 20, top: 5),
-      padding: const EdgeInsets.all(10),
-      child: SwitchListTile(
-        title: Row(
-          children: [
-            Text(
-              title,
-              style: textStyle?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            Expanded(
-              child: Text(
-                isOn ? hints[0] : hints[1],
-                style: textStyle?.copyWith(fontWeight: FontWeight.normal),
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.right,
-              ),
-            ),
-          ],
-        ),
-        contentPadding: EdgeInsets.zero,
-        dense: true,
-        visualDensity: VisualDensity.compact,
-        value: isOn,
-        onChanged: onChanged,
-      ),
+  // ----------------------------------------------------------------------------------------------------------------
+  // SAVE FEATURE
+  // ----------------------------------------------------------------------------------------------------------------
+
+  Widget _futureSaveButton(TextStyle? textStyle) {
+    return FutureBuilder(
+      future: getUser(context),
+      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
+        if (snapshot.hasError) return _noSaveButton(textStyle);
+        if (snapshot.hasData) return _saveButton(snapshot.data!.data()!);
+        return LoadingSpinnerWidget(textStyle?.fontSize ?? 20);
+      },
     );
   }
 
-  Widget _futureSaveButton() {
-    return FutureBuilder(
-      future: getFutureUser(context),
-      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
-        return snapshot.hasData ? _saveButton(snapshot.data!.data()!) : _spacer();
-      },
+  Widget _noSaveButton(TextStyle? textStyle) {
+    return Text(
+      "Cannot save without account information",
+      style: textStyle,
     );
   }
 
@@ -258,9 +196,16 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
           color: Theme.of(context).colorScheme.onPrimary,
         ),
       ),
-      icon: const Icon(Icons.save),
+      icon: Icon(
+        Icons.save,
+        color: Theme.of(context).colorScheme.onPrimary,
+      ),
     );
   }
+
+  // ----------------------------------------------------------------------------------------------------------------
+  // ACCOUNT SESSION MANAGEMENT
+  // ----------------------------------------------------------------------------------------------------------------
 
   Widget _logoutBtn() {
     return ElevatedButton.icon(

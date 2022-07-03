@@ -44,13 +44,7 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
 
   @override
   Widget build(BuildContext context) {
-    final viewState = context.watch<AppService>().viewState;
-    return viewState == ViewState.busy ? _loading() : _signupTabContents();
-  }
-
-
-  Widget _loading(){
-    return LoadingSpinnerWidget(MediaQuery.of(context).size.width / 4);
+    return _signupTabContents();
   }
   
   Widget _signupTabContents(){
