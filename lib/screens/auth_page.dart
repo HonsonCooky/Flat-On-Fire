@@ -50,31 +50,31 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
         checkPass &= optionalCheck();
       }
     }
-    
-    if (!checkPass){
+
+    if (!checkPass) {
       errorToast("Invalid user credentials", context);
       return;
     }
 
     var res = await attemptCallback();
-    if (mounted && res != AuthService.successfulOperation){
+    if (mounted && res != AuthService.successfulOperation) {
       errorToast(res, context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final viewState = context.watch<AppService>().viewState;
     double fontSize = (MediaQuery.of(context).size.height - MediaQuery.of(context).viewInsets.bottom) / 3;
-
     return WrapperFocusShift(
-      child: Scaffold(
-        body: DefaultTabController(
-          length: 2,
-          child: Column(
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          body: Column(
             children: [
               _header(fontSize),
-              _tabViews(),
-              _googleSignIn(),
+              viewState == ViewState.busy ? Expanded(child: _loading(context)) : _tabViews(),
+              viewState == ViewState.busy ? const SizedBox() : _googleSignIn(),
             ],
           ),
         ),
@@ -83,22 +83,27 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
     );
   }
 
+  Widget _loading(BuildContext context) {
+    return LoadingSpinnerWidget(MediaQuery.of(context).size.width / 4);
+  }
+
   /// An expanded container, with the Logo and Title stacked inside.
   Widget _header(double fontSize) {
     return Container(
       color: Theme.of(context).colorScheme.primary,
       child: WrapperOverflowRemoved(
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            Stack(
-              children: [
-                _headerLogo(fontSize),
-                _headerText(fontSize),
-              ],
-            ),
-            _tabBar(),
-          ],
+        child: SafeArea(
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  _headerLogo(fontSize),
+                  _headerText(fontSize),
+                ],
+              ),
+              _tabBar(),
+            ],
+          ),
         ),
       ),
     );

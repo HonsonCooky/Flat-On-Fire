@@ -1,4 +1,4 @@
-import 'package:flat_on_fire/main.dart';
+import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

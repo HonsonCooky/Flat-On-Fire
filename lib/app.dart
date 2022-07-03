@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
@@ -46,5 +47,36 @@ class _AppState extends State<App> {
         },
       ),
     );
+  }
+}
+
+
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
+  }
+}
+
+extension FirestoreDocumentExtension<T> on DocumentReference<T> {
+  Future<DocumentSnapshot<T>> getCacheFirst() async {
+    try {
+      var ds = await get(const GetOptions(source: Source.cache));
+      if (!ds.exists) return get(const GetOptions(source: Source.server));
+      return ds;
+    } catch (_) {
+      return get(const GetOptions(source: Source.server));
+    }
+  }
+}
+
+extension FirestoreQueryExtension<T> on Query<T> {
+  Future<QuerySnapshot<T>> getCacheFirst() async {
+    try {
+      var qs = await get(const GetOptions(source: Source.cache));
+      if (qs.docs.isEmpty) return get(const GetOptions(source: Source.server));
+      return qs;
+    } catch (_) {
+      return get(const GetOptions(source: Source.server));
+    }
   }
 }

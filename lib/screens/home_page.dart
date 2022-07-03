@@ -16,6 +16,10 @@ class _HomePageState extends State<HomePage> with ToastMixin {
       child: _homeBody(),
     );
   }
+  
+  // ----------------------------------------------------------------------------------------------------------------
+  // MAIN
+  // ----------------------------------------------------------------------------------------------------------------
 
   Widget _homeBody() {
     return WrapperPadding(
@@ -30,37 +34,40 @@ class _HomePageState extends State<HomePage> with ToastMixin {
       ),
     );
   }
+  
+  // ----------------------------------------------------------------------------------------------------------------
+  // WELCOME TEXT
+  // ----------------------------------------------------------------------------------------------------------------
 
   Widget _welcomeTextFuture() {
     return FutureBuilder(
-      future: getUser(context),
+      future: getUser(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
-        if (snapshot.hasData) {
-          UserModel? userModel = snapshot.data!.data()!;
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _welcomeText(userModel),
-            ],
-          );
-        } else if (snapshot.hasError) {
-          return Text(
-            "Unable to retrieve user information at this time",
-            style: Theme.of(context).textTheme.titleLarge,
-          );
-        }
-        return LoadingTextWidget(
-          text: "Loading home page ...",
-          style: Theme.of(context).textTheme.titleLarge,
-        );
+        if (snapshot.hasError) return _errorWelcomeText(Theme.of(context).textTheme.titleLarge);
+        if (snapshot.hasData) return _welcomeText(snapshot.data!.data()!, Theme.of(context).textTheme.displayMedium);
+        return _awaitingWelcomeText(Theme.of(context).textTheme.titleLarge);
       },
     );
   }
 
-  Widget _welcomeText(UserModel userModel) {
+  Widget _awaitingWelcomeText(TextStyle? textStyle) {
+    return LoadingTextWidget(
+      text: "Loading home page ...",
+      style: textStyle,
+    );
+  }
+
+  Widget _errorWelcomeText(TextStyle? textStyle) {
     return Text(
-      "Welcome\n${userModel.profile.name}!",
-      style: Theme.of(context).textTheme.displayMedium,
+      "Unable to retrieve user information at this time",
+      style: textStyle,
+    );
+  }
+
+  Widget _welcomeText(UserModel userModel, TextStyle? textStyle) {
+    return Text(
+      "Welcome\n${userModel.userProfile.name}!",
+      style: textStyle,
     );
   }
 }

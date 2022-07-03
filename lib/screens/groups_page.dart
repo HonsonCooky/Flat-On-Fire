@@ -16,32 +16,39 @@ class _GroupsPageState extends State<GroupsPage> {
   }
 
   Widget _groupsBody() {
+    var textStyle = Theme.of(context).textTheme.labelMedium;
     return Column(
-      children: [],
+      children: [
+        _userGroups(textStyle),
+      ],
     );
   }
 
-  Widget _groupsFuture() {
+  Widget _userGroups(TextStyle? textStyle) {
     return FutureBuilder(
-      future: getUser(context),
+      future: getUser(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
-        if (snapshot.hasData) {
-          UserModel? userModel = snapshot.data!.data();
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [],
-          );
-        } else if (snapshot.hasError) {
-          return Text(
-            "Unable to retrieve user information at this time",
-            style: Theme.of(context).textTheme.titleLarge,
-          );
-        }
-        return LoadingTextWidget(
-          text: "Loading home page ...",
-          style: Theme.of(context).textTheme.titleLarge,
-        );
+        if (snapshot.hasError) return _userGroupsError(textStyle);
+        if (snapshot.hasData) return _userGroupsList(snapshot.data!.data()!, textStyle);
+        return _awaitingUserGroups(textStyle);
       },
+    );
+  }
+
+  Widget _awaitingUserGroups(TextStyle? textStyle) {
+    return LoadingTextWidget(text: "... finding group information", style: textStyle);
+  }
+
+  Widget _userGroupsError(TextStyle? textStyle) {
+    return Text(
+      "Unable to retrieve group information",
+      style: textStyle,
+    );
+  }
+
+  Widget _userGroupsList(UserModel userModel, TextStyle? textStyle) {
+    return Column(
+      children: [],
     );
   }
 }

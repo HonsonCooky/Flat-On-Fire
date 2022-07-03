@@ -2,17 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
-import 'package:flat_on_fire/main.dart';
-import 'package:flat_on_fire/models/user_settings_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService extends ChangeNotifier {
-  final FirebaseAuth _firebaseAuth;
-  final AppService _appService;
   static const String successfulOperation = "Success";
   static const String authErrorBackup = "Encountered an authentication error";
   static const String storeErrorBackup = "Encountered a backend storage error";
+  final FirebaseAuth _firebaseAuth;
+  final AppService _appService;
 
   AuthService(this._firebaseAuth, this._appService) {
     _initAuthSettings();
@@ -21,53 +19,9 @@ class AuthService extends ChangeNotifier {
   /// Access the Firebase User object
   User? get user => _firebaseAuth.currentUser;
 
-  /// Access to the PRIVATE user information
-  DocumentReference<UserModel> userInfo() {
-    if (_firebaseAuth.currentUser == null) {
-      throw Exception("No user to extract information from");
-    }
-    return FirebaseFirestore.instance
-        .doc("$userCollectionName/${_firebaseAuth.currentUser!.uid}")
-        .withConverter<UserModel>(
-          fromFirestore: (snapshot, _) => UserModel.fromJson(snapshot.data()!),
-          toFirestore: (userModel, _) => userModel.toJson(),
-        );
-  }
-
-  /// Access to the PUBLIC user information
-  DocumentReference<ProfileModel> profileInfo(String? uid) {
-    if (uid == null && _firebaseAuth.currentUser == null) {
-      throw Exception("No user to extract information from");
-    }
-    return FirebaseFirestore.instance
-        .doc("$profileCollectionName/${uid ?? _firebaseAuth.currentUser!.uid}")
-        .withConverter<ProfileModel>(
-          fromFirestore: (snapshot, _) => ProfileModel.fromJson(snapshot.data()!),
-          toFirestore: (profileModel, _) => profileModel.toJson(),
-        );
-  }
-
-  updateUser({UserSettingsModel? userSettingsModel, ProfileModel? profileModel}) async {
-    var batch = FirebaseFirestore.instance.batch();
-    Map<String, dynamic> userUpdate = {};
-    Map<String, dynamic> profileUpdate = {};
-
-    if (userSettingsModel != null) {
-      userUpdate.putIfAbsent("userSettings", () => userSettingsModel.toJson());
-    }
-    if (profileModel != null) {
-      userUpdate.putIfAbsent("profile", () => profileModel.toJson());
-      profileUpdate = profileModel.toJson();
-    }
-
-    batch.update(userInfo(), userUpdate);
-    batch.update(profileInfo(null), profileUpdate);
-    await batch.commit();
-  }
-
   Future<void> _initAuthSettings() async {
     try {
-      var userDocument = await userInfo().getCacheFirst();
+      var userDocument = await getUser()!;
       var userSettings = userDocument.data()?.userSettings;
       if (userSettings != null) {
         _appService.batch(
@@ -83,29 +37,6 @@ class AuthService extends ChangeNotifier {
         initialized: true,
         viewState: ViewState.ideal,
       );
-    }
-  }
-
-  /// Update the user state, and CREATE the PRIVATE and PUBLIC user information in the Firestore
-  _createNewUser({required UserCredential uc, required String name, bool onBoarded = true}) async {
-    try {
-      ProfileModel profileModel = ProfileModel(name: name);
-      UserModel userModel = UserModel(
-        uid: uc.user?.uid,
-        isAdmin: false,
-        profile: profileModel,
-        userSettings: UserSettingsModel(themeMode: _appService.themeMode.name, onBoarded: onBoarded),
-      );
-
-      // Batch create
-      var batch = FirebaseFirestore.instance.batch();
-      batch.set<UserModel>(userInfo(), userModel);
-      batch.set<ProfileModel>(profileInfo(null), profileModel);
-      await batch.commit();
-    } catch (e) {
-      // Failed attempt. Remove user from firebase authentication
-      await uc.user?.delete();
-      rethrow;
     }
   }
 
@@ -141,7 +72,7 @@ class AuthService extends ChangeNotifier {
     _appService.viewState = ViewState.busy;
     try {
       var uc = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
-      await _createNewUser(uc: uc, name: name);
+      await createNewUser(uc: uc, name: name, themeModeName: _appService.themeMode.name);
       await _initAuthSettings();
       return successfulOperation;
     } on FirebaseException catch (e) {
@@ -181,10 +112,11 @@ class AuthService extends ChangeNotifier {
 
       // Create/Get access to the user credentials inside firebase
       var uc = await _firebaseAuth.signInWithCredential(credential);
+      var userInfo = await userExists();
 
       // If this is a new user, then we should try sign them up
-      if (uc.additionalUserInfo!.isNewUser) {
-        await _createNewUser(uc: uc, name: uc.user!.displayName!);
+      if (uc.additionalUserInfo!.isNewUser || !userInfo) {
+        await createNewUser(uc: uc, name: uc.user!.displayName!, themeModeName: _appService.themeMode.name);
       }
 
       await _initAuthSettings();
@@ -201,9 +133,13 @@ class AuthService extends ChangeNotifier {
   Future<String> deleteUser() async {
     _appService.viewState = ViewState.busy;
     try {
-      await userInfo().delete();
-      await profileInfo(null).delete();
+      var batch = FirebaseFirestore.instance.batch();
+      batch.delete(userDocument());
+      batch.delete(userProfileDocument(null));
+      await batch.commit();
+      
       await _firebaseAuth.currentUser?.delete();
+      
       await _initAuthSettings();
       return successfulOperation;
     } catch (e, s) {

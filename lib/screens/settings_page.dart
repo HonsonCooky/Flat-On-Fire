@@ -72,7 +72,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
 
   Widget _accountSettings(TextStyle? textStyle) {
     return FutureBuilder(
-      future: getUser(context),
+      future: getUser(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
         if (snapshot.hasError) return _accountError(textStyle);
         if (snapshot.hasData) return _accountSuccess(snapshot.data!.data()!, textStyle);
@@ -102,7 +102,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
       children: [
         UneditableTextEntryWidget(title: "Account Number", value: um.uid!, textStyle: textStyle),
         SizedBox(height: textStyle?.fontSize),
-        EditableTextEntryWidget(title: "Name", value: um.profile.name, controller: _name, textStyle: textStyle),
+        EditableTextEntryWidget(title: "Name", value: um.userProfile.name, controller: _name, textStyle: textStyle),
         SizedBox(height: textStyle?.fontSize),
         _onBoardedChanger(textStyle),
         SizedBox(height: textStyle?.fontSize),
@@ -160,7 +160,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
 
   Widget _futureSaveButton(TextStyle? textStyle) {
     return FutureBuilder(
-      future: getUser(context),
+      future: getUser(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
         if (snapshot.hasError) return _noSaveButton(textStyle);
         if (snapshot.hasData) return _saveButton(snapshot.data!.data()!);
@@ -179,13 +179,13 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
   Widget _saveButton(UserModel um) {
     return ElevatedButton.icon(
       onPressed: () async {
-        await context.read<AuthService>().updateUser(
-              userSettingsModel: UserSettingsModel(
-                themeMode: context.read<AppService>().themeMode.name,
-                onBoarded: context.read<AppService>().onBoarded,
-              ),
-              profileModel: ProfileModel(name: _name.text.isNotEmpty ? _name.text : um.profile.name),
-            );
+        await updateUser(
+          userSettingsModel: UserSettingsModel(
+            themeMode: context.read<AppService>().themeMode.name,
+            onBoarded: context.read<AppService>().onBoarded,
+          ),
+          profileModel: UserProfileModel(name: _name.text.isNotEmpty ? _name.text : um.userProfile.name),
+        );
       },
       style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
             backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.primary),
