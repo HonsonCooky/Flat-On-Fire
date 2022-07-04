@@ -35,31 +35,35 @@ abstract class ToastMixin {
 
   void errorToast(String msg, BuildContext context) {
     final s = ScaffoldMessenger.of(context);
-    s.showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.fixed,
-      dismissDirection: DismissDirection.horizontal,
-      content: Text(
-        msg,
-        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Theme.of(context).colorScheme.onError,
-            ),
+    s.showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.fixed,
+        dismissDirection: DismissDirection.horizontal,
+        content: Text(
+          msg,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onError,
+              ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.error,
       ),
-      backgroundColor: Theme.of(context).colorScheme.error,
-    ));
+    );
   }
 
   void devErrorToast(String id, BuildContext context) {
     final s = ScaffoldMessenger.of(context);
-    s.showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.fixed,
-      dismissDirection: DismissDirection.horizontal,
-      content: Text(
-        "The developer of this app did an oopsie\nReference: ${id}",
-        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Theme.of(context).colorScheme.onError,
-            ),
+    s.showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.fixed,
+        dismissDirection: DismissDirection.horizontal,
+        content: Text(
+          "The developer of this app did an oopsie\nReference: ${id}",
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onError,
+              ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.error,
       ),
-      backgroundColor: Theme.of(context).colorScheme.error,
-    ));
+    );
   }
 }

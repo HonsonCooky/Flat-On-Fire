@@ -179,13 +179,21 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
   Widget _saveButton(UserModel um) {
     return ElevatedButton.icon(
       onPressed: () async {
-        await updateUser(
-          userSettingsModel: UserSettingsModel(
-            themeMode: context.read<AppService>().themeMode.name,
-            onBoarded: context.read<AppService>().onBoarded,
-          ),
-          profileModel: UserProfileModel(name: _name.text.isNotEmpty ? _name.text : um.userProfile.name),
-        );
+        try {
+          context.read<AppService>().viewState = ViewState.busy;
+          await updateUser(
+            userSettingsModel: UserSettingsModel(
+              themeMode: context.read<AppService>().themeMode.name,
+              onBoarded: context.read<AppService>().onBoarded,
+            ),
+            profileModel: UserProfileModel(name: _name.text.isNotEmpty ? _name.text : um.userProfile.name),
+          );
+          if (mounted) successToast("Save successful", context);
+        } catch (_) {
+          errorToast("Unable to save changes at this time", context);
+        } finally {
+          context.read<AppService>().viewState = ViewState.ideal;
+        }
       },
       style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
             backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.primary),
@@ -219,7 +227,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
             backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.tertiary),
           ),
       label: Text(
-        "Logout",
+        "LOGOUT",
         style: Theme.of(context).elevatedButtonTheme.style?.textStyle?.resolve({})?.copyWith(
           color: Theme.of(context).colorScheme.onTertiary,
         ),
@@ -231,55 +239,27 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
     );
   }
 
-  Widget _deleteBtn() {
-    return ElevatedButton.icon(
-      onPressed: () async {
-        _deleteConfirmation();
-      },
-      label: const Text("Delete Account"),
-      icon: const Icon(Icons.person_remove),
-    );
-  }
-
-  _deleteConfirmation() {
-    // set up the buttons
-    Widget cancelButton = TextButton(
-      child: const Text("Cancel"),
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-    );
-
-    Widget deleteButton = TextButton(
-      child: Text(
-        "Delete my account",
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onError),
-      ),
-      onPressed: () async {
-        Navigator.of(context).pop();
-        var deleteText = await context.read<AuthService>().deleteUser();
-        if (mounted && deleteText != AuthService.successfulOperation) {
-          errorToast(deleteText, context);
-        }
-      },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: const Text("Warning"),
-      content: const Text("Are you sure you want to permanently delete your account and all it's information?"),
-      actions: [
-        deleteButton,
-        cancelButton,
-      ],
-    );
-
-    // show the dialog
+  void _successfulAuthentication(){
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return alert;
+        return const DeleteAccountAlertWidget();
       },
+    );
+  }
+
+  Widget _deleteBtn() {
+    return ElevatedButton.icon(
+      onPressed: () async {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return ReauthenticateAccountAlertWidget(successfulAuthentication: _successfulAuthentication);
+          },
+        );
+      },
+      label: const Text("DELETE ACCOUNT"),
+      icon: const Icon(Icons.person_remove),
     );
   }
 }

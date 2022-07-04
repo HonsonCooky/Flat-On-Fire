@@ -50,6 +50,9 @@ class _AppState extends State<App> {
   }
 }
 
+// ----------------------------------------------------------------------------------------------------------------
+// APP EXTENSIONS
+// ----------------------------------------------------------------------------------------------------------------
 
 
 extension StringExtension on String {
@@ -62,10 +65,10 @@ extension FirestoreDocumentExtension<T> on DocumentReference<T> {
   Future<DocumentSnapshot<T>> getCacheFirst() async {
     try {
       var ds = await get(const GetOptions(source: Source.cache));
-      if (!ds.exists) return get(const GetOptions(source: Source.server));
-      return ds;
-    } catch (_) {
+      if (ds.exists) return ds;
       return get(const GetOptions(source: Source.server));
+    } catch (_) {
+      return get();
     }
   }
 }
@@ -74,10 +77,10 @@ extension FirestoreQueryExtension<T> on Query<T> {
   Future<QuerySnapshot<T>> getCacheFirst() async {
     try {
       var qs = await get(const GetOptions(source: Source.cache));
-      if (qs.docs.isEmpty) return get(const GetOptions(source: Source.server));
-      return qs;
-    } catch (_) {
+      if (qs.docs.isNotEmpty) return qs;
       return get(const GetOptions(source: Source.server));
+    } catch (_) {
+      return get();
     }
   }
 }

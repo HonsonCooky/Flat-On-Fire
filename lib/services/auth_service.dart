@@ -94,25 +94,29 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  Future<OAuthCredential> _getGoogleCredentials() async {
+    // Trigger Authentication Flow
+    GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    // Obtain the auth details
+    GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+    // Create a credential from auth request
+    return GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+  }
+
   /// Login with Google
   Future<String> googleSignupLogin() async {
     _appService.viewState = ViewState.busy;
     await _attemptGoogleSignOut();
 
     try {
-      // Trigger Authentication Flow
-      GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      // Obtain the auth details
-      GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
-      // Create a credential from auth request
-      OAuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth?.accessToken,
-        idToken: googleAuth?.idToken,
-      );
+      OAuthCredential credential = await _getGoogleCredentials();
 
       // Create/Get access to the user credentials inside firebase
       var uc = await _firebaseAuth.signInWithCredential(credential);
-      var userInfo = await userExists();
+      var userInfo = await userDocExists();
 
       // If this is a new user, then we should try sign them up
       if (uc.additionalUserInfo!.isNewUser || !userInfo) {
@@ -127,6 +131,47 @@ class AuthService extends ChangeNotifier {
     } catch (_) {
       _failedAttempt();
       return "Google Authentication Failed";
+    } finally {
+      await _initAuthSettings();
+    }
+  }
+
+  Future<String> reauthenticateUser(String email, String password, bool isGoogle) async {
+    _appService.viewState = ViewState.busy;
+    var user = _firebaseAuth.currentUser;
+    if (user == null) return "Unable to retrieve current user";
+
+    try {
+      if (!isGoogle) {
+        return _reauthenticateEmail(email, password, user);
+      } else {
+        return _reauthenticateGoogle(user);
+      }
+    } catch(_){
+      _failedAttempt();
+      return "Something went wrong. Unable to delete user.";
+    }
+  }
+
+  Future<String> _reauthenticateEmail(String email, String password, User user) async {
+    var cred = EmailAuthProvider.credential(email: email, password: password);
+    try {
+      await user.reauthenticateWithCredential(cred);
+      await _initAuthSettings();
+      return successfulOperation;
+    } catch (_) {
+      return "Invalid user credentials";
+    }
+  }
+
+  Future<String> _reauthenticateGoogle(User user) async {
+    var cred = await _getGoogleCredentials();
+    try {
+      await user.reauthenticateWithCredential(cred);
+      await _initAuthSettings();
+      return successfulOperation;
+    } catch (_) {
+      return "Invalid user credentials";
     }
   }
 
@@ -137,15 +182,15 @@ class AuthService extends ChangeNotifier {
       batch.delete(userDocument());
       batch.delete(userProfileDocument(null));
       await batch.commit();
-      
+
       await _firebaseAuth.currentUser?.delete();
-      
+
       await _initAuthSettings();
       return successfulOperation;
     } catch (e, s) {
       _failedAttempt();
       await FirebaseCrashlytics.instance.recordError(e, s);
-      return "Something went wrong. Unable to delete user. $e";
+      return "Something went wrong. Unable to delete user.";
     }
   }
 

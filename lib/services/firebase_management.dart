@@ -50,7 +50,7 @@ DocumentReference<dynamic> _userProfileDocument(String? uid) {
 // ----------------------------------------------------------------------------------------------------------------
 
 /// Determine if the logged in user, has existing documentation.
-Future<bool> userExists() async {
+Future<bool> userDocExists() async {
   var path = _userPath(
     FirebaseAuth.instance.currentUser?.uid,
     "Unauthorized access to user information",
@@ -117,7 +117,7 @@ updateUser({UserSettingsModel? userSettingsModel, UserProfileModel? profileModel
     userUpdate.putIfAbsent("userSettings", () => userSettingsModel.toJson());
   }
   if (profileModel != null) {
-    userUpdate.putIfAbsent("profile", () => profileModel.toJson());
+    userUpdate.putIfAbsent("userProfile", () => profileModel.toJson());
     profileUpdate = profileModel.toJson();
   }
 
