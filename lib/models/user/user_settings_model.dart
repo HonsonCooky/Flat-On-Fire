@@ -1,3 +1,4 @@
+/// Outlines the saved user settings for some user.
 class UserSettingsModel {
   final String themeMode;
   final bool onBoarded;

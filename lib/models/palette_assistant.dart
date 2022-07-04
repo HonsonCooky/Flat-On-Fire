@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Maintains static methods for handling color management
 class PaletteAssistant {
   /// Darken the given color by the given amount.
   static Color darken(Color color, [double amount = .1]) {

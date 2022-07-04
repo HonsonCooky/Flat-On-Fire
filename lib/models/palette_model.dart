@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Outline all the colors that are used in the application
 class PaletteModel {
   // LIGHT
   static Color lightBackground = const Color(0xffDFDCE3);

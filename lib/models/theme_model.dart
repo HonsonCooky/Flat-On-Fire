@@ -5,6 +5,7 @@ import '../_app_bucket.dart';
 const double titleLargeFontSize = 30;
 const double textFieldLabelSize = 22;
 
+/// Maintains static fields for Light and Dark modes
 class ThemeModel {
   /// GLOBAL THEME CONSTANTS
   static final _base = ThemeData(

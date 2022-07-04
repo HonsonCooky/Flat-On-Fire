@@ -1,6 +1,7 @@
 import 'package:flat_on_fire/_app_bucket.dart';
 
-/// Outlines the datastructures of a user stored in firebase. This is PRIVATE to the user.
+/// Outlines the information maintained in a User Document. 
+/// This information is available to everyone. 
 class UserModel {
   final String? uid;
   final bool isAdmin;

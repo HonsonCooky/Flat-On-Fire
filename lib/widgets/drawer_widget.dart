@@ -24,41 +24,37 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   Widget _drawerContent() {
     List<AppPageEnum> pages = visibleAppRoutes;
 
-    return ListView.builder(
-      padding: EdgeInsets.zero,
-      itemCount: pages.length + 1,
-      itemBuilder: (context, index) {
-        if (index == 0) {
-          return _header();
-        }
-        var i = index - 1;
-        return _drawerItem(pages[i], i, context);
-      },
-    );
-  }
-
-  Widget _header() {
-    return DrawerHeader(
-      margin: EdgeInsets.zero,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary,
-      ),
-      child: _headerContent(),
-    );
-  }
-
-  Widget _headerContent() {
-    return Stack(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _headerIcon(),
-        _headerText(),
+        _header(),
+        Expanded(
+          child: ListView.builder(
+            padding: EdgeInsets.zero,
+            itemCount: pages.length,
+            itemBuilder: (context, index) {
+              return _drawerItem(pages[index], index, context);
+            },
+          ),
+        ),
       ],
     );
   }
 
-  Widget _headerIcon() {
-    return FofLogoWidget(
-      offset: Offset(MediaQuery.of(context).size.width / 3, 0),
+  Widget _header() {
+    return Container(
+      color: Theme.of(context).colorScheme.primary,
+      child: SafeArea(child: WrapperPadding(child: _headerContent())),
+    );
+  }
+
+  Widget _headerContent() {
+    return Container(
+      decoration: FofLogoDecoration(
+        color: Theme.of(context).colorScheme.background,
+        offset: Offset((Theme.of(context).textTheme.displayMedium?.fontSize ?? 20) * 1.8, 0),
+      ),
+      child: _headerText(),
     );
   }
 
@@ -72,9 +68,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           Text(
             "FLAT",
             style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onPrimary,
-                fontWeight: FontWeight.w900,
-                fontSize: (Theme.of(context).textTheme.displayMedium?.fontSize ?? 20) - 5),
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontWeight: FontWeight.w900,
+                ),
           ),
           Text(
             "ON",
@@ -85,9 +81,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           Text(
             "FIRE",
             style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onPrimary,
-                fontWeight: FontWeight.w900,
-                fontSize: (Theme.of(context).textTheme.displayMedium?.fontSize ?? 20) - 5),
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontWeight: FontWeight.w900,
+                ),
           ),
         ],
       ),
