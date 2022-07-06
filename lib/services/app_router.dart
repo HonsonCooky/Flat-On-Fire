@@ -44,6 +44,7 @@ class AppRouter {
         path: AppPageEnum.groups.toPath,
         name: AppPageEnum.groups.toName,
         pageBuilder: (context, state) => MaterialPage(
+          
           key: state.pageKey,
           child: const GroupsPage(),
         ),

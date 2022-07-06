@@ -1,27 +1,35 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+/// A change notifier used for authentication based functionality
 class AuthService extends ChangeNotifier {
+  // ----------------------------------------------------------------------------------------------------------------
+  // CONSTANTS
+  // ----------------------------------------------------------------------------------------------------------------
   static const String successfulOperation = "Success";
   static const String authErrorBackup = "Encountered an authentication error";
   static const String storeErrorBackup = "Encountered a backend storage error";
   final FirebaseAuth _firebaseAuth;
   final AppService _appService;
 
-  AuthService(this._firebaseAuth, this._appService) {
-    _initAuthSettings();
-  }
-
-  /// Access the Firebase User object
   User? get user => _firebaseAuth.currentUser;
 
-  Future<void> _initAuthSettings() async {
+  // ----------------------------------------------------------------------------------------------------------------
+  // CONSTRUCTION
+  // ----------------------------------------------------------------------------------------------------------------
+
+  AuthService(this._firebaseAuth, this._appService) {
+    _establishSettings();
+  }
+
+  /// Establish the baseline settings given the current environment
+  Future<void> _establishSettings() async {
     try {
-      var userDocument = await getUser()!;
+      // Attempt to setup app settings based on the user
+      var userDocument = await FirestoreService().userService.getUser();
       var userSettings = userDocument.data()?.userSettings;
       if (userSettings != null) {
         _appService.batch(
@@ -40,7 +48,9 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  _failedAttempt() {
+  /// On a failed attempt, recover using this method
+  void _failedAttempt() {
+    // Reset application state to ideal (remove loading components)
     _appService.viewState = ViewState.ideal;
   }
 
@@ -52,7 +62,7 @@ class AuthService extends ChangeNotifier {
     _appService.viewState = ViewState.busy;
     try {
       await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
-      await _initAuthSettings();
+      await _establishSettings();
       return successfulOperation;
     } on FirebaseException catch (e) {
       _failedAttempt();
@@ -72,8 +82,8 @@ class AuthService extends ChangeNotifier {
     _appService.viewState = ViewState.busy;
     try {
       var uc = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
-      await createNewUser(uc: uc, name: name, themeModeName: _appService.themeMode.name);
-      await _initAuthSettings();
+      await FirestoreService().userService.createNewUser(uc: uc, name: name, themeModeName: _appService.themeMode.name);
+      await _establishSettings();
       return successfulOperation;
     } on FirebaseException catch (e) {
       _failedAttempt();
@@ -84,6 +94,7 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  /// Attempt a google sign-out (which ensures the user has an option of which account to sign-in with) 
   Future<void> _attemptGoogleSignOut() async {
     try {
       if (await GoogleSignIn().isSignedIn()) {
@@ -94,6 +105,7 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  /// Get the google authentication credentials
   Future<OAuthCredential> _getGoogleCredentials() async {
     // Trigger Authentication Flow
     GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -116,14 +128,16 @@ class AuthService extends ChangeNotifier {
 
       // Create/Get access to the user credentials inside firebase
       var uc = await _firebaseAuth.signInWithCredential(credential);
-      var userInfo = await userDocExists();
+      var userInfo = await FirestoreService().userService.userDocExists();
 
       // If this is a new user, then we should try sign them up
       if (uc.additionalUserInfo!.isNewUser || !userInfo) {
-        await createNewUser(uc: uc, name: uc.user!.displayName!, themeModeName: _appService.themeMode.name);
+        await FirestoreService()
+            .userService
+            .createNewUser(uc: uc, name: uc.user!.displayName!, themeModeName: _appService.themeMode.name);
       }
 
-      await _initAuthSettings();
+      await _establishSettings();
       return successfulOperation;
     } on FirebaseException catch (e) {
       _failedAttempt();
@@ -132,10 +146,27 @@ class AuthService extends ChangeNotifier {
       _failedAttempt();
       return "Google Authentication Failed";
     } finally {
-      await _initAuthSettings();
+      await _establishSettings();
     }
   }
 
+  /// Sign out and (attempt google sign out)
+  Future<String> signOut() async {
+    _appService.viewState = ViewState.busy;
+    await _attemptGoogleSignOut();
+
+    try {
+      await _firebaseAuth.signOut();
+      await _establishSettings();
+      return successfulOperation;
+    } catch (e, s) {
+      _failedAttempt();
+      await FirebaseCrashlytics.instance.recordError(e, s);
+      return "Something went wrong. Unable to sign-out.";
+    }
+  }
+
+  /// A special login function which doesn't attempt a new login, but rather, the authentication of the current user.
   Future<String> reauthenticateUser(String email, String password, bool isGoogle) async {
     _appService.viewState = ViewState.busy;
     var user = _firebaseAuth.currentUser;
@@ -147,66 +178,49 @@ class AuthService extends ChangeNotifier {
       } else {
         return _reauthenticateGoogle(user);
       }
-    } catch(_){
+    } catch (_) {
       _failedAttempt();
       return "Something went wrong. Unable to delete user.";
     }
   }
 
+  /// Reauthentication via email and password
   Future<String> _reauthenticateEmail(String email, String password, User user) async {
     var cred = EmailAuthProvider.credential(email: email, password: password);
     try {
       await user.reauthenticateWithCredential(cred);
-      await _initAuthSettings();
+      await _establishSettings();
       return successfulOperation;
     } catch (_) {
       return "Invalid user credentials";
     }
   }
 
+  /// Reauthentication via google
   Future<String> _reauthenticateGoogle(User user) async {
     var cred = await _getGoogleCredentials();
     try {
       await user.reauthenticateWithCredential(cred);
-      await _initAuthSettings();
+      await _establishSettings();
       return successfulOperation;
     } catch (_) {
       return "Invalid user credentials";
     }
   }
 
-  Future<String> deleteUser() async {
+  /// Delete the users account
+  Future<String> deleteAccount() async {
     _appService.viewState = ViewState.busy;
     try {
-      var batch = FirebaseFirestore.instance.batch();
-      batch.delete(userDocument());
-      batch.delete(userProfileDocument(null));
-      await batch.commit();
-
+      await FirestoreService().userService.deleteUser();
       await _firebaseAuth.currentUser?.delete();
 
-      await _initAuthSettings();
+      await _establishSettings();
       return successfulOperation;
     } catch (e, s) {
       _failedAttempt();
       await FirebaseCrashlytics.instance.recordError(e, s);
       return "Something went wrong. Unable to delete user.";
-    }
-  }
-
-  /// Sign out and (attempt google sign out)
-  Future<String> signOut() async {
-    _appService.viewState = ViewState.busy;
-    await _attemptGoogleSignOut();
-
-    try {
-      await _firebaseAuth.signOut();
-      await _initAuthSettings();
-      return successfulOperation;
-    } catch (e, s) {
-      _failedAttempt();
-      await FirebaseCrashlytics.instance.recordError(e, s);
-      return "Something went wrong. Unable to sign-out.";
     }
   }
 }

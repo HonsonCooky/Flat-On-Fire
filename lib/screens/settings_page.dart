@@ -72,7 +72,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
 
   Widget _accountSettings(TextStyle? textStyle) {
     return FutureBuilder(
-      future: getUser(),
+      future: FirestoreService().userService.getUser(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
         if (snapshot.hasError) return _accountError(textStyle);
         if (snapshot.hasData) return _accountSuccess(snapshot.data!.data()!, textStyle);
@@ -160,7 +160,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
 
   Widget _futureSaveButton(TextStyle? textStyle) {
     return FutureBuilder(
-      future: getUser(),
+      future: FirestoreService().userService.getUser(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
         if (snapshot.hasError) return _noSaveButton(textStyle);
         if (snapshot.hasData) return _saveButton(snapshot.data!.data()!);
@@ -181,7 +181,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
       onPressed: () async {
         try {
           context.read<AppService>().viewState = ViewState.busy;
-          await updateUser(
+          await FirestoreService().userService.updateUser(
             userSettingsModel: UserSettingsModel(
               themeMode: context.read<AppService>().themeMode.name,
               onBoarded: context.read<AppService>().onBoarded,

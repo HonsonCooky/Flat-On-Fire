@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> with ToastMixin {
 
   Widget _welcomeTextFuture() {
     return FutureBuilder(
-      future: getUser(),
+      future: FirestoreService().userService.getUser(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
         if (snapshot.hasError) return _errorWelcomeText(Theme.of(context).textTheme.titleLarge);
         if (snapshot.hasData) return _welcomeText(snapshot.data!.data()!, Theme.of(context).textTheme.displayMedium);

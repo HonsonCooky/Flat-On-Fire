@@ -13,13 +13,17 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  late AppService appService;
-  late AuthService authService;
+  late AppService _appService;
+  late AuthService _authService;
+  
+  // Firestore
+  late UserService _userService;
 
   @override
   void initState() {
-    appService = AppService();
-    authService = AuthService(FirebaseAuth.instance, appService);
+    _appService = AppService();
+    _authService = AuthService(FirebaseAuth.instance, _appService);
+    _userService = UserService();
     super.initState();
   }
 
@@ -27,9 +31,11 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<AppService>(create: (_) => appService),
-        ChangeNotifierProvider<AuthService>(create: (_) => authService),
-        Provider<AppRouter>(create: (_) => AppRouter(appService: appService)),
+        ChangeNotifierProvider<AppService>(create: (_) => _appService),
+        ChangeNotifierProvider<AuthService>(create: (_) => _authService),
+        Provider<AppRouter>(create: (_) => AppRouter(appService: _appService)),
+        // Firestore
+        Provider<UserService>(create: (_) => _userService),
       ],
       child: Builder(
         builder: (context) {

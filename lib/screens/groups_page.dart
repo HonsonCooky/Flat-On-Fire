@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class GroupsPage extends StatefulWidget {
   const GroupsPage({Key? key}) : super(key: key);
@@ -26,7 +27,7 @@ class _GroupsPageState extends State<GroupsPage> {
 
   Widget _userGroups(TextStyle? textStyle) {
     return FutureBuilder(
-      future: getUser(),
+      future: context.read<UserService>().getUser(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
         if (snapshot.hasError) return _userGroupsError(textStyle);
         if (snapshot.hasData) return _userGroupsList(snapshot.data!.data()!, textStyle);

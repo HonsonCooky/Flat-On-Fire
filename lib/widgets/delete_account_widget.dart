@@ -42,7 +42,7 @@ class _DeleteAccountAlertWidgetState extends State<DeleteAccountAlertWidget> wit
       ),
       onPressed: () async {
         Navigator.of(context).pop();
-        var deleteText = await context.read<AuthService>().deleteUser();
+        var deleteText = await context.read<AuthService>().deleteAccount();
         if (mounted && deleteText != AuthService.successfulOperation) {
           errorToast(deleteText, context);
         }
