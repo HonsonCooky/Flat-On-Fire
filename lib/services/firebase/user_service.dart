@@ -4,45 +4,33 @@ import 'package:flat_on_fire/_app_bucket.dart';
 
 class UserService {
 // ----------------------------------------------------------------------------------------------------------------
-// CONSTANT VALUES
-// ----------------------------------------------------------------------------------------------------------------
-
-  final userCollectionName = "users";
-  final userProfileCollectionName = "user_profiles";
-
-// ----------------------------------------------------------------------------------------------------------------
 // PRIVATE ASSISTANT METHODS
 // ----------------------------------------------------------------------------------------------------------------
 
   /// Get the path to a users PRIVATE information.
   String _userPath(String? uid, String exception) {
     if (uid == null) throw Exception(exception);
-    return "$userCollectionName/$uid";
+    return "users/$uid";
   }
 
   /// Get the path to a users PUBLIC information
-  String _userProfilePath(String? uid, String exception) {
-    if (uid == null) throw Exception(exception);
-    return "$userProfileCollectionName/$uid";
+  String _userProfileSubDocPath(String? uid, String exception) {
+    return "${_userPath(uid, exception)}/${FirestoreService.profileSubDoc}";
   }
 
   /// Access to the PRIVATE user information
-
-  DocumentReference<UserModel> _userModelDocument() {
-    var doc = FirestoreService.getDoc(_userPath(
-      FirebaseAuth.instance.currentUser?.uid,
-      "Unauthorized access to user information",
-    ));
+  DocumentReference<UserModel> _userDocument() {
+    var path = _userPath(FirebaseAuth.instance.currentUser?.uid, "Unauthorized access to user information");
+    var doc = FirestoreService.getDoc(path);
     return doc.withConverter<UserModel>(
       fromFirestore: (snapshot, _) => UserModel.fromJson(snapshot.data()!),
-      toFirestore: (userModel, _) => userModel.toJson(),
+      toFirestore: (settingsModel, _) => settingsModel.toJson(),
     );
   }
 
-  /// Access to the PUBLIC user information (given a UID, that user will be found)
-
-  DocumentReference<UserProfileModel> userProfileDocument(String? uid) {
-    var path = _userProfilePath(
+  /// Access to the PROFILE user information (given a UID, that user will be found)
+  DocumentReference<UserProfileModel> _userProfileDocument(String? uid) {
+    var path = _userProfileSubDocPath(
       uid ?? FirebaseAuth.instance.currentUser?.uid,
       "Unauthorized access to user information",
     );
@@ -64,11 +52,11 @@ class UserService {
   }
 
   Future<DocumentSnapshot<UserModel>> getUser() {
-    return _userModelDocument().getCacheFirst();
+    return _userDocument().getCacheFirst();
   }
 
   /// Create a new user in the Firestore
-  createNewUser({
+  Future<void> createNewUser({
     required UserCredential uc,
     required String name,
     required String themeModeName,
@@ -77,16 +65,17 @@ class UserService {
     try {
       UserProfileModel userProfileModel = UserProfileModel(name: name);
       UserModel userModel = UserModel(
-        uid: uc.user?.uid,
+        uid: uc.user!.uid,
         isAdmin: false,
-        userProfile: userProfileModel,
-        userSettings: UserSettingsModel(themeMode: themeModeName, onBoarded: onBoarded),
+        themeMode: themeModeName,
+        onBoarded: onBoarded,
+        profile: userProfileModel,
       );
 
       // Batch create
       var batch = FirebaseFirestore.instance.batch();
-      batch.set<UserModel>(_userModelDocument(), userModel);
-      batch.set<UserProfileModel>(userProfileDocument(null), userProfileModel);
+      batch.set<UserModel>(_userDocument(), userModel);
+      batch.set<UserProfileModel>(_userProfileDocument(null), userProfileModel);
       await batch.commit();
     } catch (e) {
       // Failed attempt. Remove user from firebase authentication
@@ -96,28 +85,20 @@ class UserService {
   }
 
   /// Update a user + the user profile in the firestore
-  updateUser({UserSettingsModel? userSettingsModel, UserProfileModel? profileModel}) async {
+  Future<void> updateUser(Map<String, dynamic> update) async {
     var batch = FirebaseFirestore.instance.batch();
     Map<String, dynamic> userUpdate = {};
-    Map<String, dynamic> profileUpdate = {};
-
-    if (userSettingsModel != null) {
-      userUpdate.putIfAbsent("userSettings", () => userSettingsModel.toJson());
-    }
-    if (profileModel != null) {
-      userUpdate.putIfAbsent("userProfile", () => profileModel.toJson());
-      profileUpdate = profileModel.toJson();
-    }
-
-    batch.update(_userModelDocument(), userUpdate);
-    batch.update(userProfileDocument(null), profileUpdate);
+    Map<String, dynamic> profileUpdate = update["profile"] ?? {};
+    batch.update(_userDocument(), userUpdate);
+    batch.update(_userProfileDocument(null), profileUpdate);
     await batch.commit();
   }
 
-  deleteUser() async {
+  ///
+  Future<void> deleteUser() async {
     var batch = FirebaseFirestore.instance.batch();
-    batch.delete(_userModelDocument());
-    batch.delete(userProfileDocument(null));
+    batch.delete(_userDocument());
+    batch.delete(_userProfileDocument(null));
     await batch.commit();
   }
 }

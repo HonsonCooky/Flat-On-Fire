@@ -102,7 +102,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
       children: [
         UneditableTextEntryWidget(title: "Account Number", value: um.uid!, textStyle: textStyle),
         SizedBox(height: textStyle?.fontSize),
-        EditableTextEntryWidget(title: "Name", value: um.userProfile.name, controller: _name, textStyle: textStyle),
+        EditableTextEntryWidget(title: "Name", value: um.profile.name, controller: _name, textStyle: textStyle),
         SizedBox(height: textStyle?.fontSize),
         _onBoardedChanger(textStyle),
         SizedBox(height: textStyle?.fontSize),
@@ -181,15 +181,14 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
       onPressed: () async {
         try {
           context.read<AppService>().viewState = ViewState.busy;
-          await FirestoreService().userService.updateUser(
-            userSettingsModel: UserSettingsModel(
-              themeMode: context.read<AppService>().themeMode.name,
-              onBoarded: context.read<AppService>().onBoarded,
-            ),
-            profileModel: UserProfileModel(name: _name.text.isNotEmpty ? _name.text : um.userProfile.name),
-          );
+          await FirestoreService().userService.updateUser({
+            "themeMode": context.read<AppService>().themeMode.name,
+            "onBoarded": context.read<AppService>().onBoarded,
+            "profile": UserProfileModel(name: _name.text.isNotEmpty ? _name.text : um.profile.name),
+          });
           if (mounted) successToast("Save successful", context);
-        } catch (_) {
+        } catch (e) {
+          
           errorToast("Unable to save changes at this time", context);
         } finally {
           context.read<AppService>().viewState = ViewState.ideal;
@@ -239,7 +238,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
     );
   }
 
-  void _successfulAuthentication(){
+  void _successfulAuthentication() {
     showDialog(
       context: context,
       builder: (BuildContext context) {

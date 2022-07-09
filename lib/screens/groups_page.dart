@@ -27,7 +27,7 @@ class _GroupsPageState extends State<GroupsPage> {
 
   Widget _userGroups(TextStyle? textStyle) {
     return FutureBuilder(
-      future: context.read<UserService>().getUser(),
+      future: FirestoreService().userService.getUser(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
         if (snapshot.hasError) return _userGroupsError(textStyle);
         if (snapshot.hasData) return _userGroupsList(snapshot.data!.data()!, textStyle);

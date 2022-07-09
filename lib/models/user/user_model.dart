@@ -1,30 +1,33 @@
 import 'package:flat_on_fire/_app_bucket.dart';
 
-/// Outlines the information maintained in a User Document. 
-/// This information is available to everyone. 
+/// Outlines the saved user settings for some user.
 class UserModel {
   final String? uid;
   final bool isAdmin;
-  final UserProfileModel userProfile;
-  final UserSettingsModel userSettings;
+  final String themeMode;
+  final bool onBoarded;
+  final UserProfileModel profile;
 
   UserModel({
     this.uid,
     required this.isAdmin,
-    required this.userProfile,
-    required this.userSettings,
+    required this.themeMode,
+    required this.onBoarded,
+    required this.profile,
   });
 
   UserModel.fromJson(Map<String, dynamic> json)
       : uid = json["uid"],
         isAdmin = json["isAdmin"],
-        userProfile = UserProfileModel.fromJson(json["userProfile"]),
-        userSettings = UserSettingsModel.fromJson(json["userSettings"]);
+        themeMode = json["themeMode"],
+        onBoarded = json["onBoarded"],
+        profile = UserProfileModel.fromJson(json["profile"]);
 
   Map<String, dynamic> toJson() => {
         "uid": uid,
         "isAdmin": isAdmin,
-        "userProfile": userProfile.toJson(),
-        "userSettings": userSettings.toJson(),
+        "themeMode": themeMode,
+        "onBoarded": onBoarded,
+        "profile": profile.toJson(),
       };
 }

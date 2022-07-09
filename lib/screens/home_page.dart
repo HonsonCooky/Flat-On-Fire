@@ -66,7 +66,7 @@ class _HomePageState extends State<HomePage> with ToastMixin {
 
   Widget _welcomeText(UserModel userModel, TextStyle? textStyle) {
     return Text(
-      "Welcome\n${userModel.userProfile.name}!",
+      "Welcome\n${userModel.profile.name}!",
       style: textStyle,
     );
   }

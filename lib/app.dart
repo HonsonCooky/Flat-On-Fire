@@ -15,15 +15,11 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   late AppService _appService;
   late AuthService _authService;
-  
-  // Firestore
-  late UserService _userService;
 
   @override
   void initState() {
     _appService = AppService();
-    _authService = AuthService(FirebaseAuth.instance, _appService);
-    _userService = UserService();
+    _authService = AuthService(_appService);
     super.initState();
   }
 
@@ -34,8 +30,6 @@ class _AppState extends State<App> {
         ChangeNotifierProvider<AppService>(create: (_) => _appService),
         ChangeNotifierProvider<AuthService>(create: (_) => _authService),
         Provider<AppRouter>(create: (_) => AppRouter(appService: _appService)),
-        // Firestore
-        Provider<UserService>(create: (_) => _userService),
       ],
       child: Builder(
         builder: (context) {
