@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-// import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,6 +16,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingPageState extends State<SettingsPage> with ToastMixin {
   final _name = TextEditingController();
   final ImagePicker _picker = ImagePicker();
+  FileImage? _userImage;
   XFile? _pickedImage;
 
   // ----------------------------------------------------------------------------------------------------------------
@@ -83,7 +82,13 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
         if (snapshot.hasError) return _accountError(textStyle);
         if (snapshot.hasData) {
-          return _accountSuccess(snapshot.data!.data()!, textStyle);
+          if (snapshot.data?.data() != null) {
+            UserModel um = snapshot.data!.data()!;
+            _getUsersAvatar(um);
+            return _accountSuccess(um, textStyle);
+          } else {
+            return _accountError(textStyle);
+          }
         }
         return _awaitingAccountInformation(textStyle);
       },
@@ -108,7 +113,6 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
     double fontSize = textStyle?.fontSize != null ? textStyle!.fontSize! * 3 : 20;
     return Stack(
       alignment: Alignment.center,
-      clipBehavior: Clip.none,
       children: [
         _profileImage(um, fontSize),
         _editProfileImage(fontSize),
@@ -131,20 +135,33 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
         );
       },
       child: CircleAvatar(
-        radius: fontSize,
-        backgroundImage: _pickedImage != null ? FileImage(File(_pickedImage!.path)) : null,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        child: _pickedImage == null
-            ? Text(
-                um.profile.name.initials(),
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      fontSize: fontSize,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-              )
-            : null,
-      ),
+          radius: fontSize,
+          foregroundImage: _pickedImage != null ? FileImage(File(_pickedImage!.path)) : _userImage,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          child: Text(
+            um.profile.name.initials(),
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  fontSize: fontSize,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+          )),
     );
+  }
+
+  Future<void> _getUsersAvatar(UserModel um) async {
+    if (um.profile.avatarPath == null) return;
+
+    final File imageFile = File(await FirestoreService.avatarTmpLoc(um.uid!));
+    setState(() {
+      _userImage = FileImage(imageFile);
+    });
+    // if (await imageFile.exists() == false) {
+    //   try {
+    //     var image = await FirestoreService().storageRef.child(um.profile.avatarPath!).ge;
+    //   } on Exception catch (exception) {
+    //     throw 'could not write image $exception';
+    //   }
+    // }
   }
 
   Widget _editProfileImage(fontSize) {
@@ -154,10 +171,6 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
       child: ElevatedButton(
         onPressed: () async {
           _pickedImage = await _picker.pickImage(source: ImageSource.gallery);
-          // if (_pickedImage != null) {
-          //   FirebaseStorage.instance.ref().child('profiles/some_image.png').putFile(File(_pickedImage!.path));
-          // }
-
           setState(() {});
         },
         style: ElevatedButton.styleFrom(
@@ -253,7 +266,13 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
       future: FirestoreService().userService.getUser(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
         if (snapshot.hasError) return _noSaveButton(textStyle);
-        if (snapshot.hasData) return _saveButton(snapshot.data!.data()!);
+        if (snapshot.hasData) {
+          if (snapshot.data?.data() != null) {
+            return _saveButton(snapshot.data!.data()!);
+          } else {
+            return _noSaveButton(textStyle);
+          }
+        }
         return LoadingSpinnerWidget(textStyle?.fontSize ?? 20);
       },
     );

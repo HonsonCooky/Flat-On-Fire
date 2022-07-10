@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
 
 /// A change notifier used for authentication based functionality
 class AuthService extends ChangeNotifier {
@@ -30,6 +33,7 @@ class AuthService extends ChangeNotifier {
 
   /// Establish the baseline settings given the current environment
   Future<void> _establishSettings() async {
+    bool failed = true;
     try {
       // Attempt to setup app settings based on the user
       var userDocument = await FirestoreService().userService.getUser();
@@ -39,12 +43,13 @@ class AuthService extends ChangeNotifier {
           themeMode: user.themeMode == ThemeMode.light.name ? ThemeMode.light : ThemeMode.dark,
           onBoarded: user.onBoarded,
         );
+        failed = false;
       }
     } catch (_) {
     } finally {
       // Finally will ensure the UI components react accordingly in all scenarios
       _appService.batch(
-        loginState: FirebaseAuth.instance.currentUser != null,
+        loginState: FirebaseAuth.instance.currentUser != null && !failed,
         initialized: true,
         viewState: ViewState.ideal,
       );
@@ -57,7 +62,7 @@ class AuthService extends ChangeNotifier {
     _appService.viewState = ViewState.ideal;
   }
 
-  /// Attempt a google sign-out (which ensures the user has an option of which account to sign-in with) 
+  /// Attempt a google sign-out (which ensures the user has an option of which account to sign-in with)
   Future<void> _attemptGoogleSignOut() async {
     try {
       if (await GoogleSignIn().isSignedIn()) {
@@ -117,14 +122,15 @@ class AuthService extends ChangeNotifier {
     _appService.viewState = ViewState.busy;
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-      await _establishSettings();
       return successfulOperation;
     } on FirebaseException catch (e) {
+      _failedAttempt();
       return e.message ?? authErrorBackup;
     } catch (_) {
+      _failedAttempt();
       return "Authentication Failed";
     } finally {
-      _failedAttempt();
+      await _establishSettings();
     }
   }
 
@@ -138,15 +144,23 @@ class AuthService extends ChangeNotifier {
     try {
       var uc = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
       await FirestoreService().userService.createNewUser(uc: uc, name: name, themeModeName: _appService.themeMode.name);
-      await _establishSettings();
       return successfulOperation;
     } on FirebaseException catch (e) {
+      _failedAttempt();
       return e.message ?? authErrorBackup;
     } catch (_) {
+      _failedAttempt();
       return "Signup Failed";
     } finally {
-      _failedAttempt();
+      await _establishSettings();
     }
+  }
+
+  Future<File> _googleImageToFile(String imageUrl, String name) async {
+    var file = File(await FirestoreService.avatarTmpLoc(name));
+    http.Response response = await http.get(Uri.parse(imageUrl));
+    await file.writeAsBytes(response.bodyBytes);
+    return file;
   }
 
   /// Login with Google
@@ -159,22 +173,31 @@ class AuthService extends ChangeNotifier {
 
       // Create/Get access to the user credentials inside firebase
       var uc = await FirebaseAuth.instance.signInWithCredential(credential);
-      var existingUser = !uc.additionalUserInfo!.isNewUser || await FirestoreService().userService.userDocExists();
-      
+      var existingUser = !uc.additionalUserInfo!.isNewUser && await FirestoreService().userService.userDocExists();
+
       if (!existingUser) {
-        await FirestoreService()
-            .userService
-            .createNewUser(uc: uc, name: uc.user!.displayName!, themeModeName: _appService.themeMode.name);
+        var avatarPath = uc.user?.photoURL;
+        File? avatarFile;
+        if (avatarPath != null) avatarFile = await _googleImageToFile(avatarPath, uc.user!.uid);
+
+        var name = uc.user!.displayName!;
+        var themeModeName = _appService.themeMode.name;
+        await FirestoreService().userService.createNewUser(
+              uc: uc,
+              name: name,
+              themeModeName: themeModeName,
+              avatarFilePath: avatarFile?.path,
+            );
       }
 
-      await _establishSettings();
       return successfulOperation;
     } on FirebaseException catch (e) {
+      _failedAttempt();
       return e.message ?? authErrorBackup;
-    } catch (_) {
+    } catch (e) {
+      _failedAttempt();
       return "Google Authentication Failed";
     } finally {
-      _failedAttempt();
       await _establishSettings();
     }
   }

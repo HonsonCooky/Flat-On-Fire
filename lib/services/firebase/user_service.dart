@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
@@ -51,6 +53,7 @@ class UserService {
     return doc.exists;
   }
 
+  /// Get the UserModel from Firestore
   Future<DocumentSnapshot<UserModel>> getUser() {
     return _userDocument().getCacheFirst();
   }
@@ -61,9 +64,21 @@ class UserService {
     required String name,
     required String themeModeName,
     bool onBoarded = true,
+    String? avatarFilePath,
   }) async {
     try {
-      UserProfileModel userProfileModel = UserProfileModel(name: name);
+      var uid = uc.user!.uid;
+
+      // Upload profile picture
+      if (avatarFilePath != null) {
+        var child = FirestoreService().storageRef.child(FirestoreService.avatarFireStorageLoc(uid));
+        await child.putFile(File(avatarFilePath));
+      }
+
+      // Upload profile
+      UserProfileModel userProfileModel = UserProfileModel(name: name, avatarPath: 'fof_avatars/${uc.user?.uid}.jpg');
+
+      // Finally create the user
       UserModel userModel = UserModel(
         uid: uc.user!.uid,
         isAdmin: false,
@@ -86,6 +101,14 @@ class UserService {
 
   /// Update a user + the user profile in the firestore
   Future<void> updateUser(Map<String, dynamic> update) async {
+    String? avatarFilePath = update["profile"].avatarFilePath;
+    var uid = FirebaseAuth.instance.currentUser!.uid;
+
+    if (avatarFilePath != null) {
+      var child = FirestoreService().storageRef.child(FirestoreService.avatarFireStorageLoc(uid));
+      await child.putFile(File(avatarFilePath));
+    }
+
     var batch = FirebaseFirestore.instance.batch();
     Map<String, dynamic> userUpdate = update;
     Map<String, dynamic> profileUpdate = update["profile"] ?? {};
@@ -94,8 +117,14 @@ class UserService {
     await batch.commit();
   }
 
-  ///
+  /// Delete the firebase
   Future<void> deleteUser() async {
+    // Delete the profile picture first
+    var uid = FirebaseAuth.instance.currentUser!.uid;
+    try {
+      await FirestoreService().storageRef.child(FirestoreService.avatarFireStorageLoc(uid)).delete();
+    } catch (_) {}
+
     var batch = FirebaseFirestore.instance.batch();
     batch.delete(_userDocument());
     batch.delete(_userProfileDocument(null));
