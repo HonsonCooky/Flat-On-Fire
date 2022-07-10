@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 
 class UserService {
@@ -17,13 +18,21 @@ class UserService {
 
   /// Get the path to a users PUBLIC information
   String _userProfileSubDocPath(String? uid, String exception) {
-    return "${_userPath(uid, exception)}/${FirestoreService.profileSubDoc}";
+    return "${_userPath(uid, exception)}/${FirestoreService().profileSubDocPath}";
+  }
+
+  static const String userAvatarSubLoc = "users";
+
+  /// Get the cloud storage reference to the users avatar
+  Reference _userAvatarRef(String? uid, String exception) {
+    if (uid == null) throw Exception(exception);
+    return CloudStorageService().storageRef.child(CloudStorageService().avatarFireStorageLoc(userAvatarSubLoc, uid));
   }
 
   /// Access to the PRIVATE user information
   DocumentReference<UserModel> _userDocument() {
     var path = _userPath(FirebaseAuth.instance.currentUser?.uid, "Unauthorized access to user information");
-    var doc = FirestoreService.getDoc(path);
+    var doc = FirestoreService().getDoc(path);
     return doc.withConverter<UserModel>(
       fromFirestore: (snapshot, _) => UserModel.fromJson(snapshot.data()!),
       toFirestore: (settingsModel, _) => settingsModel.toJson(),
@@ -36,7 +45,7 @@ class UserService {
       uid ?? FirebaseAuth.instance.currentUser?.uid,
       "Unauthorized access to user information",
     );
-    var doc = FirestoreService.getDoc(path);
+    var doc = FirestoreService().getDoc(path);
     return doc.withConverter<UserProfileModel>(
       fromFirestore: (snapshot, _) => UserProfileModel.fromJson(snapshot.data()!),
       toFirestore: (profileModel, _) => profileModel.toJson(),
@@ -47,7 +56,7 @@ class UserService {
   Future<bool> userDocExists() async {
     var path = _userPath(
       FirebaseAuth.instance.currentUser?.uid,
-      "Unauthorized access to user information",
+      "Unauthorized access to public user information",
     );
     var doc = await FirebaseFirestore.instance.doc(path).get(const GetOptions(source: Source.server));
     return doc.exists;
@@ -58,21 +67,53 @@ class UserService {
     return _userDocument().getCacheFirst();
   }
 
+  /// Get the UserProfileModel from Firestore
+  Future<DocumentSnapshot<UserProfileModel>> getUserProfile(String? uid) {
+    return _userProfileDocument(uid).getCacheFirst();
+  }
+
+  /// Get the file reference to the users avatar
+  Future<File?> getUserAvatarFile(String uid, [bool localOnly = false]) async {
+    var umRef = await getUserProfile(uid);
+    var um = umRef.data();
+
+    if (um == null || um.avatarPath == null) return null;
+    
+    final File imageFile = File(await CloudStorageService().avatarLocalLoc(userAvatarSubLoc, uid));
+    if (imageFile.existsSync()) {
+      return imageFile;
+    }
+    
+    if (localOnly == true) {
+      return null;
+    }
+    
+    try {
+      var url = await CloudStorageService()
+          .storageRef
+          .child(CloudStorageService().avatarFireStorageLoc(userAvatarSubLoc, uid))
+          .getDownloadURL();
+      return CloudStorageService().urlToFile(url, userAvatarSubLoc, uid);
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Create a new user in the Firestore
   Future<void> createNewUser({
     required UserCredential uc,
     required String name,
     required String themeModeName,
     bool onBoarded = true,
-    String? avatarFilePath,
+    String? avatarLocalFilePath,
   }) async {
     try {
       var uid = uc.user!.uid;
 
       // Upload profile picture
-      if (avatarFilePath != null) {
-        var child = FirestoreService().storageRef.child(FirestoreService.avatarFireStorageLoc(uid));
-        await child.putFile(File(avatarFilePath));
+      if (avatarLocalFilePath != null) {
+        var child = _userAvatarRef(uid, "Unauthorized access to user avatar");
+        await child.putFile(File(avatarLocalFilePath));
       }
 
       // Upload profile
@@ -105,7 +146,7 @@ class UserService {
     var uid = FirebaseAuth.instance.currentUser!.uid;
 
     if (avatarFilePath != null) {
-      var child = FirestoreService().storageRef.child(FirestoreService.avatarFireStorageLoc(uid));
+      var child = _userAvatarRef(uid, "Unauthorized access to user avatar");
       await child.putFile(File(avatarFilePath));
     }
 
@@ -122,8 +163,13 @@ class UserService {
     // Delete the profile picture first
     var uid = FirebaseAuth.instance.currentUser!.uid;
     try {
-      await FirestoreService().storageRef.child(FirestoreService.avatarFireStorageLoc(uid)).delete();
-    } catch (_) {}
+      var localAvatar = await getUserAvatarFile(uid, true);
+      await localAvatar?.delete(recursive: true);
+      var child = _userAvatarRef(uid, "Unauthorized access to user avatar");
+      await child.delete();
+    } catch (e) {
+      print(e);
+    }
 
     var batch = FirebaseFirestore.instance.batch();
     batch.delete(_userDocument());

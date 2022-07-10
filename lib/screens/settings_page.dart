@@ -84,7 +84,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
         if (snapshot.hasData) {
           if (snapshot.data?.data() != null) {
             UserModel um = snapshot.data!.data()!;
-            _getUsersAvatar(um);
+            if (_userImage == null) _setAvatar(um.uid!);
             return _accountSuccess(um, textStyle);
           } else {
             return _accountError(textStyle);
@@ -93,6 +93,16 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
         return _awaitingAccountInformation(textStyle);
       },
     );
+  }
+
+  void _setAvatar(String uid) {
+    UserService().getUserAvatarFile(uid).then((value) {
+      if (value != null) {
+        setState(() {
+          _userImage = FileImage(value);
+        });
+      }
+    });
   }
 
   Widget _accountError(TextStyle? textStyle) {
@@ -146,22 +156,6 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
                 ),
           )),
     );
-  }
-
-  Future<void> _getUsersAvatar(UserModel um) async {
-    if (um.profile.avatarPath == null) return;
-
-    final File imageFile = File(await FirestoreService.avatarTmpLoc(um.uid!));
-    setState(() {
-      _userImage = FileImage(imageFile);
-    });
-    // if (await imageFile.exists() == false) {
-    //   try {
-    //     var image = await FirestoreService().storageRef.child(um.profile.avatarPath!).ge;
-    //   } on Exception catch (exception) {
-    //     throw 'could not write image $exception';
-    //   }
-    // }
   }
 
   Widget _editProfileImage(fontSize) {

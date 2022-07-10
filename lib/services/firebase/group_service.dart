@@ -22,12 +22,12 @@ class GroupService {
   /// Get the path to a groups PUBLIC information
   String _groupProfilePath(String? uid, String exception) {
     if (uid == null) throw Exception(exception);
-    return "$groupProfileCollectionName/$uid";
+    return "$groupProfileCollectionName/${FirestoreService().profileSubDocPath}";
   }
 
   /// Access to the PRIVATE group information
   DocumentReference<GroupModel> _groupModelDocument(String uid) {
-    var doc = FirestoreService.getDoc(_groupPath(
+    var doc = FirestoreService().getDoc(_groupPath(
       uid,
       "Unauthorized access to group information",
     ));
@@ -43,7 +43,7 @@ class GroupService {
       uid,
       "Unauthorized access to group information",
     );
-    var doc = FirestoreService.getDoc(path);
+    var doc = FirestoreService().getDoc(path);
     return doc.withConverter<GroupProfileModel>(
       fromFirestore: (snapshot, _) => GroupProfileModel.fromJson(snapshot.data()!),
       toFirestore: (profileModel, _) => profileModel.toJson(),

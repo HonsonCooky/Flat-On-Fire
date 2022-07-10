@@ -5,7 +5,6 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart' as http;
 
 /// A change notifier used for authentication based functionality
 class AuthService extends ChangeNotifier {
@@ -139,11 +138,17 @@ class AuthService extends ChangeNotifier {
     required String email,
     required String name,
     required String password,
+    String? avatarLocalFilePath,
   }) async {
     _appService.viewState = ViewState.busy;
     try {
       var uc = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-      await FirestoreService().userService.createNewUser(uc: uc, name: name, themeModeName: _appService.themeMode.name);
+      await FirestoreService().userService.createNewUser(
+            uc: uc,
+            name: name,
+            themeModeName: _appService.themeMode.name,
+            avatarLocalFilePath: avatarLocalFilePath,
+          );
       return successfulOperation;
     } on FirebaseException catch (e) {
       _failedAttempt();
@@ -154,13 +159,6 @@ class AuthService extends ChangeNotifier {
     } finally {
       await _establishSettings();
     }
-  }
-
-  Future<File> _googleImageToFile(String imageUrl, String name) async {
-    var file = File(await FirestoreService.avatarTmpLoc(name));
-    http.Response response = await http.get(Uri.parse(imageUrl));
-    await file.writeAsBytes(response.bodyBytes);
-    return file;
   }
 
   /// Login with Google
@@ -177,8 +175,14 @@ class AuthService extends ChangeNotifier {
 
       if (!existingUser) {
         var avatarPath = uc.user?.photoURL;
-        File? avatarFile;
-        if (avatarPath != null) avatarFile = await _googleImageToFile(avatarPath, uc.user!.uid);
+        File? avatarLocalFile;
+        if (avatarPath != null) {
+          avatarLocalFile = await CloudStorageService().urlToFile(
+            avatarPath,
+            UserService.userAvatarSubLoc,
+            uc.user!.uid,
+          );
+        }
 
         var name = uc.user!.displayName!;
         var themeModeName = _appService.themeMode.name;
@@ -186,7 +190,7 @@ class AuthService extends ChangeNotifier {
               uc: uc,
               name: name,
               themeModeName: themeModeName,
-              avatarFilePath: avatarFile?.path,
+              avatarLocalFilePath: avatarLocalFile?.path,
             );
       }
 
@@ -195,6 +199,7 @@ class AuthService extends ChangeNotifier {
       _failedAttempt();
       return e.message ?? authErrorBackup;
     } catch (e) {
+      print(e);
       _failedAttempt();
       return "Google Authentication Failed";
     } finally {
