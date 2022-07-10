@@ -13,3 +13,5 @@ export 'uneditable_text_entry_widget.dart';
 export 'boolean_switcher_widget.dart';
 export 'delete_account_widget.dart';
 export 'reauthenticate_account_alert_widget.dart';
+export 'tip_widget.dart';
+export 'full_image_dialog_widget.dart';

@@ -6,10 +6,10 @@ abstract class AuthenticationTab extends StatefulWidget {
   final String? emailErrMsg, passwordErrMsg;
   final VoidCallback resetErrors;
   final void Function({
-    required Future<String> Function() attemptCallback,
+    required Future<String> Function() authActionCallback,
     bool requiresCheck,
     bool Function()? optionalCheck,
-  }) attempt;
+  }) attemptAuthCallback;
 
   const AuthenticationTab({
     Key? key,
@@ -18,6 +18,6 @@ abstract class AuthenticationTab extends StatefulWidget {
     this.emailErrMsg,
     this.passwordErrMsg,
     required this.resetErrors,
-    required this.attempt,
+    required this.attemptAuthCallback,
   }) : super(key: key);
 }

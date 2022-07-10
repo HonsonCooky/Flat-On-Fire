@@ -159,7 +159,7 @@ class AuthService extends ChangeNotifier {
 
       // Create/Get access to the user credentials inside firebase
       var uc = await FirebaseAuth.instance.signInWithCredential(credential);
-      var existingUser = uc.additionalUserInfo!.isNewUser || await FirestoreService().userService.userDocExists();
+      var existingUser = !uc.additionalUserInfo!.isNewUser || await FirestoreService().userService.userDocExists();
       
       if (!existingUser) {
         await FirestoreService()

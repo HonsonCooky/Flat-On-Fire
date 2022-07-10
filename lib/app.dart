@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -54,11 +53,12 @@ class _AppState extends State<App> {
 // APP EXTENSIONS
 // ----------------------------------------------------------------------------------------------------------------
 
-
 extension StringExtension on String {
   String capitalize() {
     return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
   }
+
+  String initials() => isNotEmpty ? trim().split(' ').map((l) => l[0]).take(2).join() : '';
 }
 
 extension FirestoreDocumentExtension<T> on DocumentReference<T> {

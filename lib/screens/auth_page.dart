@@ -21,7 +21,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
     super.dispose();
   }
 
-  bool _mandatoryCheck() {
+  bool _emailPasswordCheck() {
     setState(() {
       emailErrMsg = _email.text.isEmpty ? "No Email Provided" : null;
       passwordErrMsg = _password.text.isEmpty ? "No Password Provided" : null;
@@ -29,22 +29,22 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
     return emailErrMsg == null && passwordErrMsg == null;
   }
 
-  void resetErrors() {
+  void _resetErrors() {
     setState(() {
       emailErrMsg = null;
       passwordErrMsg = null;
     });
   }
 
-  void attempt({
-    required Future<String> Function() attemptCallback,
+  void _attemptAuthAction({
+    required Future<String> Function() authActionCallback,
     bool requiresCheck = true,
     bool Function()? optionalCheck,
   }) async {
     // Don't bother checking the backend if the information is known to be wrong.
     bool checkPass = true;
     if (requiresCheck) {
-      checkPass &= _mandatoryCheck();
+      checkPass &= _emailPasswordCheck();
       // Some screens have more than email and password, so execute their other checks
       if (optionalCheck != null) {
         checkPass &= optionalCheck();
@@ -55,8 +55,8 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
       errorToast("Invalid user credentials", context);
       return;
     }
-
-    var res = await attemptCallback();
+    
+    var res = await authActionCallback();
     if (mounted && res != AuthService.successfulOperation) {
       errorToast(res, context);
     }
@@ -78,7 +78,6 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
             ],
           ),
         ),
-        // bottomNavigationBar: _googleSignIn(),
       ),
     );
   }
@@ -165,10 +164,10 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
     return const TabBar(
       tabs: [
         Tab(
-          text: "Login",
+          text: "LOGIN",
         ),
         Tab(
-          text: "Signup",
+          text: "SIGNUP",
         ),
       ],
     );
@@ -185,8 +184,8 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
                 password: _password,
                 emailErrMsg: emailErrMsg,
                 passwordErrMsg: passwordErrMsg,
-                resetErrors: resetErrors,
-                attempt: attempt,
+                resetErrors: _resetErrors,
+                attemptAuthCallback: _attemptAuthAction,
               ),
             ),
             WrapperPadding(
@@ -195,8 +194,8 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
                 password: _password,
                 emailErrMsg: emailErrMsg,
                 passwordErrMsg: passwordErrMsg,
-                resetErrors: resetErrors,
-                attempt: attempt,
+                resetErrors: _resetErrors,
+                attemptAuthCallback: _attemptAuthAction,
               ),
             ),
           ],
@@ -228,9 +227,9 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
                 color: Theme.of(context).colorScheme.onTertiary,
               ),
             ),
-            onPressed: () => attempt(
+            onPressed: () => _attemptAuthAction(
               requiresCheck: false,
-              attemptCallback: () => context.read<AuthService>().googleSignupLogin(),
+              authActionCallback: () => context.read<AuthService>().googleSignupLogin(),
             ),
             style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
                 backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.tertiary)),

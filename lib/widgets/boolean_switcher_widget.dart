@@ -1,3 +1,4 @@
+import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
 
 class BooleanSwitcherWidget extends StatelessWidget {
@@ -21,10 +22,8 @@ class BooleanSwitcherWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     assert(hints.length == 2);
-    return Tooltip(
-      message: explanation,
-      margin: const EdgeInsets.only(left: 20, right: 20, top: 5),
-      padding: const EdgeInsets.all(10),
+    return TipWidget(
+      explanation: explanation,
       child: SwitchListTile(
         title: Row(
           children: [

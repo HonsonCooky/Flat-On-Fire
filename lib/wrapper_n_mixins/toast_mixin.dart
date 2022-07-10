@@ -5,7 +5,9 @@ abstract class ToastMixin {
     final s = ScaffoldMessenger.of(context);
     s.showSnackBar(
       SnackBar(
-        behavior: SnackBarBehavior.fixed,
+        duration: const Duration(milliseconds: 2000),
+        behavior: SnackBarBehavior.floating,
+        dismissDirection: DismissDirection.horizontal,
         content: Text(
           msg,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -21,7 +23,9 @@ abstract class ToastMixin {
     final s = ScaffoldMessenger.of(context);
     s.showSnackBar(
       SnackBar(
-        behavior: SnackBarBehavior.fixed,
+        duration: const Duration(milliseconds: 2000),
+        behavior: SnackBarBehavior.floating,
+        dismissDirection: DismissDirection.horizontal,
         content: Text(
           msg,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -37,7 +41,8 @@ abstract class ToastMixin {
     final s = ScaffoldMessenger.of(context);
     s.showSnackBar(
       SnackBar(
-        behavior: SnackBarBehavior.fixed,
+        duration: const Duration(milliseconds: 2000),
+        behavior: SnackBarBehavior.floating,
         dismissDirection: DismissDirection.horizontal,
         content: Text(
           msg,
@@ -54,7 +59,8 @@ abstract class ToastMixin {
     final s = ScaffoldMessenger.of(context);
     s.showSnackBar(
       SnackBar(
-        behavior: SnackBarBehavior.fixed,
+        duration: const Duration(milliseconds: 2000),
+        behavior: SnackBarBehavior.floating,
         dismissDirection: DismissDirection.horizontal,
         content: Text(
           "The developer of this app did an oopsie\nReference: ${id}",

@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+// import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -12,6 +17,8 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingPageState extends State<SettingsPage> with ToastMixin {
   final _name = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
+  XFile? _pickedImage;
 
   // ----------------------------------------------------------------------------------------------------------------
   // MAIN
@@ -75,7 +82,9 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
       future: FirestoreService().userService.getUser(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
         if (snapshot.hasError) return _accountError(textStyle);
-        if (snapshot.hasData) return _accountSuccess(snapshot.data!.data()!, textStyle);
+        if (snapshot.hasData) {
+          return _accountSuccess(snapshot.data!.data()!, textStyle);
+        }
         return _awaitingAccountInformation(textStyle);
       },
     );
@@ -95,14 +104,95 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
     );
   }
 
+  Widget _profilePicture(UserModel um, TextStyle? textStyle) {
+    double fontSize = textStyle?.fontSize != null ? textStyle!.fontSize! * 3 : 20;
+    return Stack(
+      alignment: Alignment.center,
+      clipBehavior: Clip.none,
+      children: [
+        _profileImage(um, fontSize),
+        _editProfileImage(fontSize),
+      ],
+    );
+  }
+
+  Widget _profileImage(UserModel um, double fontSize) {
+    return GestureDetector(
+      onTap: () {
+        if (_pickedImage == null) return;
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return FullImageDialogWidget(
+              title: "Profile Picture",
+              image: Image.file(File(_pickedImage!.path)),
+            );
+          },
+        );
+      },
+      child: CircleAvatar(
+        radius: fontSize,
+        backgroundImage: _pickedImage != null ? FileImage(File(_pickedImage!.path)) : null,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        child: _pickedImage == null
+            ? Text(
+                um.profile.name.initials(),
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      fontSize: fontSize,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+              )
+            : null,
+      ),
+    );
+  }
+
+  Widget _editProfileImage(fontSize) {
+    return Positioned(
+      top: fontSize * 1.2,
+      left: MediaQuery.of(context).size.width / 2 - 10,
+      child: ElevatedButton(
+        onPressed: () async {
+          _pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+          // if (_pickedImage != null) {
+          //   FirebaseStorage.instance.ref().child('profiles/some_image.png').putFile(File(_pickedImage!.path));
+          // }
+
+          setState(() {});
+        },
+        style: ElevatedButton.styleFrom(
+          shape: const CircleBorder(),
+        ),
+        child: const Icon(Icons.add_a_photo),
+      ),
+    );
+  }
+
   Widget _accountSuccess(UserModel um, TextStyle? textStyle) {
     return ListView(
       padding: EdgeInsets.zero,
       shrinkWrap: true,
       children: [
-        UneditableTextEntryWidget(title: "Account Number", value: um.uid!, textStyle: textStyle),
+        _profilePicture(um, textStyle),
         SizedBox(height: textStyle?.fontSize),
-        EditableTextEntryWidget(title: "Name", value: um.profile.name, controller: _name, textStyle: textStyle),
+        TipWidget(
+          explanation: "A unique identifier for your account",
+          child: UneditableTextEntryWidget(
+            title: "Account Number",
+            value: um.uid!,
+            textStyle: textStyle,
+          ),
+        ),
+        SizedBox(height: textStyle?.fontSize),
+        TipWidget(
+          explanation: "The name that others in this app will see",
+          child: EditableTextEntryWidget(
+            title: "Name",
+            value: um.profile.name,
+            controller: _name,
+            textStyle: textStyle,
+          ),
+        ),
         SizedBox(height: textStyle?.fontSize),
         _onBoardedChanger(textStyle),
         SizedBox(height: textStyle?.fontSize),
@@ -184,11 +274,10 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
           await FirestoreService().userService.updateUser({
             "themeMode": context.read<AppService>().themeMode.name,
             "onBoarded": context.read<AppService>().onBoarded,
-            "profile": UserProfileModel(name: _name.text.isNotEmpty ? _name.text : um.profile.name),
+            "profile": UserProfileModel(name: _name.text.isNotEmpty ? _name.text : um.profile.name).toJson(),
           });
           if (mounted) successToast("Save successful", context);
         } catch (e) {
-          
           errorToast("Unable to save changes at this time", context);
         } finally {
           context.read<AppService>().viewState = ViewState.ideal;
@@ -198,7 +287,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
             backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.primary),
           ),
       label: Text(
-        "Save Changes",
+        "SAVE CHANGES",
         style: Theme.of(context).elevatedButtonTheme.style?.textStyle?.resolve({})?.copyWith(
           color: Theme.of(context).colorScheme.onPrimary,
         ),
@@ -249,7 +338,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
 
   Widget _deleteBtn() {
     return ElevatedButton.icon(
-      onPressed: () async {
+      onPressed: () {
         showDialog(
           context: context,
           builder: (BuildContext context) {

@@ -63,7 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '381231754472',
     projectId: 'flat-on-fire-services',
     storageBucket: 'flat-on-fire-services.appspot.com',
-    androidClientId: '381231754472-0tf125saej5jbn4g0bs9tid50gpk5ci3.apps.googleusercontent.com',
+    androidClientId: '381231754472-o1kb38mincjo6arstqq11vb3lunlfi27.apps.googleusercontent.com',
     iosClientId: '381231754472-dqppaa200kn4slqlnnd7nr00cuuhehq2.apps.googleusercontent.com',
     iosBundleId: 'com.honsoncooky.flatOnFire',
   );

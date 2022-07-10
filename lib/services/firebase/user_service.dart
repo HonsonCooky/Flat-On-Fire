@@ -87,7 +87,7 @@ class UserService {
   /// Update a user + the user profile in the firestore
   Future<void> updateUser(Map<String, dynamic> update) async {
     var batch = FirebaseFirestore.instance.batch();
-    Map<String, dynamic> userUpdate = {};
+    Map<String, dynamic> userUpdate = update;
     Map<String, dynamic> profileUpdate = update["profile"] ?? {};
     batch.update(_userDocument(), userUpdate);
     batch.update(_userProfileDocument(null), profileUpdate);

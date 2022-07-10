@@ -8,7 +8,7 @@ class SignupTabWidget extends AuthenticationTab {
     required super.email,
     required super.password,
     required super.resetErrors,
-    required super.attempt,
+    required super.attemptAuthCallback,
     super.emailErrMsg,
     super.passwordErrMsg,
   }) : super(key: key);
@@ -46,8 +46,8 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
   Widget build(BuildContext context) {
     return _signupTabContents();
   }
-  
-  Widget _signupTabContents(){
+
+  Widget _signupTabContents() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -102,14 +102,13 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
         /// Sign In Button
         ElevatedButton(
           child: const Text("CREATE ACCOUNT"),
-          onPressed: () => widget.attempt(
-              attemptCallback: () => context.read<AuthService>().signup(
-                email: widget.email.text,
-                name: _name.text,
-                password: widget.password.text,
-              ),
-              optionalCheck: preFlightCheck
-          ),
+          onPressed: () => widget.attemptAuthCallback(
+              authActionCallback: () => context.read<AuthService>().signup(
+                    email: widget.email.text,
+                    name: _name.text,
+                    password: widget.password.text,
+                  ),
+              optionalCheck: preFlightCheck),
         ),
       ],
     );

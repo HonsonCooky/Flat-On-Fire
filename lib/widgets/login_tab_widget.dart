@@ -8,7 +8,7 @@ class LoginTabWidget extends AuthenticationTab {
     required super.email,
     required super.password,
     required super.resetErrors,
-    required super.attempt,
+    required super.attemptAuthCallback,
     super.emailErrMsg,
     super.passwordErrMsg,
   }) : super(key: key);
@@ -24,8 +24,8 @@ class _LoginTabWidgetState extends State<LoginTabWidget> with ToastMixin {
   Widget build(BuildContext context) {
     return _loginTabContents();
   }
-  
-  Widget _loginTabContents(){
+
+  Widget _loginTabContents() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -68,13 +68,14 @@ class _LoginTabWidgetState extends State<LoginTabWidget> with ToastMixin {
         ),
 
         /// Sign In Button
-        ElevatedButton(
-          child: const Text("LOGIN"),
-          onPressed: () => widget.attempt(
-            attemptCallback: () => context.read<AuthService>().login(
-              email: widget.email.text,
-              password: widget.password.text,
-            ),
+        ElevatedButton.icon(
+          label: const Text("LOGIN"),
+          icon: const Icon(Icons.login),
+          onPressed: () => widget.attemptAuthCallback(
+            authActionCallback: () => context.read<AuthService>().login(
+                  email: widget.email.text,
+                  password: widget.password.text,
+                ),
           ),
         ),
       ],
