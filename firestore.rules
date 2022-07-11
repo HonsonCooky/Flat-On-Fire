@@ -1,10 +1,12 @@
 rules_version = '2';
 service cloud.firestore {
     match /databases/{database}/documents {
-        match /users/{userId} {
+        match /users/{uid} {
             // Read and write if own document
-            allow read, write: if request.auth.uid == userId;
-
+            match /{path=**} {
+                allow read, write: if request.auth.uid == uid;
+            }
+            
             match /public/{path=**} {
                 // Allow read of anything public
                 allow read: if request.auth.uid != null;

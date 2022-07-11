@@ -119,6 +119,13 @@ class AuthService extends ChangeNotifier {
     _appService.viewState = ViewState.busy;
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+      if (!await FirestoreService().userService.userDocExists()) {
+        await FirebaseAuth.instance.currentUser?.delete();
+        throw FirebaseException(
+          message: "Unable to find user information. Signup again?",
+          plugin: 'FOF',
+        );
+      }
       return successfulOperation;
     } on FirebaseException catch (e) {
       _failedAttempt();
@@ -151,7 +158,7 @@ class AuthService extends ChangeNotifier {
     } on FirebaseException catch (e) {
       _failedAttempt();
       return e.message ?? authErrorBackup;
-    } catch (_) {
+    } catch (e) {
       _failedAttempt();
       return "Signup Failed";
     } finally {

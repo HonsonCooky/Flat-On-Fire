@@ -25,10 +25,10 @@ class CloudStorageService {
   Future<String> _avatarLocalLoc(String subFolder, String uid) async {
     Directory appDir = await getApplicationDocumentsDirectory();
     String appDirPath = appDir.path;
-    return '$appDirPath/$subFolder/$uid.png';
+    return '$appDirPath/$subFolder/$uid/avatar.jpg';
   }
 
-  String _avatarFireStorageLoc(String subFolder, String uid) => "fof_avatars/$subFolder/$uid.jpg";
+  String avatarFireStorageLoc(String subFolder, String uid) => "$subFolder/$uid/avatar.jpg";
 
   Future<File> _urlToFile(String imageUrl, String subFolder, String uid) async {
     var file = File(await _avatarLocalLoc(subFolder, uid));
@@ -59,7 +59,7 @@ class CloudStorageService {
 
   Future<File?> _getCloudAvatarFile({required String subFolder, required String uid}) async {
     try {
-      var path = _avatarFireStorageLoc(subFolder, uid);
+      var path = avatarFireStorageLoc(subFolder, uid);
       var url = await _storageRef.child(path).getDownloadURL();
       var file = await _urlToFile(url, subFolder, uid);
       return file;
@@ -107,7 +107,7 @@ class CloudStorageService {
   }
 
   Future _setAvatarFileCloud({required String subFolder, required String uid, required File file}) async {
-    await _storageRef.child(_avatarFireStorageLoc(subFolder, uid)).putFile(file);
+    await _storageRef.child(avatarFireStorageLoc(subFolder, uid)).putFile(file);
   }
 
   // ----------------------------------------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ class CloudStorageService {
     var localAvatar = File(await _avatarLocalLoc(subFolder, uid));
     if (localAvatar.existsSync()) localAvatar.delete(recursive: true);
 
-    var path = _avatarFireStorageLoc(subFolder, uid);
+    var path = avatarFireStorageLoc(subFolder, uid);
     await _storageRef.child(path).delete();
   }
 }

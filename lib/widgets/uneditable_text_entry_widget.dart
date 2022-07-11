@@ -7,7 +7,7 @@ class UneditableTextEntryWidget extends StatelessWidget with ToastMixin {
   final String value;
   final TextStyle? textStyle;
 
-  const UneditableTextEntryWidget({
+  UneditableTextEntryWidget({
     Key? key,
     required this.title,
     required this.value,

@@ -76,15 +76,23 @@ class UserService {
       var uid = uc.user!.uid;
 
       // Upload user picture
-      CloudStorageService().setAvatarFile(
-        subFolder: UserService.userAvatarSubLoc,
-        uid: uid,
-        imagePath: avatarLocalFilePath,
-        imageUrl: avatarFileUrl,
-      );
+      if (avatarFileUrl != null || avatarLocalFilePath != null) {
+        await CloudStorageService().setAvatarFile(
+          subFolder: UserService.userAvatarSubLoc,
+          uid: uid,
+          imagePath: avatarLocalFilePath,
+          imageUrl: avatarFileUrl,
+        );
+      }
 
       // Upload profile
-      UserProfileModel userProfileModel = UserProfileModel(name: name, avatarPath: 'fof_avatars/${uc.user?.uid}.jpg');
+      UserProfileModel userProfileModel = UserProfileModel(
+        name: name,
+        avatarPath: CloudStorageService().avatarFireStorageLoc(
+          UserService.userAvatarSubLoc,
+          uid,
+        ),
+      );
 
       // Finally create the user
       UserModel userModel = UserModel(
