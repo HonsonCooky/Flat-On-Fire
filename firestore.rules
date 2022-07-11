@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+    match /databases/{database}/documents {
+        match /users/{userId} {
+            // Read and write if own document
+            allow read, write: if request.auth.uid == userId;
+
+            match /public/{path=**} {
+                // Allow read of anything public
+                allow read: if request.auth.uid != null;
+            }
+        }
+
+        match /groups/{path=**} {
+            allow read: if resource.data.users[request.auth.uid] in ["owner", "writer", "reader"];
+            allow write: if resource.data.users[request.auth.uid] in ["owner", "writer"];
+        }
+    }
+}

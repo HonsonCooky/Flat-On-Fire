@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 abstract class AuthenticationTab extends StatefulWidget {
+  final ScrollController scrollController;
   final TextEditingController email;
   final TextEditingController password;
   final String? emailErrMsg, passwordErrMsg;
@@ -13,6 +14,7 @@ abstract class AuthenticationTab extends StatefulWidget {
 
   const AuthenticationTab({
     Key? key,
+    required this.scrollController,
     required this.email,
     required this.password,
     this.emailErrMsg,

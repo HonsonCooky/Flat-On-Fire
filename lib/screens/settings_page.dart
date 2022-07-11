@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
@@ -16,8 +17,19 @@ class SettingsPage extends StatefulWidget {
 class _SettingPageState extends State<SettingsPage> with ToastMixin {
   final _name = TextEditingController();
   final ImagePicker _picker = ImagePicker();
-  FileImage? _userImage;
+  final List<String> profileTitles = [
+    "Dis you?",
+    "Ya so handsome",
+    "Felt cute...",
+    "This is me!",
+    "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧",
+    "(◕‿◕✿)",
+    "This dude! \n(☞ﾟ∀ﾟ)☞",
+    "So pretty! \n(;´༎ຶД༎ຶ`)"
+  ];
   XFile? _pickedImage;
+  File? _userImage;
+  bool _userImageLoaded = false;
 
   // ----------------------------------------------------------------------------------------------------------------
   // MAIN
@@ -80,29 +92,15 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
     return FutureBuilder(
       future: FirestoreService().userService.getUser(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
-        if (snapshot.hasError) return _accountError(textStyle);
-        if (snapshot.hasData) {
-          if (snapshot.data?.data() != null) {
-            UserModel um = snapshot.data!.data()!;
-            if (_userImage == null) _setAvatar(um.uid!);
-            return _accountSuccess(um, textStyle);
-          } else {
-            return _accountError(textStyle);
-          }
+        if (snapshot.hasData && snapshot.data?.data() != null) {
+          UserModel um = snapshot.data!.data()!;
+          return _accountSuccess(um, textStyle);
+        } else if (snapshot.hasData || snapshot.hasError) {
+          return _accountError(textStyle);
         }
         return _awaitingAccountInformation(textStyle);
       },
     );
-  }
-
-  void _setAvatar(String uid) {
-    UserService().getUserAvatarFile(uid).then((value) {
-      if (value != null) {
-        setState(() {
-          _userImage = FileImage(value);
-        });
-      }
-    });
   }
 
   Widget _accountError(TextStyle? textStyle) {
@@ -116,62 +114,6 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
     return LoadingTextWidget(
       text: "... finding account information",
       style: textStyle,
-    );
-  }
-
-  Widget _profilePicture(UserModel um, TextStyle? textStyle) {
-    double fontSize = textStyle?.fontSize != null ? textStyle!.fontSize! * 3 : 20;
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        _profileImage(um, fontSize),
-        _editProfileImage(fontSize),
-      ],
-    );
-  }
-
-  Widget _profileImage(UserModel um, double fontSize) {
-    return GestureDetector(
-      onTap: () {
-        if (_pickedImage == null) return;
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return FullImageDialogWidget(
-              title: "Profile Picture",
-              image: Image.file(File(_pickedImage!.path)),
-            );
-          },
-        );
-      },
-      child: CircleAvatar(
-          radius: fontSize,
-          foregroundImage: _pickedImage != null ? FileImage(File(_pickedImage!.path)) : _userImage,
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          child: Text(
-            um.profile.name.initials(),
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  fontSize: fontSize,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-          )),
-    );
-  }
-
-  Widget _editProfileImage(fontSize) {
-    return Positioned(
-      top: fontSize * 1.2,
-      left: MediaQuery.of(context).size.width / 2 - 10,
-      child: ElevatedButton(
-        onPressed: () async {
-          _pickedImage = await _picker.pickImage(source: ImageSource.gallery);
-          setState(() {});
-        },
-        style: ElevatedButton.styleFrom(
-          shape: const CircleBorder(),
-        ),
-        child: const Icon(Icons.add_a_photo),
-      ),
     );
   }
 
@@ -224,6 +166,93 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
   }
 
   // ----------------------------------------------------------------------------------------------------------------
+  // PROFILE PICTURE
+  // ----------------------------------------------------------------------------------------------------------------
+
+  Widget _profilePicture(UserModel um, TextStyle? textStyle) {
+    double fontSize = textStyle?.fontSize != null ? textStyle!.fontSize! * 3 : 20;
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        _profileImage(um, fontSize),
+        _editProfileImage(fontSize),
+      ],
+    );
+  }
+
+  Widget _profileImage(UserModel um, double fontSize) {
+    return GestureDetector(
+      onTap: () {
+        if (_pickedImage == null && _userImage == null) return;
+        int randomIndex = Random().nextInt(profileTitles.length);
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return FullImageDialogWidget(
+              title: profileTitles[randomIndex],
+              image: _pickedImage != null ? Image.file(File(_pickedImage!.path)) : Image.file(_userImage!),
+            );
+          },
+        );
+      },
+      child: _circleAvatar(um, fontSize),
+    );
+  }
+
+  Widget _circleAvatar(UserModel um, double fontSize) {
+    return CircleAvatar(
+      radius: fontSize,
+      foregroundImage: _pickedImage != null
+          ? FileImage(File(_pickedImage!.path))
+          : _userImage != null
+              ? FileImage(_userImage!)
+              : null,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      child: _userAvatar(um, fontSize),
+    );
+  }
+
+  Widget _userAvatar(UserModel um, double fontSize) {
+    if (_userImageLoaded) return _userInitials(um, fontSize);
+
+    CloudStorageService()
+        .getAvatarFile(subFolder: UserService.userAvatarSubLoc, uid: um.uid!, cacheOnly: true)
+        .then((value) => setState(() {
+              _userImage = value;
+              _userImageLoaded = true;
+            }));
+
+    return LoadingSpinnerWidget(fontSize);
+  }
+
+  Widget _userInitials(UserModel um, double fontSize) {
+    return Text(
+      um.profile.name.initials().toUpperCase(),
+      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            fontSize: fontSize,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+    );
+  }
+
+  Widget _editProfileImage(fontSize) {
+    return Positioned(
+      top: fontSize * 1.2,
+      left: MediaQuery.of(context).size.width / 2 - 10,
+      child: ElevatedButton(
+        onPressed: () async {
+          _pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+          setState(() {});
+        },
+        style: ElevatedButton.styleFrom(
+          shape: const CircleBorder(),
+        ),
+        child: const Icon(Icons.add_a_photo),
+      ),
+    );
+  }
+
+  // ----------------------------------------------------------------------------------------------------------------
   // APP SETTINGS
   // ----------------------------------------------------------------------------------------------------------------
 
@@ -259,23 +288,13 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
     return FutureBuilder(
       future: FirestoreService().userService.getUser(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
-        if (snapshot.hasError) return _noSaveButton(textStyle);
-        if (snapshot.hasData) {
-          if (snapshot.data?.data() != null) {
-            return _saveButton(snapshot.data!.data()!);
-          } else {
-            return _noSaveButton(textStyle);
-          }
+        if (snapshot.hasData && snapshot.data?.data() != null) {
+          return _saveButton(snapshot.data!.data()!);
+        } else if (snapshot.hasData || snapshot.hasError) {
+          return const SizedBox();
         }
         return LoadingSpinnerWidget(textStyle?.fontSize ?? 20);
       },
-    );
-  }
-
-  Widget _noSaveButton(TextStyle? textStyle) {
-    return Text(
-      "Cannot save without account information",
-      style: textStyle,
     );
   }
 
@@ -287,7 +306,10 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
           await FirestoreService().userService.updateUser({
             "themeMode": context.read<AppService>().themeMode.name,
             "onBoarded": context.read<AppService>().onBoarded,
-            "profile": UserProfileModel(name: _name.text.isNotEmpty ? _name.text : um.profile.name).toJson(),
+            "profile": UserProfileModel(
+              name: _name.text.isNotEmpty ? _name.text : um.profile.name,
+              avatarPath: _pickedImage?.path ?? um.profile.avatarPath,
+            ).toJson(),
           });
           if (mounted) successToast("Save successful", context);
         } catch (e) {

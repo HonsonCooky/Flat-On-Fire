@@ -17,11 +17,14 @@ class _ReauthenticateAccountAlertWidgetState extends State<ReauthenticateAccount
   String? emailErr;
   String? passwordErr;
   String? errorText;
+  bool _isObscure = true;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text("Account Deletion"),
+      titlePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
       content: SingleChildScrollView(
         child: WrapperFocusShift(
           child: _authenticationComponents(),
@@ -71,6 +74,7 @@ class _ReauthenticateAccountAlertWidgetState extends State<ReauthenticateAccount
   }
 
   Widget _authenticationTextFields() {
+    double fontSize = 18;
     return Column(
       children: [
         TextField(
@@ -83,7 +87,7 @@ class _ReauthenticateAccountAlertWidgetState extends State<ReauthenticateAccount
             });
           },
           decoration: InputDecoration(
-            label: const Text("Email"),
+            label: Text("Email", style: TextStyle(fontSize: fontSize)),
             errorText: emailErr,
           ),
         ),
@@ -96,9 +100,16 @@ class _ReauthenticateAccountAlertWidgetState extends State<ReauthenticateAccount
               errorText = null;
             });
           },
+          obscureText: _isObscure,
           decoration: InputDecoration(
-            label: const Text("Password"),
+            label: Text("Password", style: TextStyle(fontSize: fontSize)),
             errorText: passwordErr,
+            suffixIcon: IconButton(
+              icon: Icon(_isObscure ? Icons.visibility : Icons.visibility_off),
+              onPressed: () {
+                setState(() => _isObscure = !_isObscure);
+              },
+            ),
           ),
         ),
       ],

@@ -1,0 +1,12 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /fof_avatars {
+      allow read: if request.auth!=null;
+      
+      match /users/{filename} {
+        allow write: if filename.matches(request.auth.uid + ".jpg|.png");
+      }
+    }
+  }
+}

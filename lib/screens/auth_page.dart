@@ -10,6 +10,9 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> with ToastMixin {
+  final ScrollController _loginScroll = ScrollController();
+  final ScrollController _signupScroll = ScrollController();
+
   final _email = TextEditingController();
   final _password = TextEditingController();
   String? emailErrMsg, passwordErrMsg;
@@ -55,7 +58,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
       errorToast("Invalid user credentials", context);
       return;
     }
-    
+
     var res = await authActionCallback();
     if (mounted && res != AuthService.successfulOperation) {
       errorToast(res, context);
@@ -94,6 +97,9 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
         child: SafeArea(
           child: Column(
             children: [
+              const SizedBox(
+                height: 20,
+              ),
               Stack(
                 children: [
                   _headerLogo(fontSize),
@@ -178,24 +184,40 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
       child: WrapperOverflowRemoved(
         child: TabBarView(
           children: [
-            WrapperPadding(
-              child: LoginTabWidget(
-                email: _email,
-                password: _password,
-                emailErrMsg: emailErrMsg,
-                passwordErrMsg: passwordErrMsg,
-                resetErrors: _resetErrors,
-                attemptAuthCallback: _attemptAuthAction,
+            RawScrollbar(
+              thumbColor: PaletteAssistant.alpha(Theme.of(context).colorScheme.secondary),
+              thickness: 10,
+              thumbVisibility: true,
+              radius: const Radius.circular(2),
+              controller: _loginScroll,
+              child: WrapperPadding(
+                child: LoginTabWidget(
+                  scrollController: _loginScroll,
+                  email: _email,
+                  password: _password,
+                  emailErrMsg: emailErrMsg,
+                  passwordErrMsg: passwordErrMsg,
+                  resetErrors: _resetErrors,
+                  attemptAuthCallback: _attemptAuthAction,
+                ),
               ),
             ),
-            WrapperPadding(
-              child: SignupTabWidget(
-                email: _email,
-                password: _password,
-                emailErrMsg: emailErrMsg,
-                passwordErrMsg: passwordErrMsg,
-                resetErrors: _resetErrors,
-                attemptAuthCallback: _attemptAuthAction,
+            RawScrollbar(
+              thumbColor: PaletteAssistant.alpha(Theme.of(context).colorScheme.secondary),
+              thickness: 10,
+              thumbVisibility: true,
+              radius: const Radius.circular(2),
+              controller: _signupScroll,
+              child: WrapperPadding(
+                child: SignupTabWidget(
+                  scrollController: _signupScroll,
+                  email: _email,
+                  password: _password,
+                  emailErrMsg: emailErrMsg,
+                  passwordErrMsg: passwordErrMsg,
+                  resetErrors: _resetErrors,
+                  attemptAuthCallback: _attemptAuthAction,
+                ),
               ),
             ),
           ],

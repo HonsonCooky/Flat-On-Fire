@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 class LoginTabWidget extends AuthenticationTab {
   const LoginTabWidget({
     Key? key,
+    required super.scrollController,
     required super.email,
     required super.password,
     required super.resetErrors,
@@ -31,6 +32,7 @@ class _LoginTabWidgetState extends State<LoginTabWidget> with ToastMixin {
       children: [
         Expanded(
           child: ListView(
+            controller: widget.scrollController,
             physics: const BouncingScrollPhysics(),
             children: [
               /// Email Text Box

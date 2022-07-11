@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
@@ -174,23 +172,13 @@ class AuthService extends ChangeNotifier {
       var existingUser = !uc.additionalUserInfo!.isNewUser && await FirestoreService().userService.userDocExists();
 
       if (!existingUser) {
-        var avatarPath = uc.user?.photoURL;
-        File? avatarLocalFile;
-        if (avatarPath != null) {
-          avatarLocalFile = await CloudStorageService().urlToFile(
-            avatarPath,
-            UserService.userAvatarSubLoc,
-            uc.user!.uid,
-          );
-        }
-
         var name = uc.user!.displayName!;
         var themeModeName = _appService.themeMode.name;
         await FirestoreService().userService.createNewUser(
               uc: uc,
               name: name,
               themeModeName: themeModeName,
-              avatarLocalFilePath: avatarLocalFile?.path,
+              avatarFileUrl: uc.user?.photoURL,
             );
       }
 
@@ -199,7 +187,6 @@ class AuthService extends ChangeNotifier {
       _failedAttempt();
       return e.message ?? authErrorBackup;
     } catch (e) {
-      print(e);
       _failedAttempt();
       return "Google Authentication Failed";
     } finally {

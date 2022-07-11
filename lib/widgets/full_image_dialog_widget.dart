@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class FullImageDialogWidget extends StatelessWidget {
   final Image image;
   final String title;
-
+  
   const FullImageDialogWidget({Key? key, required this.image, required this.title}) : super(key: key);
 
   @override

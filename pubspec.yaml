@@ -3,6 +3,13 @@ description: A new Flutter project to create the Flat Out Management application
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
+
+scripts:
+  run: 
+    deploy-rules: "firebase deploy --only firestore:rules && firebase deploy --only storage"
+      
+    
+    
 environment:
   sdk: ">=2.17.1 <3.0.2"
 dependencies:

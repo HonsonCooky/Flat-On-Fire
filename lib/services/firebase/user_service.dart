@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 
 class UserService {
@@ -22,12 +19,6 @@ class UserService {
   }
 
   static const String userAvatarSubLoc = "users";
-
-  /// Get the cloud storage reference to the users avatar
-  Reference _userAvatarRef(String? uid, String exception) {
-    if (uid == null) throw Exception(exception);
-    return CloudStorageService().storageRef.child(CloudStorageService().avatarFireStorageLoc(userAvatarSubLoc, uid));
-  }
 
   /// Access to the PRIVATE user information
   DocumentReference<UserModel> _userDocument() {
@@ -72,49 +63,25 @@ class UserService {
     return _userProfileDocument(uid).getCacheFirst();
   }
 
-  /// Get the file reference to the users avatar
-  Future<File?> getUserAvatarFile(String uid, [bool localOnly = false]) async {
-    var umRef = await getUserProfile(uid);
-    var um = umRef.data();
-
-    if (um == null || um.avatarPath == null) return null;
-    
-    final File imageFile = File(await CloudStorageService().avatarLocalLoc(userAvatarSubLoc, uid));
-    if (imageFile.existsSync()) {
-      return imageFile;
-    }
-    
-    if (localOnly == true) {
-      return null;
-    }
-    
-    try {
-      var url = await CloudStorageService()
-          .storageRef
-          .child(CloudStorageService().avatarFireStorageLoc(userAvatarSubLoc, uid))
-          .getDownloadURL();
-      return CloudStorageService().urlToFile(url, userAvatarSubLoc, uid);
-    } catch (_) {
-      return null;
-    }
-  }
-
   /// Create a new user in the Firestore
   Future<void> createNewUser({
     required UserCredential uc,
     required String name,
     required String themeModeName,
     bool onBoarded = true,
+    String? avatarFileUrl,
     String? avatarLocalFilePath,
   }) async {
     try {
       var uid = uc.user!.uid;
 
-      // Upload profile picture
-      if (avatarLocalFilePath != null) {
-        var child = _userAvatarRef(uid, "Unauthorized access to user avatar");
-        await child.putFile(File(avatarLocalFilePath));
-      }
+      // Upload user picture
+      CloudStorageService().setAvatarFile(
+        subFolder: UserService.userAvatarSubLoc,
+        uid: uid,
+        imagePath: avatarLocalFilePath,
+        imageUrl: avatarFileUrl,
+      );
 
       // Upload profile
       UserProfileModel userProfileModel = UserProfileModel(name: name, avatarPath: 'fof_avatars/${uc.user?.uid}.jpg');
@@ -142,12 +109,16 @@ class UserService {
 
   /// Update a user + the user profile in the firestore
   Future<void> updateUser(Map<String, dynamic> update) async {
-    String? avatarFilePath = update["profile"].avatarFilePath;
+    String? avatarLocalFilePath = update["profile"]["avatarPath"];
     var uid = FirebaseAuth.instance.currentUser!.uid;
 
-    if (avatarFilePath != null) {
-      var child = _userAvatarRef(uid, "Unauthorized access to user avatar");
-      await child.putFile(File(avatarFilePath));
+    // Upload user picture
+    if (avatarLocalFilePath != null) {
+      CloudStorageService().setAvatarFile(
+        subFolder: UserService.userAvatarSubLoc,
+        uid: uid,
+        imagePath: avatarLocalFilePath,
+      );
     }
 
     var batch = FirebaseFirestore.instance.batch();
@@ -163,13 +134,8 @@ class UserService {
     // Delete the profile picture first
     var uid = FirebaseAuth.instance.currentUser!.uid;
     try {
-      var localAvatar = await getUserAvatarFile(uid, true);
-      await localAvatar?.delete(recursive: true);
-      var child = _userAvatarRef(uid, "Unauthorized access to user avatar");
-      await child.delete();
-    } catch (e) {
-      print(e);
-    }
+      CloudStorageService().deleteAvatarFile(subFolder: UserService.userAvatarSubLoc, uid: uid);
+    } catch (_) {}
 
     var batch = FirebaseFirestore.instance.batch();
     batch.delete(_userDocument());
