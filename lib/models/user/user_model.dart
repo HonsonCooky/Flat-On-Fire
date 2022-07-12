@@ -7,6 +7,8 @@ class UserModel {
   final String themeMode;
   final bool onBoarded;
   final UserProfileModel profile;
+  final Map<String, Authorization>? groups;
+  final Map<String, Authorization>? tables;
 
   UserModel({
     this.uid,
@@ -14,6 +16,8 @@ class UserModel {
     required this.themeMode,
     required this.onBoarded,
     required this.profile,
+    this.groups,
+    this.tables,
   });
 
   UserModel.fromJson(Map<String, dynamic> json)
@@ -21,7 +25,9 @@ class UserModel {
         isAdmin = json["isAdmin"],
         themeMode = json["themeMode"],
         onBoarded = json["onBoarded"],
-        profile = UserProfileModel.fromJson(json["profile"]);
+        profile = UserProfileModel.fromJson(json["profile"]),
+        groups = authorizationMapFromJson(json["groups"]),
+        tables = authorizationMapFromJson(json["tables"]);
 
   Map<String, dynamic> toJson() => {
         "uid": uid,
@@ -29,5 +35,7 @@ class UserModel {
         "themeMode": themeMode,
         "onBoarded": onBoarded,
         "profile": profile.toJson(),
+        "groups": authorizationMapToJson(groups),
+        "tables": authorizationMapToJson(tables),
       };
 }

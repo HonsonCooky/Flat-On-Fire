@@ -26,8 +26,6 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
   final ImagePicker _picker = ImagePicker();
   String? _nameErrMsg;
   XFile? _pickedImage;
-  bool _isObscure = true;
-
   @override
   void dispose() {
     _name.dispose();
@@ -63,42 +61,34 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
             physics: const BouncingScrollPhysics(),
             children: [
               _profilePicture(),
+              
+              const SizedBox(
+                height: 10,
+              ),
 
               /// Email Text Box
-              TextField(
-                onTap: resetErrors,
-                decoration: InputDecoration(
-                  labelText: "Email",
-                  errorText: widget.emailErrMsg,
-                ),
+              FofTextField(
+                onTap: widget.resetErrors,
+                labelText: "Email",
+                errorText: widget.emailErrMsg,
                 controller: widget.email,
               ),
 
               /// Name Text Box
-              TextField(
-                onTap: resetErrors,
-                decoration: InputDecoration(
-                  labelText: "Name",
-                  errorText: _nameErrMsg,
-                ),
+              FofTextField(
+                onTap: widget.resetErrors,
+                labelText: "Name",
+                errorText: _nameErrMsg,
                 controller: _name,
               ),
 
               /// Password Text Box
-              TextField(
-                onTap: resetErrors,
+              FofTextField(
+                onTap: widget.resetErrors,
                 controller: widget.password,
-                obscureText: _isObscure,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  errorText: widget.passwordErrMsg,
-                  suffixIcon: IconButton(
-                    icon: Icon(_isObscure ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () {
-                      setState(() => _isObscure = !_isObscure);
-                    },
-                  ),
-                ),
+                canObscure: true,
+                labelText: 'Password',
+                errorText: widget.passwordErrMsg,
               ),
 
               const SizedBox(

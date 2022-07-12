@@ -15,3 +15,4 @@ export 'delete_account_widget.dart';
 export 'reauthenticate_account_alert_widget.dart';
 export 'tip_widget.dart';
 export 'full_image_dialog_widget.dart';
+export 'fof_text_field.dart';

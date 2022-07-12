@@ -82,6 +82,14 @@ class ThemeModel {
         fontWeight: FontWeight.normal,
       ),
     ),
+    inputDecorationTheme: const InputDecorationTheme(
+      labelStyle:  TextStyle(fontSize: textFieldLabelSize),
+      floatingLabelStyle: TextStyle(fontSize: textFieldLabelSize),
+      border: OutlineInputBorder(borderSide: BorderSide.none),
+      filled: true,
+      alignLabelWithHint: true,
+      isDense: true,
+    ),
     tabBarTheme: const TabBarTheme(
       labelStyle: TextStyle(
         fontSize: titleLargeFontSize,
@@ -137,22 +145,19 @@ class ThemeModel {
       labelMedium: _base.textTheme.labelMedium?.copyWith(color: PaletteModel.lightOnPrimary),
       labelLarge: _base.textTheme.labelLarge?.copyWith(color: PaletteModel.lightOnPrimary),
       titleMedium: _base.textTheme.titleMedium?.copyWith(color: PaletteModel.lightOnPrimary),
+      
     ),
     textSelectionTheme: TextSelectionThemeData(
       cursorColor: PaletteModel.lightSecondary,
       selectionColor: PaletteAssistant.alpha(PaletteModel.lightPrimary, 0.4),
       selectionHandleColor: PaletteModel.lightTertiary,
     ),
-    inputDecorationTheme: InputDecorationTheme(
-      labelStyle: _base.textTheme.labelMedium?.copyWith(
-        color: PaletteModel.lightOnBackground,
-        fontSize: textFieldLabelSize,
-      ),
-      floatingLabelStyle: _base.textTheme.labelMedium?.copyWith(color: PaletteModel.lightSecondary),
+    inputDecorationTheme: _base.inputDecorationTheme.copyWith(
+      labelStyle: _base.inputDecorationTheme.labelStyle?.copyWith(color: PaletteModel.lightOnSurface),
+      floatingLabelStyle: _base.inputDecorationTheme.floatingLabelStyle?.copyWith(color: PaletteModel.lightSecondary),
       focusColor: PaletteModel.lightOnBackground,
-      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: PaletteModel.lightOnBackground)),
-      iconColor: PaletteModel.lightOnBackground,
-      isDense: true,
+      iconColor: PaletteModel.lightOnSurface,
+      fillColor: PaletteModel.lightSurface,
     ),
     tabBarTheme: _base.tabBarTheme.copyWith(
       indicator: UnderlineTabIndicator(borderSide: BorderSide(width: 4, color: PaletteModel.lightSecondary)),

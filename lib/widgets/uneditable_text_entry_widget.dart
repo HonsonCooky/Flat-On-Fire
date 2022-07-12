@@ -21,8 +21,9 @@ class UneditableTextEntryWidget extends StatelessWidget with ToastMixin {
       children: [
         Text(
           title,
-          style: textStyle?.copyWith(fontWeight: FontWeight.bold),
+          style: textStyle?.copyWith(fontWeight: FontWeight.bold, fontSize: (textStyle?.fontSize ?? 10) - 2),
         ),
+        const SizedBox(height: 5),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

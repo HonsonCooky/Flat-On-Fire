@@ -17,7 +17,6 @@ class _ReauthenticateAccountAlertWidgetState extends State<ReauthenticateAccount
   String? emailErr;
   String? passwordErr;
   String? errorText;
-  bool _isObscure = true;
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +65,7 @@ class _ReauthenticateAccountAlertWidgetState extends State<ReauthenticateAccount
             : Text(
                 errorText!,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.error,
+                      color: Theme.of(context).colorScheme.onError,
                     ),
               ),
       ],
@@ -77,7 +76,7 @@ class _ReauthenticateAccountAlertWidgetState extends State<ReauthenticateAccount
     double fontSize = 18;
     return Column(
       children: [
-        TextField(
+        FofTextField(
           controller: email,
           onTap: () {
             setState(() {
@@ -86,12 +85,11 @@ class _ReauthenticateAccountAlertWidgetState extends State<ReauthenticateAccount
               errorText = null;
             });
           },
-          decoration: InputDecoration(
-            label: Text("Email", style: TextStyle(fontSize: fontSize)),
-            errorText: emailErr,
-          ),
+          labelText: "Email",
+          style: TextStyle(fontSize: fontSize),
+          errorText: emailErr,
         ),
-        TextField(
+        FofTextField(
           controller: password,
           onTap: () {
             setState(() {
@@ -100,17 +98,10 @@ class _ReauthenticateAccountAlertWidgetState extends State<ReauthenticateAccount
               errorText = null;
             });
           },
-          obscureText: _isObscure,
-          decoration: InputDecoration(
-            label: Text("Password", style: TextStyle(fontSize: fontSize)),
-            errorText: passwordErr,
-            suffixIcon: IconButton(
-              icon: Icon(_isObscure ? Icons.visibility : Icons.visibility_off),
-              onPressed: () {
-                setState(() => _isObscure = !_isObscure);
-              },
-            ),
-          ),
+          canObscure: true,
+          labelText: "Password",
+          style: TextStyle(fontSize: fontSize),
+          errorText: passwordErr,
         ),
       ],
     );

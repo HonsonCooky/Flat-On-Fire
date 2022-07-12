@@ -23,16 +23,12 @@ class EditableTextEntryWidget extends StatelessWidget {
           title,
           style: textStyle?.copyWith(fontWeight: FontWeight.bold),
         ),
+        const SizedBox(height: 5),
         TextField(
           controller: controller,
           decoration: InputDecoration(
             hintText: value,
-            border: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            errorBorder: InputBorder.none,
-            disabledBorder: InputBorder.none,
-            contentPadding: EdgeInsets.zero,
+            contentPadding: const EdgeInsets.all(5),
           ),
           style: textStyle?.copyWith(fontWeight: FontWeight.normal),
         ),

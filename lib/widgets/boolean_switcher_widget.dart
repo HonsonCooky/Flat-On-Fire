@@ -29,12 +29,16 @@ class BooleanSwitcherWidget extends StatelessWidget {
           children: [
             Text(
               title,
-              style: textStyle?.copyWith(fontWeight: FontWeight.bold),
+              style: textStyle?.copyWith(fontWeight: FontWeight.bold, fontSize: (textStyle?.fontSize ?? 10) - 2),
             ),
             Expanded(
               child: Text(
                 isOn ? hints[0] : hints[1],
-                style: textStyle?.copyWith(fontWeight: FontWeight.normal),
+                style: textStyle?.copyWith(
+                  fontWeight: FontWeight.normal,
+                  fontStyle: FontStyle.italic,
+                  fontSize: (textStyle?.fontSize ?? 10) - 2,
+                ),
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.right,
               ),

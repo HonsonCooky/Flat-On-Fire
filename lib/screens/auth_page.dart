@@ -68,14 +68,13 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
   @override
   Widget build(BuildContext context) {
     final viewState = context.watch<AppService>().viewState;
-    double fontSize = (MediaQuery.of(context).size.height - MediaQuery.of(context).viewInsets.bottom) / 3;
     return WrapperFocusShift(
       child: DefaultTabController(
         length: 2,
         child: Scaffold(
           body: Column(
             children: [
-              _header(fontSize),
+              _header(),
               viewState == ViewState.busy ? Expanded(child: _loading(context)) : _tabViews(),
               viewState == ViewState.busy ? const SizedBox() : _googleSignIn(),
             ],
@@ -90,7 +89,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
   }
 
   /// An expanded container, with the Logo and Title stacked inside.
-  Widget _header(double fontSize) {
+  Widget _header() {
     return Container(
       color: Theme.of(context).colorScheme.primary,
       child: WrapperOverflowRemoved(
@@ -102,8 +101,8 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
               ),
               Stack(
                 children: [
-                  _headerLogo(fontSize),
-                  _headerText(fontSize),
+                  _headerLogo(),
+                  _headerText(),
                 ],
               ),
               _tabBar(),
@@ -115,42 +114,37 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
   }
 
   /// An implementation of the FofLogoWidget
-  Widget _headerLogo(double fontSize) {
-    double alpha = fontSize / (MediaQuery.of(context).size.height / 3) - 0.01;
+  Widget _headerLogo() {
 
+    double fontSize = MediaQuery.of(context).size.height / 3; 
     return FofLogoWidget(
-      color: PaletteAssistant.alpha(
-        Theme.of(context).colorScheme.background,
-        alpha,
-      ),
+      color: Theme.of(context).colorScheme.background,
       size: fontSize,
       offset: Offset(MediaQuery.of(context).size.width - fontSize, 0),
     );
   }
 
   /// A padded column that represents the title of the application.
-  Widget _headerText(double fontSize) {
+  Widget _headerText() {
+    double fontSize = (MediaQuery.of(context).size.width / 5) - MediaQuery.of(context).viewInsets.bottom;
     return Container(
       padding: const EdgeInsets.only(left: 20, right: 20),
-      width: (fontSize + MediaQuery.of(context).viewInsets.bottom),
       alignment: Alignment.bottomLeft,
-      child: Wrap(
-        alignment: WrapAlignment.spaceBetween,
-        runAlignment: WrapAlignment.spaceBetween,
-        crossAxisAlignment: WrapCrossAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             "FLAT",
             style: Theme.of(context).textTheme.headline1?.copyWith(
                   color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: fontSize / 3.5,
+                  fontSize: fontSize,
                 ),
           ),
           Text(
             "ON",
             style: Theme.of(context).textTheme.headline1?.copyWith(
                   color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: fontSize / 6,
+                  fontSize: fontSize / 2,
                   fontWeight: FontWeight.w400,
                 ),
           ),
@@ -158,7 +152,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
             "FIRE",
             style: Theme.of(context).textTheme.headline1?.copyWith(
                   color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: fontSize / 3.5,
+                  fontSize: fontSize,
                 ),
           ),
         ],

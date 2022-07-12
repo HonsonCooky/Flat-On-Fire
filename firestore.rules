@@ -1,21 +1,52 @@
 rules_version = '2';
 service cloud.firestore {
     match /databases/{database}/documents {
-        match /users/{uid} {
-            // Read and write if own document
-            match /{path=**} {
-                allow read, write: if request.auth.uid == uid;
-            }
-            
-            match /public/{path=**} {
-                // Allow read of anything public
-                allow read: if request.auth.uid != null;
-            }
+
+        // Everything in a public domain is readable to authenticated users
+        match /{prefix=**}/public/{doc} {
+            // Allow read of anything public
+            allow read: if request.auth.uid != null;
+        }
+
+        match /users/{uid}/{path=**} {
+            // Read and write if owner of document
+            allow read, write: if request.auth.uid == uid;
         }
 
         match /groups/{path=**} {
-            allow read: if resource.data.users[request.auth.uid] in ["owner", "writer", "reader"];
-            allow write: if resource.data.users[request.auth.uid] in ["owner", "writer"];
+            allow read: if userCanReadDoc(request.auth.uid, resource);
+            allow update: if userCanUpdateDoc(request.auth.uid, resource);
+            allow delete: if userCanDeleteDoc(request.auth.uid, resource);
+            allow create: if userCanCreateDoc(request.auth.uid, request);
+        }
+
+        match /tables/{path=**} {
+            allow read: if userCanReadDoc(request.auth.uid, resource);
+            allow update: if userCanUpdateDoc(request.auth.uid, resource);
+            allow delete: if userCanDeleteDoc(request.auth.uid, resource);
+            allow create: if userCanCreateDoc(request.auth.uid, request);
+        }
+
+        // Validate that uid in resource's "users" field, has an existing authorization of 
+        // "owner", "writer", or "reader".
+        function userCanReadDoc(uid, resource) {
+            return resource.data.users[uid] in ["owner", "writer", "reader"];
+        }
+        
+        // Validate that uid in resource's "users" field, has an existing authorization of
+        // "owner" or "writer". You cannot give yourself this access level.
+        function userCanUpdateDoc(uid, resource) {
+            return resource.data.users[uid] in ["owner", "writer"];
+        }
+
+        // Validate that uid in resource's "users" field, has an existing authorization of "owner".
+        function userCanDeleteDoc(uid, resource) {
+            return resource.data.users[uid] in ["owner"];
+        }
+        
+        // Validate that uid in resource's "users" field, has an existing authorization of "owner".
+        function userCanCreateDoc(uid, request) {
+            return request.resource.data.users[uid] in ["owner"];
         }
     }
 }
