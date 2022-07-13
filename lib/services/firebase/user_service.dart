@@ -54,7 +54,8 @@ class UserService {
   }
 
   /// Get the UserModel from Firestore
-  Future<DocumentSnapshot<UserModel>> getUser() {
+  Future<DocumentSnapshot<UserModel>>? getUser() {
+    if (FirebaseAuth.instance.currentUser == null) return null;
     return _userDocument().getCacheFirst();
   }
 

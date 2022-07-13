@@ -7,6 +7,7 @@ class FofTextField extends StatefulWidget {
   final TextEditingController? controller;
   final TextStyle? style;
   final bool canObscure;
+  final Color? fillColor;
 
   const FofTextField({
     Key? key,
@@ -15,7 +16,7 @@ class FofTextField extends StatefulWidget {
     this.onTap,
     this.controller,
     this.style,
-    this.canObscure = false,
+    this.canObscure = false, this.fillColor,
   }) : super(key: key);
 
   @override
@@ -35,6 +36,7 @@ class _FofTextFieldState extends State<FofTextField> {
         onTap: widget.onTap,
         obscureText: widget.canObscure ? _isObscure : false,
         decoration: InputDecoration(
+            fillColor: widget.fillColor,
             labelText: widget.labelText,
             errorText: widget.errorText,
             suffixIcon: widget.canObscure

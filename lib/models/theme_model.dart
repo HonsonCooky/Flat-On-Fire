@@ -4,6 +4,7 @@ import '../_app_bucket.dart';
 
 const double titleLargeFontSize = 30;
 const double textFieldLabelSize = 22;
+const double captionSize = 12;
 
 /// Maintains static fields for Light and Dark modes
 class ThemeModel {
@@ -61,7 +62,7 @@ class ThemeModel {
         fontFamily: "Ubuntu",
       ),
       bodySmall: TextStyle(
-        fontSize: 10,
+        fontSize: captionSize,
         fontFamily: "Ubuntu",
       ),
 
@@ -83,12 +84,16 @@ class ThemeModel {
       ),
     ),
     inputDecorationTheme: const InputDecorationTheme(
-      labelStyle:  TextStyle(fontSize: textFieldLabelSize),
+      labelStyle: TextStyle(fontSize: textFieldLabelSize),
+      hintStyle: TextStyle(fontSize: textFieldLabelSize),
       floatingLabelStyle: TextStyle(fontSize: textFieldLabelSize),
       border: OutlineInputBorder(borderSide: BorderSide.none),
+      errorBorder: OutlineInputBorder(borderSide: BorderSide(width: 1)),
+      errorStyle: TextStyle(fontSize: captionSize),
       filled: true,
       alignLabelWithHint: true,
       isDense: true,
+      contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
     ),
     tabBarTheme: const TabBarTheme(
       labelStyle: TextStyle(
@@ -142,10 +147,21 @@ class ThemeModel {
       onSurface: PaletteModel.lightOnSurface,
     ),
     textTheme: _base.textTheme.copyWith(
-      labelMedium: _base.textTheme.labelMedium?.copyWith(color: PaletteModel.lightOnPrimary),
-      labelLarge: _base.textTheme.labelLarge?.copyWith(color: PaletteModel.lightOnPrimary),
+      displayLarge: _base.textTheme.displayLarge?.copyWith(color: PaletteModel.lightOnBackground),
+      displayMedium: _base.textTheme.displayMedium?.copyWith(color: PaletteModel.lightOnBackground),
+      displaySmall: _base.textTheme.displaySmall?.copyWith(color: PaletteModel.lightOnBackground),
+      headlineLarge: _base.textTheme.headlineLarge?.copyWith(color: PaletteModel.lightOnBackground),
+      headlineMedium: _base.textTheme.headlineMedium?.copyWith(color: PaletteModel.lightOnBackground),
+      headlineSmall: _base.textTheme.headlineSmall?.copyWith(color: PaletteModel.lightOnBackground),
+      titleLarge: _base.textTheme.titleLarge?.copyWith(color: PaletteModel.lightOnBackground),
       titleMedium: _base.textTheme.titleMedium?.copyWith(color: PaletteModel.lightOnPrimary),
-      
+      titleSmall: _base.textTheme.titleSmall?.copyWith(color: PaletteModel.lightOnBackground),
+      bodyLarge: _base.textTheme.bodyLarge?.copyWith(color: PaletteModel.lightOnBackground),
+      bodyMedium: _base.textTheme.bodyMedium?.copyWith(color: PaletteModel.lightOnBackground),
+      bodySmall: _base.textTheme.bodySmall?.copyWith(color: PaletteModel.lightOnBackground),
+      labelLarge: _base.textTheme.labelLarge?.copyWith(color: PaletteModel.lightOnPrimary),
+      labelMedium: _base.textTheme.labelMedium?.copyWith(color: PaletteModel.lightOnPrimary),
+      labelSmall: _base.textTheme.labelSmall?.copyWith(color: PaletteModel.lightOnBackground),
     ),
     textSelectionTheme: TextSelectionThemeData(
       cursorColor: PaletteModel.lightSecondary,
@@ -154,10 +170,15 @@ class ThemeModel {
     ),
     inputDecorationTheme: _base.inputDecorationTheme.copyWith(
       labelStyle: _base.inputDecorationTheme.labelStyle?.copyWith(color: PaletteModel.lightOnSurface),
+      hintStyle: _base.inputDecorationTheme.hintStyle?.copyWith(color: PaletteModel.lightOnSurface),
       floatingLabelStyle: _base.inputDecorationTheme.floatingLabelStyle?.copyWith(color: PaletteModel.lightSecondary),
       focusColor: PaletteModel.lightOnBackground,
       iconColor: PaletteModel.lightOnSurface,
       fillColor: PaletteModel.lightSurface,
+      errorBorder: _base.inputDecorationTheme.errorBorder?.copyWith(
+        borderSide: BorderSide(color: PaletteModel.lightOnError, width: 1),
+      ),
+      errorStyle: _base.inputDecorationTheme.errorStyle?.copyWith(color: PaletteModel.lightOnError),
     ),
     tabBarTheme: _base.tabBarTheme.copyWith(
       indicator: UnderlineTabIndicator(borderSide: BorderSide(width: 4, color: PaletteModel.lightSecondary)),
@@ -175,6 +196,7 @@ class ThemeModel {
       style: _base.textButtonTheme.style
           ?.copyWith(foregroundColor: MaterialStateProperty.resolveWith((states) => PaletteModel.lightOnBackground)),
     ),
+    dialogBackgroundColor: PaletteModel.lightSurface,
   );
 
   /// DARK THEME
@@ -198,5 +220,56 @@ class ThemeModel {
       surface: PaletteModel.darkSurface,
       onSurface: PaletteModel.darkOnSurface,
     ),
+    textTheme: _base.textTheme.copyWith(
+      displayLarge: _base.textTheme.displayLarge?.copyWith(color: PaletteModel.darkOnBackground),
+      displayMedium: _base.textTheme.displayMedium?.copyWith(color: PaletteModel.darkOnBackground),
+      displaySmall: _base.textTheme.displaySmall?.copyWith(color: PaletteModel.darkOnBackground),
+      headlineLarge: _base.textTheme.headlineLarge?.copyWith(color: PaletteModel.darkOnBackground),
+      headlineMedium: _base.textTheme.headlineMedium?.copyWith(color: PaletteModel.darkOnBackground),
+      headlineSmall: _base.textTheme.headlineSmall?.copyWith(color: PaletteModel.darkOnBackground),
+      titleLarge: _base.textTheme.titleLarge?.copyWith(color: PaletteModel.darkOnBackground),
+      titleMedium: _base.textTheme.titleMedium?.copyWith(color: PaletteModel.darkOnPrimary),
+      titleSmall: _base.textTheme.titleSmall?.copyWith(color: PaletteModel.darkOnBackground),
+      bodyLarge: _base.textTheme.bodyLarge?.copyWith(color: PaletteModel.darkOnBackground),
+      bodyMedium: _base.textTheme.bodyMedium?.copyWith(color: PaletteModel.darkOnBackground),
+      bodySmall: _base.textTheme.bodySmall?.copyWith(color: PaletteModel.darkOnBackground),
+      labelLarge: _base.textTheme.labelLarge?.copyWith(color: PaletteModel.darkOnPrimary),
+      labelMedium: _base.textTheme.labelMedium?.copyWith(color: PaletteModel.darkOnPrimary),
+      labelSmall: _base.textTheme.labelSmall?.copyWith(color: PaletteModel.darkOnBackground),
+    ),
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: PaletteModel.darkSecondary,
+      selectionColor: PaletteAssistant.alpha(PaletteModel.darkPrimary, 0.4),
+      selectionHandleColor: PaletteModel.darkTertiary,
+    ),
+    inputDecorationTheme: _base.inputDecorationTheme.copyWith(
+      labelStyle: _base.inputDecorationTheme.labelStyle?.copyWith(color: PaletteModel.darkOnSurface),
+      hintStyle: _base.inputDecorationTheme.hintStyle?.copyWith(color: PaletteModel.darkOnSurface),
+      floatingLabelStyle: _base.inputDecorationTheme.floatingLabelStyle?.copyWith(color: PaletteModel.darkSecondary),
+      focusColor: PaletteModel.darkOnBackground,
+      iconColor: PaletteModel.darkOnSurface,
+      fillColor: PaletteModel.darkSurface,
+      errorBorder: _base.inputDecorationTheme.errorBorder?.copyWith(
+        borderSide: BorderSide(color: PaletteModel.darkOnError, width: 1),
+      ),
+      errorStyle: _base.inputDecorationTheme.errorStyle?.copyWith(color: PaletteModel.darkOnError),
+    ),
+    tabBarTheme: _base.tabBarTheme.copyWith(
+      indicator: UnderlineTabIndicator(borderSide: BorderSide(width: 4, color: PaletteModel.darkSecondary)),
+      labelColor: PaletteModel.darkOnPrimary,
+      unselectedLabelColor: PaletteAssistant.alpha(PaletteModel.darkOnPrimary),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: _base.elevatedButtonTheme.style?.copyWith(
+          overlayColor:
+              MaterialStateProperty.resolveWith((states) => PaletteAssistant.alpha(PaletteModel.darkOnSecondary, 0.3)),
+          foregroundColor: MaterialStateProperty.resolveWith((states) => PaletteModel.darkOnSecondary),
+          backgroundColor: MaterialStateProperty.resolveWith((states) => PaletteModel.darkSecondary)),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: _base.textButtonTheme.style
+          ?.copyWith(foregroundColor: MaterialStateProperty.resolveWith((states) => PaletteModel.darkOnBackground)),
+    ),
+    dialogBackgroundColor: PaletteModel.darkSurface,
   );
 }

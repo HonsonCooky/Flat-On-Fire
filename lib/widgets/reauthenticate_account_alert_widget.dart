@@ -78,6 +78,7 @@ class _ReauthenticateAccountAlertWidgetState extends State<ReauthenticateAccount
       children: [
         FofTextField(
           controller: email,
+          fillColor: Theme.of(context).colorScheme.background,
           onTap: () {
             setState(() {
               emailErr = null;
@@ -91,6 +92,7 @@ class _ReauthenticateAccountAlertWidgetState extends State<ReauthenticateAccount
         ),
         FofTextField(
           controller: password,
+          fillColor: Theme.of(context).colorScheme.background,
           onTap: () {
             setState(() {
               emailErr = null;

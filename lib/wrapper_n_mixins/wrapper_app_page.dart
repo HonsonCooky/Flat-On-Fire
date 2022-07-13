@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 class WrapperAppPage extends StatelessWidget {
   final Widget child;
   final bool? resizeToAvoidBottomInset;
-  
+
   const WrapperAppPage({Key? key, required this.child, this.resizeToAvoidBottomInset = false}) : super(key: key);
 
   @override
@@ -25,7 +25,9 @@ class WrapperAppPage extends StatelessWidget {
   }
 
   PreferredSizeWidget _appBar(BuildContext context) {
-    TextStyle? textStyle = Theme.of(context).textTheme.titleLarge;
+    TextStyle? textStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
+          color: Theme.of(context).colorScheme.onSurface,
+        );
     return AppBar(
       toolbarHeight: (textStyle?.fontSize ?? 10) * 2,
       title: Text(fromPath(GoRouter.of(context).location), style: textStyle),
@@ -33,7 +35,7 @@ class WrapperAppPage extends StatelessWidget {
     );
   }
   
-  Widget _loading(BuildContext context){
+  Widget _loading(BuildContext context) {
     return LoadingSpinnerWidget(MediaQuery.of(context).size.width / 4);
   }
 }

@@ -34,13 +34,15 @@ class AuthService extends ChangeNotifier {
     try {
       // Attempt to setup app settings based on the user
       var userDocument = await FirestoreService().userService.getUser();
-      var user = userDocument.data();
-      if (user != null) {
-        _appService.batch(
-          themeMode: user.themeMode == ThemeMode.light.name ? ThemeMode.light : ThemeMode.dark,
-          onBoarded: user.onBoarded,
-        );
-        failed = false;
+      if (userDocument != null) {
+        var user = userDocument.data();
+        if (user != null) {
+          _appService.batch(
+            themeMode: user.themeMode == ThemeMode.light.name ? ThemeMode.light : ThemeMode.dark,
+            onBoarded: user.onBoarded,
+          );
+          failed = false;
+        }
       }
     } catch (_) {
     } finally {
@@ -49,6 +51,7 @@ class AuthService extends ChangeNotifier {
         loginState: FirebaseAuth.instance.currentUser != null && !failed,
         initialized: true,
         viewState: ViewState.ideal,
+        themeMode: failed ? ThemeMode.light : null,
       );
     }
   }

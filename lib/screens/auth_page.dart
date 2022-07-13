@@ -96,8 +96,8 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
         child: SafeArea(
           child: Column(
             children: [
-              const SizedBox(
-                height: 20,
+              SizedBox(
+                height: MediaQuery.of(context).viewInsets.bottom == 0 ? 20 : 0,
               ),
               Stack(
                 children: [
@@ -115,8 +115,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
 
   /// An implementation of the FofLogoWidget
   Widget _headerLogo() {
-
-    double fontSize = MediaQuery.of(context).size.height / 3; 
+    double fontSize = MediaQuery.of(context).size.height / 3;
     return FofLogoWidget(
       color: Theme.of(context).colorScheme.background,
       size: fontSize,
@@ -180,7 +179,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
           children: [
             RawScrollbar(
               thumbColor: PaletteAssistant.alpha(Theme.of(context).colorScheme.secondary),
-              thickness: 10,
+              thickness: 5,
               thumbVisibility: true,
               radius: const Radius.circular(2),
               controller: _loginScroll,
@@ -198,7 +197,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
             ),
             RawScrollbar(
               thumbColor: PaletteAssistant.alpha(Theme.of(context).colorScheme.secondary),
-              thickness: 10,
+              thickness: 5,
               thumbVisibility: true,
               radius: const Radius.circular(2),
               controller: _signupScroll,

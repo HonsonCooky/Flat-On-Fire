@@ -23,9 +23,12 @@ class SignupTabWidget extends AuthenticationTab {
 
 class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
   final _name = TextEditingController();
+  final _confirmPassword = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   String? _nameErrMsg;
+  String? _confirmErrMsg;
   XFile? _pickedImage;
+
   @override
   void dispose() {
     _name.dispose();
@@ -35,13 +38,20 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
   bool preFlightCheck() {
     setState(() {
       _nameErrMsg = _name.text.isEmpty ? "No Name Provided" : null;
+      _confirmErrMsg = _confirmPassword.text.isEmpty
+          ? "No Password Provided"
+          : _confirmPassword.text != widget.password.text
+              ? "Passwords do not match"
+              : null;
     });
-    return _nameErrMsg == null;
+    print(_confirmErrMsg);
+    return _nameErrMsg == null && _confirmErrMsg == null;
   }
 
   void resetErrors() {
     setState(() {
       _nameErrMsg = null;
+      _confirmErrMsg = null;
     });
     widget.resetErrors();
   }
@@ -61,14 +71,14 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
             physics: const BouncingScrollPhysics(),
             children: [
               _profilePicture(),
-              
+
               const SizedBox(
                 height: 10,
               ),
 
               /// Email Text Box
               FofTextField(
-                onTap: widget.resetErrors,
+                onTap: resetErrors,
                 labelText: "Email",
                 errorText: widget.emailErrMsg,
                 controller: widget.email,
@@ -76,7 +86,7 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
 
               /// Name Text Box
               FofTextField(
-                onTap: widget.resetErrors,
+                onTap: resetErrors,
                 labelText: "Name",
                 errorText: _nameErrMsg,
                 controller: _name,
@@ -84,23 +94,33 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
 
               /// Password Text Box
               FofTextField(
-                onTap: widget.resetErrors,
+                onTap: resetErrors,
                 controller: widget.password,
                 canObscure: true,
                 labelText: 'Password',
                 errorText: widget.passwordErrMsg,
               ),
 
+              /// Password Text Box
+              FofTextField(
+                onTap: resetErrors,
+                controller: _confirmPassword,
+                canObscure: true,
+                labelText: 'Confirm Password',
+                errorText: _confirmErrMsg,
+              ),
+
               const SizedBox(
-                height: 100,
-              )
+                height: 50,
+              ),
             ],
           ),
         ),
 
         /// Sign In Button
-        ElevatedButton(
-          child: const Text("CREATE ACCOUNT"),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.person_add),
+          label: const Text("CREATE ACCOUNT"),
           onPressed: () => widget.attemptAuthCallback(
               authActionCallback: () => context.read<AuthService>().signup(
                   email: widget.email.text,

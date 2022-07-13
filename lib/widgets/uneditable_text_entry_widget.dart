@@ -21,22 +21,22 @@ class UneditableTextEntryWidget extends StatelessWidget with ToastMixin {
       children: [
         Text(
           title,
-          style: textStyle?.copyWith(fontWeight: FontWeight.bold, fontSize: (textStyle?.fontSize ?? 10) - 2),
+          style: textStyle?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 5),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Stack(
+          alignment: Alignment.centerRight,
           children: [
-            Expanded(
-              child: Text(
-                value,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: textStyle?.copyWith(
-                  fontWeight: FontWeight.normal,
-                  color: PaletteAssistant.alpha(textStyle?.color ?? Colors.black, 0.4),
+            TextField(
+              enabled: false,
+              decoration: InputDecoration(
+                hintText: value,
+                hintStyle: textStyle?.copyWith(
+                  color: PaletteAssistant.alpha(textStyle?.color ?? Theme.of(context).colorScheme.onSurface),
                 ),
+                contentPadding: const EdgeInsets.all(5).copyWith(right: (textStyle?.fontSize ?? 10) * 3),
               ),
+              style: textStyle?.copyWith(fontWeight: FontWeight.normal),
             ),
             IconButton(
               padding: EdgeInsets.zero,
@@ -44,10 +44,12 @@ class UneditableTextEntryWidget extends StatelessWidget with ToastMixin {
               splashRadius: textStyle?.fontSize,
               iconSize: textStyle?.fontSize,
               onPressed: () {
-                Clipboard.setData(ClipboardData(text: value)).then((value) => successToast("Copied Text", context));
+                Clipboard.setData(ClipboardData(text: value))
+                    .then((_) => successToast("Copied Text", context))
+                    .catchError((_) => errorToast("Unable to copy text", context));
               },
               icon: const Icon(Icons.copy),
-            ),
+            )
           ],
         ),
       ],

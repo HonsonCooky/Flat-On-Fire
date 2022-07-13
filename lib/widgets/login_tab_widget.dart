@@ -19,7 +19,6 @@ class LoginTabWidget extends AuthenticationTab {
 }
 
 class _LoginTabWidgetState extends State<LoginTabWidget> with ToastMixin {
-  
   @override
   Widget build(BuildContext context) {
     return _loginTabContents();
@@ -28,6 +27,7 @@ class _LoginTabWidgetState extends State<LoginTabWidget> with ToastMixin {
   Widget _loginTabContents() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Expanded(
           child: ListView(
@@ -50,10 +50,6 @@ class _LoginTabWidgetState extends State<LoginTabWidget> with ToastMixin {
                 labelText: 'Password',
                 errorText: widget.passwordErrMsg,
               ),
-
-              const SizedBox(
-                height: 100,
-              )
             ],
           ),
         ),

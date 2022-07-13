@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -38,7 +39,13 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
   @override
   Widget build(BuildContext context) {
     return WrapperAppPage(
-      child: _settingsBody(),
+      child: RawScrollbar(
+        thumbColor: PaletteAssistant.alpha(Theme.of(context).colorScheme.secondary),
+        thickness: 5,
+        thumbVisibility: true,
+        radius: const Radius.circular(2),
+        child: _settingsBody(),
+      ),
     );
   }
 
@@ -46,28 +53,18 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
     var textStyle = Theme.of(context).textTheme.labelMedium;
     return WrapperPadding(
       child: WrapperOverflowRemoved(
-        child: Column(
+        child: ListView(
+          physics: const BouncingScrollPhysics(),
           children: [
-            Expanded(
-              child: ListView(
-                physics: const BouncingScrollPhysics(),
-                children: [
-                  _spacer(),
-                  _accountSettings(textStyle),
-                  _appSettings(textStyle),
-                  _spacer(),
-                  _futureSaveButton(textStyle),
-                ],
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _deleteBtn(),
-                _logoutBtn(),
-                _spacer(),
-              ],
-            ),
+            _spacer(),
+            _accountSettings(textStyle),
+            _appSettings(textStyle),
+            _spacer(),
+            _futureSaveButton(textStyle),
+            _spacer(),
+            _deleteBtn(),
+            _logoutBtn(),
+            _spacer(),
           ],
         ),
       ),
@@ -124,11 +121,25 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
       children: [
         _profilePicture(um, textStyle),
         SizedBox(height: textStyle?.fontSize),
+        HorizontalOrLineWidget(
+          label: "Account",
+          padding: 30,
+          color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
+        ),
         TipWidget(
           explanation: "A unique identifier for your account",
           child: UneditableTextEntryWidget(
-            title: "Account Number",
+            title: "Uuid",
             value: um.uid!,
+            textStyle: textStyle,
+          ),
+        ),
+        SizedBox(height: textStyle?.fontSize),
+        TipWidget(
+          explanation: "The name that others in this app will see",
+          child: UneditableTextEntryWidget(
+            title: "Email",
+            value: FirebaseAuth.instance.currentUser?.email ?? "N/A",
             textStyle: textStyle,
           ),
         ),
@@ -142,8 +153,6 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
             textStyle: textStyle,
           ),
         ),
-        SizedBox(height: textStyle?.fontSize),
-        _onBoardedChanger(textStyle),
         SizedBox(height: textStyle?.fontSize),
       ],
     );
@@ -258,7 +267,16 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
 
   Widget _appSettings(TextStyle? textStyle) {
     return Column(
-      children: [_themeChanger(textStyle)],
+      children: [
+        HorizontalOrLineWidget(
+          label: "App",
+          padding: 30,
+          color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
+        ),
+        _onBoardedChanger(textStyle),
+        SizedBox(height: textStyle?.fontSize),
+        _themeChanger(textStyle),
+      ],
     );
   }
 
