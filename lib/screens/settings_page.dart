@@ -15,7 +15,7 @@ class SettingsPage extends StatefulWidget {
   State<StatefulWidget> createState() => _SettingPageState();
 }
 
-class _SettingPageState extends State<SettingsPage> with ToastMixin {
+class _SettingPageState extends State<SettingsPage> {
   final _name = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   final List<String> profileTitles = [
@@ -321,7 +321,7 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
       onPressed: () async {
         try {
           context.read<AppService>().viewState = ViewState.busy;
-          await FirestoreService().userService.updateUser({
+          FirestoreService().userService.updateUser({
             "themeMode": context.read<AppService>().themeMode.name,
             "onBoarded": context.read<AppService>().onBoarded,
             "profile": UserProfileModel(
@@ -329,9 +329,9 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
               avatarPath: _pickedImage?.path ?? um.profile.avatarPath,
             ).toJson(),
           });
-          if (mounted) successToast("Save successful", context);
+          ToastManager.instance.successToast("Save successful", Theme.of(context));
         } catch (e) {
-          errorToast("Unable to save changes at this time", context);
+          ToastManager.instance.errorToast("Unable to save changes at this time", Theme.of(context));
         } finally {
           context.read<AppService>().viewState = ViewState.ideal;
         }
@@ -359,9 +359,10 @@ class _SettingPageState extends State<SettingsPage> with ToastMixin {
   Widget _logoutBtn() {
     return ElevatedButton.icon(
       onPressed: () async {
+        var theme = Theme.of(context); // Get before async gap
         var signOutText = await context.read<AuthService>().signOut();
-        if (mounted && signOutText != AuthService.successfulOperation) {
-          errorToast(signOutText, context);
+        if (signOutText != AuthService.successfulOperation) {
+          ToastManager.instance.errorToast(signOutText, theme);
         }
       },
       style: Theme.of(context).elevatedButtonTheme.style?.copyWith(

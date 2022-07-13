@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
@@ -109,6 +111,18 @@ class AuthService extends ChangeNotifier {
       return "Invalid user credentials";
     }
   }
+  
+  Future<bool> _networkConnected() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+      return false;
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
 
   // ----------------------------------------------------------------------------------------------------------------
   // INTERFACE METHODS
@@ -119,6 +133,9 @@ class AuthService extends ChangeNotifier {
     required String email,
     required String password,
   }) async {
+    if (!(await _networkConnected())) {
+      return "No internet connection. Unable to authenticate without a network connection.";
+    }
     _appService.viewState = ViewState.busy;
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
@@ -148,6 +165,9 @@ class AuthService extends ChangeNotifier {
     required String password,
     String? avatarLocalFilePath,
   }) async {
+    if (!(await _networkConnected())) {
+      return "No internet connection. Unable to authenticate without a network connection.";
+    }
     _appService.viewState = ViewState.busy;
     try {
       var uc = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
@@ -171,6 +191,9 @@ class AuthService extends ChangeNotifier {
 
   /// Login with Google
   Future<String> googleSignupLogin() async {
+    if (!(await _networkConnected())) {
+      return "No internet connection. Unable to authenticate without a network connection.";
+    }
     _appService.viewState = ViewState.busy;
     await _attemptGoogleSignOut();
 
@@ -222,6 +245,9 @@ class AuthService extends ChangeNotifier {
 
   /// A special login function which doesn't attempt a new login, but rather, the authentication of the current user.
   Future<String> reauthenticateUser(String email, String password, bool isGoogle) async {
+    if (!(await _networkConnected())) {
+      return "No internet connection. Unable to authenticate without a network connection.";
+    }
     _appService.viewState = ViewState.busy;
     var user = FirebaseAuth.instance.currentUser;
     if (user == null) return "Unable to retrieve current user";
@@ -240,6 +266,9 @@ class AuthService extends ChangeNotifier {
 
   /// Delete the users account
   Future<String> deleteAccount() async {
+    if (!(await _networkConnected())) {
+      return "No internet connection. Unable to authenticate without a network connection.";
+    }
     _appService.viewState = ViewState.busy;
     try {
       await FirestoreService().userService.deleteUser();

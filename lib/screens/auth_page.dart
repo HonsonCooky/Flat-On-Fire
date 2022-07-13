@@ -9,7 +9,7 @@ class AuthPage extends StatefulWidget {
   State<StatefulWidget> createState() => _AuthPageState();
 }
 
-class _AuthPageState extends State<AuthPage> with ToastMixin {
+class _AuthPageState extends State<AuthPage> {
   final ScrollController _loginScroll = ScrollController();
   final ScrollController _signupScroll = ScrollController();
 
@@ -37,7 +37,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
 
   /// An expanded container, with the Logo and Title stacked inside.
   Widget _header() {
-    double fontSize = ((MediaQuery.of(context).size.width - (MediaQuery.of(context).viewInsets.bottom / 1.5)) / 5);
+    double fontSize = ((MediaQuery.of(context).size.width - (MediaQuery.of(context).viewInsets.bottom / 1.7)) / 5);
     return Container(
       color: Theme.of(context).colorScheme.primary,
       child: WrapperOverflowRemoved(

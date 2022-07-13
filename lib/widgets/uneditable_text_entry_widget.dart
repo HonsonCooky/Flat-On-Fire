@@ -2,12 +2,12 @@ import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class UneditableTextEntryWidget extends StatelessWidget with ToastMixin {
+class UneditableTextEntryWidget extends StatelessWidget {
   final String title;
   final String value;
   final TextStyle? textStyle;
 
-  UneditableTextEntryWidget({
+  const UneditableTextEntryWidget({
     Key? key,
     required this.title,
     required this.value,
@@ -45,8 +45,8 @@ class UneditableTextEntryWidget extends StatelessWidget with ToastMixin {
               iconSize: textStyle?.fontSize,
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: value))
-                    .then((_) => successToast("Copied Text", context))
-                    .catchError((_) => errorToast("Unable to copy text", context));
+                    .then((_) => ToastManager.instance.successToast("Copied Text", Theme.of(context)))
+                    .catchError((_) => ToastManager.instance.errorToast("Unable to copy text", Theme.of(context)));
               },
               icon: const Icon(Icons.copy),
             )

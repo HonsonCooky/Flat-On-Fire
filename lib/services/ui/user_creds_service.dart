@@ -8,7 +8,7 @@ enum UserCredAuthType {
   google,
 }
 
-class UserCredService extends ChangeNotifier with ToastMixin {
+class UserCredService extends ChangeNotifier {
   final TextEditingController email = TextEditingController();
   final TextEditingController name = TextEditingController();
   final TextEditingController pass = TextEditingController();
@@ -35,40 +35,43 @@ class UserCredService extends ChangeNotifier with ToastMixin {
               : null;
     }
 
-    return emailErr != null && nameErr != null && passErr != null && confErr != null;
+    return emailErr == null && nameErr == null && passErr == null && confErr == null;
   }
 
-  void attemptAuth(UserCredAuthType authType, BuildContext context, State state) async {
+  void attemptAuth(UserCredAuthType authType, BuildContext context) async {
     switch (authType) {
       case UserCredAuthType.login:
         var check = _preflightChecks(false);
         if (check) {
+          var theme = Theme.of(context); // Get before async gap
           var authVal = await context.read<AuthService>().login(
                 email: email.text,
                 password: pass.text,
               );
-          if (state.mounted && authVal != AuthService.successfulOperation) {
-            errorToast(authVal, context);
+          if (authVal != AuthService.successfulOperation) {
+            ToastManager.instance.errorToast(authVal, theme);
           }
         }
         break;
       case UserCredAuthType.signup:
         var check = _preflightChecks(true);
         if (check) {
+          var theme = Theme.of(context); // Get before async gap
           var authVal = await context.read<AuthService>().signup(
                 email: email.text,
                 name: name.text,
                 password: pass.text,
               );
-          if (state.mounted && authVal != AuthService.successfulOperation) {
-            errorToast(authVal, context);
+          if (authVal != AuthService.successfulOperation) {
+            ToastManager.instance.errorToast(authVal, theme);
           }
         }
         break;
       case UserCredAuthType.google:
+        var theme = Theme.of(context); // Get before async gap
         var authVal = await context.read<AuthService>().googleSignupLogin();
-        if (state.mounted && authVal != AuthService.successfulOperation) {
-          errorToast(authVal, context);
+        if (authVal != AuthService.successfulOperation) {
+          ToastManager.instance.errorToast(authVal, theme);
         }
         break;
     }

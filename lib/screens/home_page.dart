@@ -9,7 +9,7 @@ class HomePage extends StatefulWidget {
   State<StatefulWidget> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with ToastMixin {
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return WrapperAppPage(

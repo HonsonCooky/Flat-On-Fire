@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+
 class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
 
@@ -48,6 +49,7 @@ class _AppState extends State<App> {
           var themeMode = Provider.of<AppService>(context, listen: true).themeMode;
           final GoRouter goRouter = Provider.of<AppRouter>(context, listen: false).router;
           return MaterialApp.router(
+            scaffoldMessengerKey: ToastManager.instance.rootScaffoldMessengerKey,
             debugShowCheckedModeBanner: false,
             theme: ThemeModel.light,
             darkTheme: ThemeModel.dark,

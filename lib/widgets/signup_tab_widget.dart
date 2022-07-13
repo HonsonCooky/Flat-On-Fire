@@ -14,7 +14,7 @@ class SignupTabWidget extends StatefulWidget {
   State<StatefulWidget> createState() => _SignupTabWidgetState();
 }
 
-class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
+class _SignupTabWidgetState extends State<SignupTabWidget> {
   final ImagePicker _picker = ImagePicker();
   XFile? _pickedImage;
 
@@ -77,7 +77,7 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
           ElevatedButton.icon(
             icon: const Icon(Icons.person_add),
             label: const Text("CREATE ACCOUNT"),
-            onPressed: () => content.attemptAuth(UserCredAuthType.signup, context, this),
+            onPressed: () => content.attemptAuth(UserCredAuthType.signup, context),
           ),
 
           HorizontalOrLineWidget(

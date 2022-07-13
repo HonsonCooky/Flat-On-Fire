@@ -11,7 +11,7 @@ class LoginTabWidget extends StatefulWidget {
   State<StatefulWidget> createState() => _LoginTabWidgetState();
 }
 
-class _LoginTabWidgetState extends State<LoginTabWidget> with ToastMixin {
+class _LoginTabWidgetState extends State<LoginTabWidget> {
   @override
   Widget build(BuildContext context) {
     return _loginTabContents();
@@ -23,27 +23,30 @@ class _LoginTabWidgetState extends State<LoginTabWidget> with ToastMixin {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: ListView(
-              controller: widget.scrollController,
-              physics: const BouncingScrollPhysics(),
-              children: [
-                /// Email Text Box
-                FofTextField(
-                  onTap: content.resetErrors,
-                  labelText: "Email",
-                  errorText: content.emailErr,
-                  controller: content.email,
-                ),
+            child: Center(
+              child: ListView(
+                shrinkWrap: true,
+                controller: widget.scrollController,
+                physics: const BouncingScrollPhysics(),
+                children: [
+                  /// Email Text Box
+                  FofTextField(
+                    onTap: content.resetErrors,
+                    labelText: "Email",
+                    errorText: content.emailErr,
+                    controller: content.email,
+                  ),
 
-                /// Password Text Box
-                FofTextField(
-                  onTap: content.resetErrors,
-                  controller: content.pass,
-                  canObscure: true,
-                  labelText: 'Password',
-                  errorText: content.passErr,
-                ),
-              ],
+                  /// Password Text Box
+                  FofTextField(
+                    onTap: content.resetErrors,
+                    controller: content.pass,
+                    canObscure: true,
+                    labelText: 'Password',
+                    errorText: content.passErr,
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -51,7 +54,7 @@ class _LoginTabWidgetState extends State<LoginTabWidget> with ToastMixin {
           ElevatedButton.icon(
             label: const Text("LOGIN"),
             icon: const Icon(Icons.login),
-            onPressed: () => content.attemptAuth(UserCredAuthType.login, context, this),
+            onPressed: () => content.attemptAuth(UserCredAuthType.login, context),
           ),
 
           HorizontalOrLineWidget(

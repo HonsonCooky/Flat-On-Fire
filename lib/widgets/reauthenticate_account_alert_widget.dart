@@ -121,7 +121,7 @@ class _ReauthenticateAccountAlertWidgetState extends State<ReauthenticateAccount
               password.text,
               false,
             );
-        if (mounted && authenticateText != AuthService.successfulOperation) {
+        if (authenticateText != AuthService.successfulOperation) {
           setState(() => errorText = authenticateText);
         } else {
           Navigator.of(context).pop();
@@ -156,9 +156,9 @@ class _ReauthenticateAccountAlertWidgetState extends State<ReauthenticateAccount
               password.text,
               true,
             );
-        if (mounted && authenticateText != AuthService.successfulOperation) {
+        if (authenticateText != AuthService.successfulOperation) {
           setState(() => errorText = authenticateText);
-        } else {
+        } else if (mounted) {
           Navigator.of(context).pop();
           widget.successfulAuthentication();
         }

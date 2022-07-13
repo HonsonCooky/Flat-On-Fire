@@ -117,7 +117,7 @@ class UserService {
   }
 
   /// Update a user + the user profile in the firestore
-  Future<void> updateUser(Map<String, dynamic> update) async {
+  void updateUser(Map<String, dynamic> update) {
     String? avatarLocalFilePath = update["profile"]["avatarPath"];
     var uid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -135,7 +135,7 @@ class UserService {
     Map<String, dynamic> profileUpdate = update["profile"] ?? {};
     batch.update(_userDocument(), userUpdate);
     batch.update(_userProfileDocument(null), profileUpdate);
-    await batch.commit();
+    batch.commit();
   }
 
   /// Delete the firebase

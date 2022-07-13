@@ -105,6 +105,7 @@ class ThemeModel {
         fontSize: titleLargeFontSize - 7,
         fontFamily: "Ubuntu",
       ),
+      indicatorSize: TabBarIndicatorSize.tab,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
@@ -181,9 +182,12 @@ class ThemeModel {
       errorStyle: _base.inputDecorationTheme.errorStyle?.copyWith(color: PaletteModel.lightOnError),
     ),
     tabBarTheme: _base.tabBarTheme.copyWith(
-      indicator: UnderlineTabIndicator(borderSide: BorderSide(width: 4, color: PaletteModel.lightSecondary)),
       labelColor: PaletteModel.lightOnPrimary,
       unselectedLabelColor: PaletteAssistant.alpha(PaletteModel.lightOnPrimary),
+      indicator: BoxDecoration(
+        borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+        color: PaletteModel.lightSecondary,
+      ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: _base.elevatedButtonTheme.style?.copyWith(
@@ -255,9 +259,12 @@ class ThemeModel {
       errorStyle: _base.inputDecorationTheme.errorStyle?.copyWith(color: PaletteModel.darkOnError),
     ),
     tabBarTheme: _base.tabBarTheme.copyWith(
-      indicator: UnderlineTabIndicator(borderSide: BorderSide(width: 4, color: PaletteModel.darkSecondary)),
       labelColor: PaletteModel.darkOnPrimary,
       unselectedLabelColor: PaletteAssistant.alpha(PaletteModel.darkOnPrimary),
+      indicator: BoxDecoration(
+        borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+        color: PaletteModel.darkSecondary,
+      ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: _base.elevatedButtonTheme.style?.copyWith(

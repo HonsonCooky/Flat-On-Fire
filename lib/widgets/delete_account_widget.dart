@@ -9,7 +9,7 @@ class DeleteAccountAlertWidget extends StatefulWidget {
   State<StatefulWidget> createState() => _DeleteAccountAlertWidgetState();
 }
 
-class _DeleteAccountAlertWidgetState extends State<DeleteAccountAlertWidget> with ToastMixin {
+class _DeleteAccountAlertWidgetState extends State<DeleteAccountAlertWidget> {
   @override
   Widget build(BuildContext context) {
     // set up the AlertDialog
@@ -41,9 +41,10 @@ class _DeleteAccountAlertWidgetState extends State<DeleteAccountAlertWidget> wit
       ),
       onPressed: () async {
         Navigator.of(context).pop();
+        var theme = Theme.of(context); // Get before async gap
         var deleteText = await context.read<AuthService>().deleteAccount();
-        if (mounted && deleteText != AuthService.successfulOperation) {
-          errorToast(deleteText, context);
+        if (deleteText != AuthService.successfulOperation) {
+          ToastManager.instance.errorToast(deleteText, theme);
         }
       },
     );
