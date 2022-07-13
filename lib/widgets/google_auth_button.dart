@@ -3,15 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class GoogleAuthButton extends StatelessWidget {
-  final void Function({
-    required Future<String> Function() authActionCallback,
-    bool requiresCheck,
-    bool Function()? optionalCheck,
-  }) attemptAuthCallback;
-
   final String title;
+  final State state;
 
-  const GoogleAuthButton({Key? key, required this.attemptAuthCallback, required this.title}) : super(key: key);
+  const GoogleAuthButton({Key? key, required this.title, required this.state}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +21,7 @@ class GoogleAuthButton extends StatelessWidget {
           color: Theme.of(context).colorScheme.onTertiary,
         ),
       ),
-      onPressed: () => attemptAuthCallback(
-        requiresCheck: false,
-        authActionCallback: () => context.read<AuthService>().googleSignupLogin(),
-      ),
+      onPressed: () => context.read<UserCredService>().attemptAuth(UserCredAuthType.google, context, state),
       style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
           backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.tertiary)),
       icon: Image.asset(

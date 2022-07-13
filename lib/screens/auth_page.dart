@@ -13,58 +13,6 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
   final ScrollController _loginScroll = ScrollController();
   final ScrollController _signupScroll = ScrollController();
 
-  final _email = TextEditingController();
-  final _password = TextEditingController();
-  String? emailErrMsg, passwordErrMsg;
-
-  @override
-  void dispose() {
-    _email.dispose();
-    _password.dispose();
-    super.dispose();
-  }
-
-  bool _emailPasswordCheck() {
-    setState(() {
-      emailErrMsg = _email.text.isEmpty ? "No Email Provided" : null;
-      passwordErrMsg = _password.text.isEmpty ? "No Password Provided" : null;
-    });
-    return emailErrMsg == null && passwordErrMsg == null;
-  }
-
-  void _resetErrors() {
-    setState(() {
-      emailErrMsg = null;
-      passwordErrMsg = null;
-    });
-  }
-
-  void _attemptAuthAction({
-    required Future<String> Function() authActionCallback,
-    bool requiresCheck = true,
-    bool Function()? optionalCheck,
-  }) async {
-    // Don't bother checking the backend if the information is known to be wrong.
-    bool checkPass = true;
-    if (requiresCheck) {
-      checkPass &= _emailPasswordCheck();
-      // Some screens have more than email and password, so execute their other checks
-      if (optionalCheck != null) {
-        checkPass &= optionalCheck();
-      }
-    }
-
-    if (!checkPass) {
-      errorToast("Invalid user credentials", context);
-      return;
-    }
-
-    var res = await authActionCallback();
-    if (mounted && res != AuthService.successfulOperation) {
-      errorToast(res, context);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final viewState = context.watch<AppService>().viewState;
@@ -89,7 +37,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
 
   /// An expanded container, with the Logo and Title stacked inside.
   Widget _header() {
-    double fontSize = ((MediaQuery.of(context).size.width - MediaQuery.of(context).viewInsets.bottom) / 5);
+    double fontSize = ((MediaQuery.of(context).size.width - (MediaQuery.of(context).viewInsets.bottom / 1.5)) / 5);
     return Container(
       color: Theme.of(context).colorScheme.primary,
       child: WrapperOverflowRemoved(
@@ -173,22 +121,9 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
       child: WrapperOverflowRemoved(
         child: TabBarView(
           children: [
-            RawScrollbar(
-              thumbColor: PaletteAssistant.alpha(Theme.of(context).colorScheme.secondary),
-              thickness: 5,
-              thumbVisibility: true,
-              radius: const Radius.circular(2),
-              controller: _loginScroll,
-              child: WrapperPadding(
-                child: LoginTabWidget(
-                  scrollController: _loginScroll,
-                  email: _email,
-                  password: _password,
-                  emailErrMsg: emailErrMsg,
-                  passwordErrMsg: passwordErrMsg,
-                  resetErrors: _resetErrors,
-                  attemptAuthCallback: _attemptAuthAction,
-                ),
+            WrapperPadding(
+              child: LoginTabWidget(
+                scrollController: _loginScroll,
               ),
             ),
             RawScrollbar(
@@ -200,12 +135,6 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
               child: WrapperPadding(
                 child: SignupTabWidget(
                   scrollController: _signupScroll,
-                  email: _email,
-                  password: _password,
-                  emailErrMsg: emailErrMsg,
-                  passwordErrMsg: passwordErrMsg,
-                  resetErrors: _resetErrors,
-                  attemptAuthCallback: _attemptAuthAction,
                 ),
               ),
             ),

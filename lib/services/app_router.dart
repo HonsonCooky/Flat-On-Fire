@@ -8,7 +8,7 @@ class AppRouter {
 
   GoRouter get router => _goRouter;
 
-  AppRouter({required this.appService});
+  AppRouter(this.appService);
 
   late final GoRouter _goRouter = GoRouter(
     refreshListenable: appService,
@@ -86,8 +86,9 @@ class AppRouter {
       final homePagePath = AppPageEnum.home.toPath;
 
       if (!loggedIn && state.location != authPagePath) return authPagePath;
-      if (loggedIn && (state.location == authPagePath || state.location == splashPage))
+      if (loggedIn && (state.location == authPagePath || state.location == splashPage)) {
         return AppPageEnum.settings.toPath;
+      }
       return null;
     },
   );

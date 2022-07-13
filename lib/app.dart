@@ -14,12 +14,24 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   late AppService _appService;
   late AuthService _authService;
+  late UserCredService _userCredService;
+  late AppRouter _appRouter;
 
   @override
   void initState() {
     _appService = AppService();
     _authService = AuthService(_appService);
+    _appRouter = AppRouter(_appService);
+    _userCredService = UserCredService();
     super.initState();
+  }
+
+
+  @override
+  void dispose() {
+    _authService.dispose();
+    _appService.dispose();
+    super.dispose();
   }
 
   @override
@@ -28,7 +40,8 @@ class _AppState extends State<App> {
       providers: [
         ChangeNotifierProvider<AppService>(create: (_) => _appService),
         ChangeNotifierProvider<AuthService>(create: (_) => _authService),
-        Provider<AppRouter>(create: (_) => AppRouter(appService: _appService)),
+        ChangeNotifierProvider<UserCredService>(create: (_) => _userCredService),
+        Provider<AppRouter>(create: (_) => _appRouter),
       ],
       child: Builder(
         builder: (context) {

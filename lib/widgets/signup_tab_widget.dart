@@ -5,55 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-class SignupTabWidget extends AuthenticationTab {
-  const SignupTabWidget({
-    Key? key,
-    required super.scrollController,
-    required super.email,
-    required super.password,
-    required super.resetErrors,
-    required super.attemptAuthCallback,
-    super.emailErrMsg,
-    super.passwordErrMsg,
-  }) : super(key: key);
+class SignupTabWidget extends StatefulWidget {
+  final ScrollController scrollController;
+
+  const SignupTabWidget({Key? key, required this.scrollController}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _SignupTabWidgetState();
 }
 
 class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
-  final _name = TextEditingController();
-  final _confirmPassword = TextEditingController();
   final ImagePicker _picker = ImagePicker();
-  String? _nameErrMsg;
-  String? _confirmErrMsg;
   XFile? _pickedImage;
-
-  @override
-  void dispose() {
-    _name.dispose();
-    super.dispose();
-  }
-
-  bool preFlightCheck() {
-    setState(() {
-      _nameErrMsg = _name.text.isEmpty ? "No Name Provided" : null;
-      _confirmErrMsg = _confirmPassword.text.isEmpty
-          ? "No Password Provided"
-          : _confirmPassword.text != widget.password.text
-              ? "Passwords do not match"
-              : null;
-    });
-    return _nameErrMsg == null && _confirmErrMsg == null;
-  }
-
-  void resetErrors() {
-    setState(() {
-      _nameErrMsg = null;
-      _confirmErrMsg = null;
-    });
-    widget.resetErrors();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,82 +24,78 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
   }
 
   Widget _signupTabContents() {
-    return ListView(
-      controller: widget.scrollController,
-      physics: const BouncingScrollPhysics(),
-      children: [
-        _profilePicture(),
+    return Consumer<UserCredService>(
+      builder: (BuildContext context, UserCredService content, _) => ListView(
+        controller: widget.scrollController,
+        physics: const BouncingScrollPhysics(),
+        children: [
+          _profilePicture(),
 
-        const SizedBox(
-          height: 10,
-        ),
+          const SizedBox(
+            height: 10,
+          ),
 
-        /// Email Text Box
-        FofTextField(
-          onTap: resetErrors,
-          labelText: "Email",
-          errorText: widget.emailErrMsg,
-          controller: widget.email,
-        ),
+          /// Email Text Box
+          FofTextField(
+            onTap: content.resetErrors,
+            labelText: "Email",
+            errorText: content.emailErr,
+            controller: content.email,
+          ),
 
-        /// Name Text Box
-        FofTextField(
-          onTap: resetErrors,
-          labelText: "Name",
-          errorText: _nameErrMsg,
-          controller: _name,
-        ),
+          /// Name Text Box
+          FofTextField(
+            onTap: content.resetErrors,
+            labelText: "Name",
+            errorText: content.nameErr,
+            controller: content.name,
+          ),
 
-        /// Password Text Box
-        FofTextField(
-          onTap: resetErrors,
-          controller: widget.password,
-          canObscure: true,
-          labelText: 'Password',
-          errorText: widget.passwordErrMsg,
-        ),
+          /// Password Text Box
+          FofTextField(
+            onTap: content.resetErrors,
+            controller: content.pass,
+            canObscure: true,
+            labelText: 'Password',
+            errorText: content.passErr,
+          ),
 
-        /// Password Text Box
-        FofTextField(
-          onTap: resetErrors,
-          controller: _confirmPassword,
-          canObscure: true,
-          labelText: 'Confirm Password',
-          errorText: _confirmErrMsg,
-        ),
+          /// Password Text Box
+          FofTextField(
+            onTap: content.resetErrors,
+            controller: content.conf,
+            canObscure: true,
+            labelText: 'Confirm Password',
+            errorText: content.confErr,
+          ),
 
-        const SizedBox(
-          height: 50,
-        ),
+          const SizedBox(
+            height: 50,
+          ),
 
-        /// Sign In Button
-        ElevatedButton.icon(
-          icon: const Icon(Icons.person_add),
-          label: const Text("CREATE ACCOUNT"),
-          onPressed: () => widget.attemptAuthCallback(
-              authActionCallback: () => context.read<AuthService>().signup(
-                  email: widget.email.text,
-                  name: _name.text,
-                  password: widget.password.text,
-                  avatarLocalFilePath: _pickedImage?.path),
-              optionalCheck: preFlightCheck),
-        ),
+          /// Sign In Button
+          ElevatedButton.icon(
+            icon: const Icon(Icons.person_add),
+            label: const Text("CREATE ACCOUNT"),
+            onPressed: () => content.attemptAuth(UserCredAuthType.signup, context, this),
+          ),
 
-        HorizontalOrLineWidget(
-          label: "OR",
-          padding: 20,
-          color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
-        ),
+          HorizontalOrLineWidget(
+            label: "OR",
+            padding: 20,
+            color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
+          ),
 
-        GoogleAuthButton(
-          title: "SIGNUP WITH GOOGLE",
-          attemptAuthCallback: widget.attemptAuthCallback,
-        ),
+          GoogleAuthButton(
+            title: "SIGNUP WITH GOOGLE",
+            state: this,
+          ),
 
-        const SizedBox(
-          height: 50,
-        ),
-      ],
+          const SizedBox(
+            height: 50,
+          ),
+        ],
+      ),
     );
   }
 
