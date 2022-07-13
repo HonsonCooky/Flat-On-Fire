@@ -113,7 +113,7 @@ class CloudStorageService {
   // ----------------------------------------------------------------------------------------------------------------
   // DELETE AVATAR
   // ----------------------------------------------------------------------------------------------------------------
-  
+
   /// Delete an avatar file locally and in the cloud.
   /// [subFolder] and [uid] are used to identify the avatar.
   Future deleteAvatarFile({

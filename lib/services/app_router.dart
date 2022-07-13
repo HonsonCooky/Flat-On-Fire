@@ -44,7 +44,6 @@ class AppRouter {
         path: AppPageEnum.groups.toPath,
         name: AppPageEnum.groups.toName,
         pageBuilder: (context, state) => MaterialPage(
-          
           key: state.pageKey,
           child: const GroupsPage(),
         ),
@@ -82,13 +81,13 @@ class AppRouter {
         return null;
       }
 
-
       final loggedIn = appService.loginState;
       final authPagePath = AppPageEnum.auth.toPath;
       final homePagePath = AppPageEnum.home.toPath;
 
       if (!loggedIn && state.location != authPagePath) return authPagePath;
-      if (loggedIn && (state.location == authPagePath || state.location == splashPage)) return AppPageEnum.settings.toPath;
+      if (loggedIn && (state.location == authPagePath || state.location == splashPage))
+        return AppPageEnum.settings.toPath;
       return null;
     },
   );

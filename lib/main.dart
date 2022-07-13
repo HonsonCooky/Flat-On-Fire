@@ -15,7 +15,6 @@ Future main() async {
   // Pass all uncaught errors from the framework to Crashlytics.
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-
   const platform = MethodChannel('honsoncooky.flutter.dev/appcheck');
   if (kDebugMode) {
     await platform.invokeMethod("installDebug");

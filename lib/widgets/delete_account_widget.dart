@@ -10,7 +10,6 @@ class DeleteAccountAlertWidget extends StatefulWidget {
 }
 
 class _DeleteAccountAlertWidgetState extends State<DeleteAccountAlertWidget> with ToastMixin {
-
   @override
   Widget build(BuildContext context) {
     // set up the AlertDialog

@@ -1,5 +1,5 @@
-/// Outlines the information maintained in a GroupProfile Document. 
-/// This information is available to everyone. 
+/// Outlines the information maintained in a GroupProfile Document.
+/// This information is available to everyone.
 class GroupProfileModel {
   final String name;
   final List<String> memberNames;

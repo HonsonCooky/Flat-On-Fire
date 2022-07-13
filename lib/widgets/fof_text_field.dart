@@ -16,7 +16,8 @@ class FofTextField extends StatefulWidget {
     this.onTap,
     this.controller,
     this.style,
-    this.canObscure = false, this.fillColor,
+    this.canObscure = false,
+    this.fillColor,
   }) : super(key: key);
 
   @override

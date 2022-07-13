@@ -34,7 +34,7 @@ class WrapperAppPage extends StatelessWidget {
       elevation: 0,
     );
   }
-  
+
   Widget _loading(BuildContext context) {
     return LoadingSpinnerWidget(MediaQuery.of(context).size.width / 4);
   }
