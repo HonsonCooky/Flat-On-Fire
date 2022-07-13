@@ -27,7 +27,6 @@ class _LoginTabWidgetState extends State<LoginTabWidget> with ToastMixin {
   Widget _loginTabContents() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Expanded(
           child: ListView(
@@ -64,6 +63,21 @@ class _LoginTabWidgetState extends State<LoginTabWidget> with ToastMixin {
                   password: widget.password.text,
                 ),
           ),
+        ),
+
+        HorizontalOrLineWidget(
+          label: "OR",
+          padding: 20,
+          color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
+        ),
+
+        GoogleAuthButton(
+          title: "LOGIN WITH GOOGLE",
+          attemptAuthCallback: widget.attemptAuthCallback,
+        ),
+
+        const SizedBox(
+          height: 20,
         ),
       ],
     );

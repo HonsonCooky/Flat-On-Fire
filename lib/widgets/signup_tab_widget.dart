@@ -44,7 +44,6 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
               ? "Passwords do not match"
               : null;
     });
-    print(_confirmErrMsg);
     return _nameErrMsg == null && _confirmErrMsg == null;
   }
 
@@ -62,59 +61,52 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
   }
 
   Widget _signupTabContents() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return ListView(
+      controller: widget.scrollController,
+      physics: const BouncingScrollPhysics(),
       children: [
-        Expanded(
-          child: ListView(
-            controller: widget.scrollController,
-            physics: const BouncingScrollPhysics(),
-            children: [
-              _profilePicture(),
+        _profilePicture(),
 
-              const SizedBox(
-                height: 10,
-              ),
+        const SizedBox(
+          height: 10,
+        ),
 
-              /// Email Text Box
-              FofTextField(
-                onTap: resetErrors,
-                labelText: "Email",
-                errorText: widget.emailErrMsg,
-                controller: widget.email,
-              ),
+        /// Email Text Box
+        FofTextField(
+          onTap: resetErrors,
+          labelText: "Email",
+          errorText: widget.emailErrMsg,
+          controller: widget.email,
+        ),
 
-              /// Name Text Box
-              FofTextField(
-                onTap: resetErrors,
-                labelText: "Name",
-                errorText: _nameErrMsg,
-                controller: _name,
-              ),
+        /// Name Text Box
+        FofTextField(
+          onTap: resetErrors,
+          labelText: "Name",
+          errorText: _nameErrMsg,
+          controller: _name,
+        ),
 
-              /// Password Text Box
-              FofTextField(
-                onTap: resetErrors,
-                controller: widget.password,
-                canObscure: true,
-                labelText: 'Password',
-                errorText: widget.passwordErrMsg,
-              ),
+        /// Password Text Box
+        FofTextField(
+          onTap: resetErrors,
+          controller: widget.password,
+          canObscure: true,
+          labelText: 'Password',
+          errorText: widget.passwordErrMsg,
+        ),
 
-              /// Password Text Box
-              FofTextField(
-                onTap: resetErrors,
-                controller: _confirmPassword,
-                canObscure: true,
-                labelText: 'Confirm Password',
-                errorText: _confirmErrMsg,
-              ),
+        /// Password Text Box
+        FofTextField(
+          onTap: resetErrors,
+          controller: _confirmPassword,
+          canObscure: true,
+          labelText: 'Confirm Password',
+          errorText: _confirmErrMsg,
+        ),
 
-              const SizedBox(
-                height: 50,
-              ),
-            ],
-          ),
+        const SizedBox(
+          height: 50,
         ),
 
         /// Sign In Button
@@ -128,6 +120,21 @@ class _SignupTabWidgetState extends State<SignupTabWidget> with ToastMixin {
                   password: widget.password.text,
                   avatarLocalFilePath: _pickedImage?.path),
               optionalCheck: preFlightCheck),
+        ),
+
+        HorizontalOrLineWidget(
+          label: "OR",
+          padding: 20,
+          color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
+        ),
+
+        GoogleAuthButton(
+          title: "SIGNUP WITH GOOGLE",
+          attemptAuthCallback: widget.attemptAuthCallback,
+        ),
+
+        const SizedBox(
+          height: 50,
         ),
       ],
     );

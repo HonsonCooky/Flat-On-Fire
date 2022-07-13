@@ -76,7 +76,6 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
             children: [
               _header(),
               viewState == ViewState.busy ? Expanded(child: _loading(context)) : _tabViews(),
-              viewState == ViewState.busy ? const SizedBox() : _googleSignIn(),
             ],
           ),
         ),
@@ -90,6 +89,7 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
 
   /// An expanded container, with the Logo and Title stacked inside.
   Widget _header() {
+    double fontSize = ((MediaQuery.of(context).size.width - MediaQuery.of(context).viewInsets.bottom) / 5);
     return Container(
       color: Theme.of(context).colorScheme.primary,
       child: WrapperOverflowRemoved(
@@ -101,8 +101,8 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
               ),
               Stack(
                 children: [
-                  _headerLogo(),
-                  _headerText(),
+                  _headerLogo(fontSize),
+                  _headerText(fontSize),
                 ],
               ),
               _tabBar(),
@@ -114,18 +114,17 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
   }
 
   /// An implementation of the FofLogoWidget
-  Widget _headerLogo() {
-    double fontSize = MediaQuery.of(context).size.height / 3;
+  Widget _headerLogo(double fontSize) {
+    double fs = fontSize * 3.5;
     return FofLogoWidget(
       color: Theme.of(context).colorScheme.background,
-      size: fontSize,
-      offset: Offset(MediaQuery.of(context).size.width - fontSize, 0),
+      size: fs,
+      offset: Offset(MediaQuery.of(context).size.width - fs, 0),
     );
   }
 
   /// A padded column that represents the title of the application.
-  Widget _headerText() {
-    double fontSize = (MediaQuery.of(context).size.width / 5) - MediaQuery.of(context).viewInsets.bottom;
+  Widget _headerText(double fontSize) {
     return Container(
       padding: const EdgeInsets.only(left: 20, right: 20),
       alignment: Alignment.bottomLeft,
@@ -215,50 +214,6 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _googleSignIn() {
-    final googleImage = context.read<AppService>().themeMode == ThemeMode.light
-        ? 'assets/google_logo_light.png'
-        : 'assets/google_logo_dark.png';
-
-    return WrapperPadding(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          HorizontalOrLineWidget(
-            label: "OR",
-            padding: 20,
-            color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
-          ),
-
-          /// Google Sign In Button
-          ElevatedButton.icon(
-            label: Text(
-              "SIGN IN WITH GOOGLE",
-              style: Theme.of(context).elevatedButtonTheme.style?.textStyle?.resolve({})?.copyWith(
-                color: Theme.of(context).colorScheme.onTertiary,
-              ),
-            ),
-            onPressed: () => _attemptAuthAction(
-              requiresCheck: false,
-              authActionCallback: () => context.read<AuthService>().googleSignupLogin(),
-            ),
-            style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
-                backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.tertiary)),
-            icon: Image.asset(
-              googleImage,
-              height: (Theme.of(context).textTheme.button?.fontSize ?? 10) + 5,
-              fit: BoxFit.fitHeight,
-            ),
-          ),
-
-          SizedBox(
-            height: MediaQuery.of(context).size.height / 20,
-          ),
-        ],
       ),
     );
   }
