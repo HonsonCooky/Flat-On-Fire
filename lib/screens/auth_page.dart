@@ -96,9 +96,6 @@ class _AuthPageState extends State<AuthPage> with ToastMixin {
         child: SafeArea(
           child: Column(
             children: [
-              SizedBox(
-                height: MediaQuery.of(context).viewInsets.bottom == 0 ? 20 : 0,
-              ),
               Stack(
                 children: [
                   _headerLogo(fontSize),
