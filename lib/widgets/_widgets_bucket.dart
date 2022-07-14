@@ -1,3 +1,4 @@
+export 'awaiting_information_widget.dart';
 export 'boolean_switcher_widget.dart';
 export 'colored_tab_bar_widget.dart';
 export 'delete_account_widget.dart';
@@ -16,4 +17,3 @@ export 'reauthenticate_account_alert_widget.dart';
 export 'signup_tab_widget.dart';
 export 'tip_widget.dart';
 export 'uneditable_text_entry_widget.dart';
-export 'awaiting_information_widget.dart';

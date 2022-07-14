@@ -55,7 +55,7 @@ class _GroupsPageState extends State<GroupsPage> {
   }
 
   Widget _userGroupsList(UserModel userModel) {
-    if (userModel.groups == null || userModel.groups!.isEmpty) return _noGroups();
+    // if (userModel.groups == null || userModel.groups!.isEmpty) return _noGroups();
     return const SizedBox();
   }
 
@@ -80,9 +80,7 @@ class _GroupsPageState extends State<GroupsPage> {
               height: MediaQuery.of(context).size.height / 40,
             ),
             ElevatedButton.icon(
-              onPressed: () {
-                
-              },
+              onPressed: () {},
               icon: const Icon(Icons.table_view),
               label: const Text("Create Group"),
             ),

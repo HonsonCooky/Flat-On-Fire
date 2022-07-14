@@ -3,24 +3,23 @@ import 'package:flat_on_fire/_app_bucket.dart';
 
 class GroupService {
   static const groupKey = "groups";
+  static const memberKey = "members";
+
 // ----------------------------------------------------------------------------------------------------------------
 // PRIVATE ASSISTANT METHODS
 // ----------------------------------------------------------------------------------------------------------------
 
-  /// Get the path to a groups PRIVATE information.
-  String _groupPath(String? uid, String exception) {
-    if (uid == null) throw Exception(exception);
+  String _groupPath(String uid) {
     return "$groupKey/$uid";
   }
 
-  /// Get the path to a groups PUBLIC information
-  String _groupProfileSubDocPath(String? uid, String exception) {
-    return "${_groupPath(uid, exception)}/${FirestoreService().profileSubDocPath(groupKey)}";
+  String _membersCollection(String uid) {
+    return "${_groupPath(uid)}/$memberKey";
   }
 
   /// Access to the PRIVATE group information
-  DocumentReference<GroupModel> _groupDocument() {
-    var path = _groupPath("SOME_UID", "Unauthorized access to group information");
+  DocumentReference<GroupModel> _groupDocument(String uid) {
+    var path = _groupPath(uid);
     var doc = FirestoreService().getDoc(path);
     return doc.withConverter<GroupModel>(
       fromFirestore: (snapshot, _) => GroupModel.fromJson(snapshot.data()!),
@@ -28,20 +27,16 @@ class GroupService {
     );
   }
 
-  /// Access to the PROFILE group information (given a UID, that group will be found)
-  DocumentReference<GroupProfileModel> _groupProfileDocument(String uid) {
-    var path = _groupProfileSubDocPath(
-      uid,
-      "Unauthorized access to group information",
-    );
-    var doc = FirestoreService().getDoc(path);
-    return doc.withConverter<GroupProfileModel>(
-      fromFirestore: (snapshot, _) => GroupProfileModel.fromJson(snapshot.data()!),
-      toFirestore: (profileModel, _) => profileModel.toJson(),
-    );
-  }
 // ----------------------------------------------------------------------------------------------------------------
 // PUBLIC METHODS
 // ----------------------------------------------------------------------------------------------------------------
 
+// void createNewGroup({
+//   required UserModel owner,
+//   required String name,
+//   String? avatarLocalFilePath,
+//   FirebaseSyncFuncs? syncFuncs,
+// }) {
+//   _groupDocument().
+// }
 }

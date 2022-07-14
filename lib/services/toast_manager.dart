@@ -10,6 +10,7 @@ class ToastManager {
 
   void successToast(String msg, ThemeData theme) {
     if (rootScaffoldMessengerKey.currentState == null) return;
+    rootScaffoldMessengerKey.currentState!.hideCurrentSnackBar();
     rootScaffoldMessengerKey.currentState!.showSnackBar(
       SnackBar(
           duration: Duration(milliseconds: _snackbarDuration),
@@ -25,6 +26,7 @@ class ToastManager {
 
   void infoToast(String msg, ThemeData theme) {
     if (rootScaffoldMessengerKey.currentState == null) return;
+    rootScaffoldMessengerKey.currentState!.hideCurrentSnackBar();
     rootScaffoldMessengerKey.currentState!.showSnackBar(
       SnackBar(
           duration: Duration(milliseconds: _snackbarDuration),
@@ -40,6 +42,7 @@ class ToastManager {
 
   void errorToast(String msg, ThemeData theme) {
     if (rootScaffoldMessengerKey.currentState == null) return;
+    rootScaffoldMessengerKey.currentState!.hideCurrentSnackBar();
     rootScaffoldMessengerKey.currentState!.showSnackBar(
       SnackBar(
           duration: Duration(milliseconds: _snackbarDuration),

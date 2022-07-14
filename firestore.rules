@@ -1,13 +1,6 @@
 rules_version = '2';
 service cloud.firestore {
     match /databases/{database}/documents {
-
-        // Everything in a public domain is readable to authenticated users
-        match /{prefix=**}/public/{doc} {
-            // Allow read of anything public
-            allow read: if request.auth.uid != null;
-        }
-
         match /users/{uid}/{path=**} {
             // Read and write if owner of document
             allow read, write: if request.auth.uid == uid;

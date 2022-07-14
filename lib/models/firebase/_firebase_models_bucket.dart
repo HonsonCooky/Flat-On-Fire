@@ -1,3 +1,3 @@
-export 'user/_user_bucket.dart';
-export 'group/_group_bucket.dart';
+export 'group_model.dart';
 export 'model_connection.dart';
+export 'user_model.dart';

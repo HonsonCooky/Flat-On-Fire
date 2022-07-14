@@ -44,7 +44,6 @@ class _LoginTabWidgetState extends State<LoginTabWidget> {
             controller: content.pass,
             canObscure: true,
             labelText: 'Password',
-            
             errorText: content.passErr,
           ),
 

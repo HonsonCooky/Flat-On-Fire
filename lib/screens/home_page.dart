@@ -52,11 +52,8 @@ class _HomePageState extends State<HomePage> {
         } else if (snapshot.hasData || snapshot.hasError) {
           return _errorWelcomeText(Theme.of(context).textTheme.titleLarge);
         }
-        return const AwaitingInformationWidget(texts: [
-          "Favourites Loading",
-          "Advanced AI at work",
-          "Patience, you must have, Padawan"
-        ]);
+        return const AwaitingInformationWidget(
+            texts: ["Favourites Loading", "Advanced AI at work", "Patience, you must have, Padawan"]);
       },
     );
   }

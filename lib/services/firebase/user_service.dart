@@ -4,7 +4,7 @@ import 'package:flat_on_fire/_app_bucket.dart';
 
 class UserService {
   static const userKey = "users";
-  
+
 // ----------------------------------------------------------------------------------------------------------------
 // PRIVATE ASSISTANT METHODS
 // ----------------------------------------------------------------------------------------------------------------
@@ -15,11 +15,6 @@ class UserService {
     return "$userKey/$uid";
   }
 
-  /// Get the path to a users PUBLIC information
-  String _userProfileSubDocPath(String? uid, String exception) {
-    return "${_userPath(uid, exception)}/${FirestoreService().profileSubDocPath(userKey)}";
-  }
-
   /// Access to the PRIVATE user information
   DocumentReference<UserModel> _userDocument() {
     var path = _userPath(FirebaseAuth.instance.currentUser?.uid, "Unauthorized access to user information");
@@ -27,19 +22,6 @@ class UserService {
     return doc.withConverter<UserModel>(
       fromFirestore: (snapshot, _) => UserModel.fromJson(snapshot.data()!),
       toFirestore: (settingsModel, _) => settingsModel.toJson(),
-    );
-  }
-
-  /// Access to the PROFILE user information (given a UID, that user will be found)
-  DocumentReference<UserProfileModel> _userProfileDocument(String? uid) {
-    var path = _userProfileSubDocPath(
-      uid ?? FirebaseAuth.instance.currentUser?.uid,
-      "Unauthorized access to user information",
-    );
-    var doc = FirestoreService().getDoc(path);
-    return doc.withConverter<UserProfileModel>(
-      fromFirestore: (snapshot, _) => UserProfileModel.fromJson(snapshot.data()!),
-      toFirestore: (profileModel, _) => profileModel.toJson(),
     );
   }
 
@@ -61,11 +43,6 @@ class UserService {
   Future<DocumentSnapshot<UserModel>>? getUser() {
     if (FirebaseAuth.instance.currentUser == null) return null;
     return _userDocument().getCacheFirst();
-  }
-
-  /// Get the UserProfileModel from Firestore
-  Future<DocumentSnapshot<UserProfileModel>> getUserProfile(String? uid) {
-    return _userProfileDocument(uid).getCacheFirst();
   }
 
   /// Create a new user in the Firestore
@@ -110,7 +87,6 @@ class UserService {
       // Batch create
       var batch = FirebaseFirestore.instance.batch();
       batch.set<UserModel>(_userDocument(), userModel);
-      batch.set<UserProfileModel>(_userProfileDocument(null), userProfileModel);
       await batch.commit();
     } catch (e) {
       // Failed attempt. Remove user from firebase authentication
@@ -120,7 +96,10 @@ class UserService {
   }
 
   /// Update a user + the user profile in the firestore
-  void updateUser(Map<String, dynamic> update) {
+  void updateUser({
+    required Map<String, dynamic> update,
+    FirebaseSyncFuncs? syncFuncs,
+  }) {
     String? avatarLocalFilePath = update["profile"]["avatarPath"];
     var uid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -133,12 +112,16 @@ class UserService {
       );
     }
 
+    Map<String, dynamic> userUpdate = update;    
     var batch = FirebaseFirestore.instance.batch();
-    Map<String, dynamic> userUpdate = update;
-    Map<String, dynamic> profileUpdate = update["profile"] ?? {};
     batch.update(_userDocument(), userUpdate);
-    batch.update(_userProfileDocument(null), profileUpdate);
-    batch.commit();
+    batch.commit().then((_) {
+      syncFuncs?.onSuccess();
+    }).catchError((_) {
+      syncFuncs?.onError();
+    });
+
+    syncFuncs?.onLocalSuccess();
   }
 
   /// Delete the firebase
@@ -151,7 +134,6 @@ class UserService {
 
     var batch = FirebaseFirestore.instance.batch();
     batch.delete(_userDocument());
-    batch.delete(_userProfileDocument(null));
     await batch.commit();
   }
 }

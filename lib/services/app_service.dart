@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 const loggedInText = 'Logged In';
@@ -72,5 +74,17 @@ class AppService extends ChangeNotifier {
   set loginState(bool value) {
     _loginState = value;
     notifyListeners();
+  }
+
+  static Future<bool> networkConnected() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+      return false;
+    } on SocketException catch (_) {
+      return false;
+    }
   }
 }

@@ -321,15 +321,21 @@ class _SettingPageState extends State<SettingsPage> {
       onPressed: () async {
         try {
           context.read<AppService>().viewState = ViewState.busy;
-          FirestoreService().userService.updateUser({
-            "themeMode": context.read<AppService>().themeMode.name,
-            "onBoarded": context.read<AppService>().onBoarded,
-            "profile": UserProfileModel(
-              name: _name.text.isNotEmpty ? _name.text : um.profile.name,
-              avatarPath: _pickedImage?.path ?? um.profile.avatarPath,
-            ).toJson(),
-          });
-          ToastManager.instance.successToast("Save successful", Theme.of(context));
+          FirestoreService().userService.updateUser(
+            update: {
+              "themeMode": context.read<AppService>().themeMode.name,
+              "onBoarded": context.read<AppService>().onBoarded,
+              "profile": UserProfileModel(
+                name: _name.text.isNotEmpty ? _name.text : um.profile.name,
+                avatarPath: _pickedImage?.path ?? um.profile.avatarPath,
+              ).toJson(),
+            },
+            syncFuncs: FirebaseSyncFuncs(
+              () => ToastManager.instance.successToast("Save successful", Theme.of(context)),
+              () => ToastManager.instance.infoToast("Local save successful", Theme.of(context)),
+              () => ToastManager.instance.errorToast("Unable to save changes at this time", Theme.of(context)),
+            ),
+          );
         } catch (e) {
           ToastManager.instance.errorToast("Unable to save changes at this time", Theme.of(context));
         } finally {

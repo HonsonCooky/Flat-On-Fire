@@ -30,7 +30,7 @@ class _SignupTabWidgetState extends State<SignupTabWidget> {
         physics: const BouncingScrollPhysics(),
         children: [
           _profilePicture(),
-          
+
           SizedBox(
             height: MediaQuery.of(context).size.height / 40,
           ),
@@ -72,6 +72,7 @@ class _SignupTabWidgetState extends State<SignupTabWidget> {
           SizedBox(
             height: MediaQuery.of(context).size.height / 10,
           ),
+
           /// Sign In Button
           ElevatedButton.icon(
             icon: const Icon(Icons.person_add),
