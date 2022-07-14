@@ -46,7 +46,8 @@ class AuthService extends ChangeNotifier {
           failed = false;
         }
       }
-    } catch (_) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
     } finally {
       // Finally will ensure the UI components react accordingly in all scenarios
       _appService.batch(

@@ -83,11 +83,10 @@ class AppRouter {
 
       final loggedIn = appService.loginState;
       final authPagePath = AppPageEnum.auth.toPath;
-      final homePagePath = AppPageEnum.home.toPath;
 
       if (!loggedIn && state.location != authPagePath) return authPagePath;
       if (loggedIn && (state.location == authPagePath || state.location == splashPage)) {
-        return homePagePath;
+        return AppPageEnum.groups.toPath;
       }
       return null;
     },
