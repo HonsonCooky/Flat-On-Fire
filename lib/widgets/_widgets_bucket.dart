@@ -16,3 +16,4 @@ export 'reauthenticate_account_alert_widget.dart';
 export 'signup_tab_widget.dart';
 export 'tip_widget.dart';
 export 'uneditable_text_entry_widget.dart';
+export 'awaiting_information_widget.dart';

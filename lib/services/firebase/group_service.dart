@@ -2,13 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 
 class GroupService {
-// ----------------------------------------------------------------------------------------------------------------
-// CONSTANT VALUES
-// ----------------------------------------------------------------------------------------------------------------
-
-  final groupCollectionName = "groups";
-  final groupProfileCollectionName = "group_profiles";
-
+  static const groupKey = "groups";
 // ----------------------------------------------------------------------------------------------------------------
 // PRIVATE ASSISTANT METHODS
 // ----------------------------------------------------------------------------------------------------------------
@@ -16,30 +10,27 @@ class GroupService {
   /// Get the path to a groups PRIVATE information.
   String _groupPath(String? uid, String exception) {
     if (uid == null) throw Exception(exception);
-    return "$groupCollectionName/$uid";
+    return "$groupKey/$uid";
   }
 
   /// Get the path to a groups PUBLIC information
-  String _groupProfilePath(String? uid, String exception) {
-    if (uid == null) throw Exception(exception);
-    return "$groupProfileCollectionName/${FirestoreService().profileSubDocPath}";
+  String _groupProfileSubDocPath(String? uid, String exception) {
+    return "${_groupPath(uid, exception)}/${FirestoreService().profileSubDocPath(groupKey)}";
   }
 
   /// Access to the PRIVATE group information
-  DocumentReference<GroupModel> _groupModelDocument(String uid) {
-    var doc = FirestoreService().getDoc(_groupPath(
-      uid,
-      "Unauthorized access to group information",
-    ));
+  DocumentReference<GroupModel> _groupDocument() {
+    var path = _groupPath("SOME_UID", "Unauthorized access to group information");
+    var doc = FirestoreService().getDoc(path);
     return doc.withConverter<GroupModel>(
       fromFirestore: (snapshot, _) => GroupModel.fromJson(snapshot.data()!),
-      toFirestore: (groupModel, _) => groupModel.toJson(),
+      toFirestore: (settingsModel, _) => settingsModel.toJson(),
     );
   }
 
-  /// Access to the PUBLIC group information (given a UID, that group will be found)
-  DocumentReference<GroupProfileModel> groupProfileDocument(String uid) {
-    var path = _groupProfilePath(
+  /// Access to the PROFILE group information (given a UID, that group will be found)
+  DocumentReference<GroupProfileModel> _groupProfileDocument(String uid) {
+    var path = _groupProfileSubDocPath(
       uid,
       "Unauthorized access to group information",
     );
@@ -49,4 +40,8 @@ class GroupService {
       toFirestore: (profileModel, _) => profileModel.toJson(),
     );
   }
+// ----------------------------------------------------------------------------------------------------------------
+// PUBLIC METHODS
+// ----------------------------------------------------------------------------------------------------------------
+
 }

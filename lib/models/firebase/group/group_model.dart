@@ -4,8 +4,8 @@ import 'package:flat_on_fire/_app_bucket.dart';
 /// This information is only available to group members.
 /// The groupProfile field is a duplicate of publicly available information.
 class GroupModel {
-  final Map<String, Authorization>? users;
-  final Map<String, Authorization>? tables;
+  final Map<String, ModelConnection<GroupProfileModel>>? users;
+  final Map<String, ModelConnection<GroupProfileModel>>? tables;
   final GroupProfileModel groupProfile;
 
   GroupModel({
@@ -15,13 +15,13 @@ class GroupModel {
   });
 
   GroupModel.fromJson(Map<String, dynamic> json)
-      : users = json["users"],
-        tables = json["tables"],
+      : users = json["users"]?.map((key, value) => MapEntry(key, ModelConnection.fromJson(value))),
+        tables = json["tables"]?.map((key, value) => MapEntry(key, ModelConnection.fromJson(value))),
         groupProfile = GroupProfileModel.fromJson(json["groupProfile"]);
 
   Map<String, dynamic> toJson() => {
-        "users": users,
-        "tables": tables,
+        "users": users?.map((key, value) => MapEntry(key, value.toJson())),
+        "tables": tables?.map((key, value) => MapEntry(key, value.toJson())),
         "groupProfile": groupProfile.toJson(),
       };
 }

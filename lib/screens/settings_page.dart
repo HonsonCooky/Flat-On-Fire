@@ -225,7 +225,7 @@ class _SettingPageState extends State<SettingsPage> {
     if (_userImageLoaded) return _userInitials(um, fontSize);
 
     CloudStorageService()
-        .getAvatarFile(subFolder: UserService.userAvatarSubLoc, uid: um.uid!, cacheOnly: true)
+        .getAvatarFile(subFolder: UserService.userKey, uid: um.uid!, cacheOnly: true)
         .then((value) => setState(() {
               _userImage = value;
               _userImageLoaded = true;

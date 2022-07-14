@@ -12,43 +12,83 @@ class GroupsPage extends StatefulWidget {
 class _GroupsPageState extends State<GroupsPage> {
   @override
   Widget build(BuildContext context) {
-    return WrapperAppPage(child: _groupsBody());
+    return WrapperAppPage(
+      child: _groupsBody(),
+    );
   }
 
   Widget _groupsBody() {
-    var textStyle = Theme.of(context).textTheme.labelMedium;
     return Column(
       children: [
-        _userGroups(textStyle),
+        _userGroups(),
       ],
     );
   }
 
-  Widget _userGroups(TextStyle? textStyle) {
+  Widget _userGroups() {
     return FutureBuilder(
       future: FirestoreService().userService.getUser(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
-        if (snapshot.hasError) return _userGroupsError(textStyle);
-        if (snapshot.hasData) return _userGroupsList(snapshot.data!.data()!, textStyle);
-        return _awaitingUserGroups(textStyle);
+        if (snapshot.hasData && snapshot.data?.data() != null) {
+          return _userGroupsList(snapshot.data!.data()!);
+        } else if (snapshot.hasData || snapshot.hasError) {
+          return _userGroupsError();
+        }
+        return const AwaitingInformationWidget(texts: [
+          "Group information loading",
+          "Playing pickup 52",
+          "Asking the server nicely",
+        ]);
       },
     );
   }
 
-  Widget _awaitingUserGroups(TextStyle? textStyle) {
-    return LoadingTextWidget(text: "... finding group information", style: textStyle);
-  }
-
-  Widget _userGroupsError(TextStyle? textStyle) {
-    return Text(
-      "Unable to retrieve group information",
-      style: textStyle,
+  Widget _userGroupsError() {
+    return Expanded(
+      child: Center(
+        child: Text(
+          "Unable to retrieve information",
+          style: Theme.of(context).textTheme.labelMedium,
+        ),
+      ),
     );
   }
 
-  Widget _userGroupsList(UserModel userModel, TextStyle? textStyle) {
-    return Column(
-      children: [],
+  Widget _userGroupsList(UserModel userModel) {
+    if (userModel.groups == null || userModel.groups!.isEmpty) return _noGroups();
+    return const SizedBox();
+  }
+
+  Widget _noGroups() {
+    return Expanded(
+      child: WrapperPadding(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              "Oh no!",
+              style: Theme.of(context).textTheme.headlineLarge,
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              "You're not associated to any groups yet",
+              style: Theme.of(context).textTheme.headlineMedium,
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height / 40,
+            ),
+            ElevatedButton.icon(
+              onPressed: () {
+                
+              },
+              icon: const Icon(Icons.table_view),
+              label: const Text("Create Group"),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

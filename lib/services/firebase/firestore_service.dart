@@ -16,7 +16,7 @@ class FirestoreService {
   // ----------------------------------------------------------------------------------------------------------------
   // COMMON COMPONENTS
   // ----------------------------------------------------------------------------------------------------------------
-  final String profileSubDocPath = "public/profile";
+  String profileSubDocPath(String specific) => "public/${specific}_profile";
 
   final UserService userService = UserService();
   final GroupService groupService = GroupService();

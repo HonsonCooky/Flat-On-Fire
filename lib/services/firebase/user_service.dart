@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 
 class UserService {
+  static const userKey = "users";
+  
 // ----------------------------------------------------------------------------------------------------------------
 // PRIVATE ASSISTANT METHODS
 // ----------------------------------------------------------------------------------------------------------------
@@ -10,15 +12,13 @@ class UserService {
   /// Get the path to a users PRIVATE information.
   String _userPath(String? uid, String exception) {
     if (uid == null) throw Exception(exception);
-    return "users/$uid";
+    return "$userKey/$uid";
   }
 
   /// Get the path to a users PUBLIC information
   String _userProfileSubDocPath(String? uid, String exception) {
-    return "${_userPath(uid, exception)}/${FirestoreService().profileSubDocPath}";
+    return "${_userPath(uid, exception)}/${FirestoreService().profileSubDocPath(userKey)}";
   }
-
-  static const String userAvatarSubLoc = "users";
 
   /// Access to the PRIVATE user information
   DocumentReference<UserModel> _userDocument() {
@@ -42,6 +42,10 @@ class UserService {
       toFirestore: (profileModel, _) => profileModel.toJson(),
     );
   }
+
+// ----------------------------------------------------------------------------------------------------------------
+// PUBLIC METHODS
+// ----------------------------------------------------------------------------------------------------------------
 
   /// Determine if the logged in user, has existing documentation.
   Future<bool> userDocExists() async {
@@ -79,7 +83,7 @@ class UserService {
       // Upload user picture
       if (avatarFileUrl != null || avatarLocalFilePath != null) {
         await CloudStorageService().setAvatarFile(
-          subFolder: UserService.userAvatarSubLoc,
+          subFolder: userKey,
           uid: uid,
           imagePath: avatarLocalFilePath,
           imageUrl: avatarFileUrl,
@@ -90,7 +94,7 @@ class UserService {
       UserProfileModel userProfileModel = UserProfileModel(
         name: name,
         avatarPath: CloudStorageService().avatarFireStorageLoc(
-          UserService.userAvatarSubLoc,
+          userKey,
           uid,
         ),
       );
@@ -98,7 +102,6 @@ class UserService {
       // Finally create the user
       UserModel userModel = UserModel(
         uid: uc.user!.uid,
-        isAdmin: false,
         themeMode: themeModeName,
         onBoarded: onBoarded,
         profile: userProfileModel,
@@ -124,7 +127,7 @@ class UserService {
     // Upload user picture
     if (avatarLocalFilePath != null) {
       CloudStorageService().setAvatarFile(
-        subFolder: UserService.userAvatarSubLoc,
+        subFolder: userKey,
         uid: uid,
         imagePath: avatarLocalFilePath,
       );
@@ -143,7 +146,7 @@ class UserService {
     // Delete the profile picture first
     var uid = FirebaseAuth.instance.currentUser!.uid;
     try {
-      CloudStorageService().deleteAvatarFile(subFolder: UserService.userAvatarSubLoc, uid: uid);
+      CloudStorageService().deleteAvatarFile(subFolder: userKey, uid: uid);
     } catch (_) {}
 
     var batch = FirebaseFirestore.instance.batch();

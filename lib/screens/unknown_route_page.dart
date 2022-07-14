@@ -17,7 +17,7 @@ class UnknownPageRoute extends StatelessWidget {
       body: Center(
         child: Text(
           'No route defined for "$name"',
-          style: Theme.of(context).textTheme.headline3,
+          style: Theme.of(context).textTheme.labelMedium,
           textAlign: TextAlign.center,
         ),
       ),

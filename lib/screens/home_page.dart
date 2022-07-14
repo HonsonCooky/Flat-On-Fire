@@ -13,7 +13,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return WrapperAppPage(
-      child: _homeBody(),
+      child: Column(
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 40,
+          ),
+          _homeBody(),
+        ],
+      ),
     );
   }
 
@@ -26,9 +33,6 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(
-            height: 20,
-          ),
           _welcomeTextFuture(),
         ],
       ),
@@ -48,15 +52,12 @@ class _HomePageState extends State<HomePage> {
         } else if (snapshot.hasData || snapshot.hasError) {
           return _errorWelcomeText(Theme.of(context).textTheme.titleLarge);
         }
-        return _awaitingWelcomeText(Theme.of(context).textTheme.titleLarge);
+        return const AwaitingInformationWidget(texts: [
+          "Favourites Loading",
+          "Advanced AI at work",
+          "Patience, you must have, Padawan"
+        ]);
       },
-    );
-  }
-
-  Widget _awaitingWelcomeText(TextStyle? textStyle) {
-    return LoadingTextWidget(
-      text: "Loading home page ...",
-      style: textStyle,
     );
   }
 
@@ -82,8 +83,8 @@ class _HomePageState extends State<HomePage> {
       style: Theme.of(context).textTheme.displayMedium,
     );
   }
-  
-  // Widget _favouritePages(UserModel userModel) {
-  //  
-  // }
+
+// Widget _favouritePages(UserModel userModel) {
+//
+// }
 }

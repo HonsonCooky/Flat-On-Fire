@@ -26,8 +26,9 @@ class ThemeModel {
         fontFamily: "Merriweather",
       ),
       headlineLarge: TextStyle(
-        fontSize: 10,
+        fontSize: 30,
         fontFamily: "Ubuntu",
+        fontWeight: FontWeight.bold,
       ),
       headlineMedium: TextStyle(
         fontSize: 24,
@@ -153,8 +154,12 @@ class ThemeModel {
         color: PaletteAssistant.alpha(PaletteModel.lightOnBackground),
       ),
       displaySmall: _base.textTheme.displaySmall?.copyWith(color: PaletteModel.lightOnBackground),
-      headlineLarge: _base.textTheme.headlineLarge?.copyWith(color: PaletteModel.lightOnBackground),
-      headlineMedium: _base.textTheme.headlineMedium?.copyWith(color: PaletteModel.lightOnBackground),
+      headlineLarge: _base.textTheme.headlineLarge?.copyWith(
+        color: PaletteAssistant.alpha(PaletteModel.lightOnBackground),
+      ),
+      headlineMedium: _base.textTheme.headlineMedium?.copyWith(
+        color: PaletteAssistant.alpha(PaletteModel.lightOnBackground),
+      ),
       headlineSmall: _base.textTheme.headlineSmall?.copyWith(color: PaletteModel.lightOnBackground),
       titleLarge: _base.textTheme.titleLarge?.copyWith(color: PaletteModel.lightOnBackground),
       titleMedium: _base.textTheme.titleMedium?.copyWith(color: PaletteModel.lightOnPrimary),
