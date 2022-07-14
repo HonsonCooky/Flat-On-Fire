@@ -121,9 +121,16 @@ class _AuthPageState extends State<AuthPage> {
       child: WrapperOverflowRemoved(
         child: TabBarView(
           children: [
-            WrapperPadding(
-              child: LoginTabWidget(
-                scrollController: _loginScroll,
+            RawScrollbar(
+              thumbColor: PaletteAssistant.alpha(Theme.of(context).colorScheme.secondary),
+              thickness: 5,
+              thumbVisibility: true,
+              radius: const Radius.circular(2),
+              controller: _loginScroll,
+              child: WrapperPadding(
+                child: LoginTabWidget(
+                  scrollController: _loginScroll,
+                ),
               ),
             ),
             RawScrollbar(

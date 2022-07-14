@@ -43,8 +43,11 @@ class _HomePageState extends State<HomePage> {
     return FutureBuilder(
       future: FirestoreService().userService.getUser(),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
-        if (snapshot.hasError) return _errorWelcomeText(Theme.of(context).textTheme.titleLarge);
-        if (snapshot.hasData) return _welcomeText(snapshot.data!.data()!, Theme.of(context).textTheme.displayMedium);
+        if (snapshot.hasData && snapshot.data?.data() != null) {
+          return _homePageBodyWithUserInformation(snapshot.data!.data()!);
+        } else if (snapshot.hasData || snapshot.hasError) {
+          return _errorWelcomeText(Theme.of(context).textTheme.titleLarge);
+        }
         return _awaitingWelcomeText(Theme.of(context).textTheme.titleLarge);
       },
     );
@@ -64,10 +67,23 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _welcomeText(UserModel userModel, TextStyle? textStyle) {
-    return Text(
-      "Welcome\n${userModel.profile.name}!",
-      style: textStyle,
+  Widget _homePageBodyWithUserInformation(UserModel userModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _welcomeText(userModel),
+      ],
     );
   }
+
+  Widget _welcomeText(UserModel userModel) {
+    return Text(
+      "Welcome\n${userModel.profile.name}!",
+      style: Theme.of(context).textTheme.displayMedium,
+    );
+  }
+  
+  // Widget _favouritePages(UserModel userModel) {
+  //  
+  // }
 }

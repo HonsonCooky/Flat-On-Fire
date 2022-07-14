@@ -15,6 +15,13 @@ class UserCredService extends ChangeNotifier {
   final TextEditingController conf = TextEditingController();
   String? emailErr, nameErr, passErr, confErr;
 
+  void _resetValues() {
+    email.text = "";
+    name.text = "";
+    pass.text = "";
+    conf.text = "";
+  }
+
   void resetErrors() {
     emailErr = null;
     nameErr = null;
@@ -50,6 +57,9 @@ class UserCredService extends ChangeNotifier {
               );
           if (authVal != AuthService.successfulOperation) {
             ToastManager.instance.errorToast(authVal, theme);
+          } else {
+            resetErrors();
+            _resetValues();
           }
         }
         break;
@@ -64,6 +74,9 @@ class UserCredService extends ChangeNotifier {
               );
           if (authVal != AuthService.successfulOperation) {
             ToastManager.instance.errorToast(authVal, theme);
+          } else {
+            resetErrors();
+            _resetValues();
           }
         }
         break;
@@ -72,6 +85,9 @@ class UserCredService extends ChangeNotifier {
         var authVal = await context.read<AuthService>().googleSignupLogin();
         if (authVal != AuthService.successfulOperation) {
           ToastManager.instance.errorToast(authVal, theme);
+        } else {
+          resetErrors();
+          _resetValues();
         }
         break;
     }

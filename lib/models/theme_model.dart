@@ -149,7 +149,9 @@ class ThemeModel {
     ),
     textTheme: _base.textTheme.copyWith(
       displayLarge: _base.textTheme.displayLarge?.copyWith(color: PaletteModel.lightOnBackground),
-      displayMedium: _base.textTheme.displayMedium?.copyWith(color: PaletteModel.lightOnBackground),
+      displayMedium: _base.textTheme.displayMedium?.copyWith(
+        color: PaletteAssistant.alpha(PaletteModel.lightOnBackground),
+      ),
       displaySmall: _base.textTheme.displaySmall?.copyWith(color: PaletteModel.lightOnBackground),
       headlineLarge: _base.textTheme.headlineLarge?.copyWith(color: PaletteModel.lightOnBackground),
       headlineMedium: _base.textTheme.headlineMedium?.copyWith(color: PaletteModel.lightOnBackground),
@@ -182,8 +184,8 @@ class ThemeModel {
       errorStyle: _base.inputDecorationTheme.errorStyle?.copyWith(color: PaletteModel.lightOnError),
     ),
     tabBarTheme: _base.tabBarTheme.copyWith(
-      labelColor: PaletteModel.lightOnPrimary,
-      unselectedLabelColor: PaletteAssistant.alpha(PaletteModel.lightOnPrimary),
+      labelColor: PaletteModel.lightOnSecondary,
+      unselectedLabelColor: PaletteModel.lightOnPrimary,
       indicator: BoxDecoration(
         borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
         color: PaletteModel.lightSecondary,

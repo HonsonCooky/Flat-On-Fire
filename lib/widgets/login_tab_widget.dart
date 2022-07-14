@@ -19,35 +19,37 @@ class _LoginTabWidgetState extends State<LoginTabWidget> {
 
   Widget _loginTabContents() {
     return Consumer<UserCredService>(
-      builder: (BuildContext context, UserCredService content, _) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      builder: (BuildContext context, UserCredService content, _) => ListView(
+        controller: widget.scrollController,
+        shrinkWrap: true,
+        physics: const BouncingScrollPhysics(),
         children: [
-          Expanded(
-            child: Center(
-              child: ListView(
-                shrinkWrap: true,
-                controller: widget.scrollController,
-                physics: const BouncingScrollPhysics(),
-                children: [
-                  /// Email Text Box
-                  FofTextField(
-                    onTap: content.resetErrors,
-                    labelText: "Email",
-                    errorText: content.emailErr,
-                    controller: content.email,
-                  ),
+          _avatarIcon(),
 
-                  /// Password Text Box
-                  FofTextField(
-                    onTap: content.resetErrors,
-                    controller: content.pass,
-                    canObscure: true,
-                    labelText: 'Password',
-                    errorText: content.passErr,
-                  ),
-                ],
-              ),
-            ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 40,
+          ),
+
+          /// Email Text Box
+          FofTextField(
+            onTap: content.resetErrors,
+            labelText: "Email",
+            errorText: content.emailErr,
+            controller: content.email,
+          ),
+
+          /// Password Text Box
+          FofTextField(
+            onTap: content.resetErrors,
+            controller: content.pass,
+            canObscure: true,
+            labelText: 'Password',
+            
+            errorText: content.passErr,
+          ),
+
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 10,
           ),
 
           /// Sign In Button
@@ -68,10 +70,24 @@ class _LoginTabWidgetState extends State<LoginTabWidget> {
             state: this,
           ),
 
-          const SizedBox(
-            height: 20,
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 10,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _avatarIcon() {
+    TextStyle? textStyle = Theme.of(context).textTheme.labelMedium;
+    double fontSize = textStyle?.fontSize != null ? textStyle!.fontSize! * 3 : 20;
+    return CircleAvatar(
+      radius: fontSize,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      child: Icon(
+        Icons.person,
+        size: fontSize,
+        color: Theme.of(context).colorScheme.onSurface,
       ),
     );
   }

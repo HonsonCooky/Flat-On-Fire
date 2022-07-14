@@ -87,7 +87,7 @@ class AppRouter {
 
       if (!loggedIn && state.location != authPagePath) return authPagePath;
       if (loggedIn && (state.location == authPagePath || state.location == splashPage)) {
-        return AppPageEnum.settings.toPath;
+        return homePagePath;
       }
       return null;
     },

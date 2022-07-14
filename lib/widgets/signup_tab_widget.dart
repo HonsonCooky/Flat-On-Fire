@@ -30,9 +30,9 @@ class _SignupTabWidgetState extends State<SignupTabWidget> {
         physics: const BouncingScrollPhysics(),
         children: [
           _profilePicture(),
-
-          const SizedBox(
-            height: 10,
+          
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 40,
           ),
 
           /// Email Text Box
@@ -69,10 +69,9 @@ class _SignupTabWidgetState extends State<SignupTabWidget> {
             errorText: content.confErr,
           ),
 
-          const SizedBox(
-            height: 50,
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 10,
           ),
-
           /// Sign In Button
           ElevatedButton.icon(
             icon: const Icon(Icons.person_add),
@@ -91,8 +90,8 @@ class _SignupTabWidgetState extends State<SignupTabWidget> {
             state: this,
           ),
 
-          const SizedBox(
-            height: 50,
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 10,
           ),
         ],
       ),
