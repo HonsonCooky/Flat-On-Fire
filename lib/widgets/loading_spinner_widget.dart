@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class LoadingSpinnerWidget extends StatefulWidget {
   final double size;
+  final Color? color;
 
-  const LoadingSpinnerWidget(this.size, {Key? key}) : super(key: key);
+  const LoadingSpinnerWidget(this.size, {Key? key, this.color}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _LoadingSpinnerWidgetState();
@@ -33,12 +34,15 @@ class _LoadingSpinnerWidgetState extends State<LoadingSpinnerWidget> with Ticker
         height: widget.size,
         child: CircularProgressIndicator(
           strokeWidth: widget.size / 7,
-          valueColor: _controller.drive(
-            ColorTween(
-              begin: Theme.of(context).colorScheme.primary,
-              end: Theme.of(context).colorScheme.secondary,
-            ),
-          ),
+          color: widget.color,
+          valueColor: widget.color != null
+              ? null
+              : _controller.drive(
+                  ColorTween(
+                    begin: Theme.of(context).colorScheme.primary,
+                    end: Theme.of(context).colorScheme.secondary,
+                  ),
+                ),
         ),
       ),
     );

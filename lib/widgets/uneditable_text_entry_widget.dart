@@ -31,24 +31,27 @@ class UneditableTextEntryWidget extends StatelessWidget {
               enabled: false,
               decoration: InputDecoration(
                 hintText: value,
-                hintStyle: textStyle?.copyWith(
-                  color: PaletteAssistant.alpha(textStyle?.color ?? Theme.of(context).colorScheme.onSurface),
-                ),
-                contentPadding: const EdgeInsets.all(5).copyWith(right: (textStyle?.fontSize ?? 10) * 3),
+                hintStyle: Theme.of(context).inputDecorationTheme.hintStyle?.copyWith(
+                      fontSize: textStyle?.fontSize,
+                      color: textStyle?.color,
+                      fontStyle: FontStyle.italic,
+                    ),
               ),
               style: textStyle?.copyWith(fontWeight: FontWeight.normal),
             ),
-            IconButton(
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              splashRadius: textStyle?.fontSize,
-              iconSize: textStyle?.fontSize,
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: value))
-                    .then((_) => ToastManager.instance.successToast("Copied Text", Theme.of(context)))
-                    .catchError((_) => ToastManager.instance.errorToast("Unable to copy text", Theme.of(context)));
-              },
-              icon: const Icon(Icons.copy),
+            Material(
+              color: Colors.transparent,
+              child: IconButton(
+                splashRadius: textStyle?.fontSize ?? Theme.of(context).textTheme.labelMedium?.fontSize ?? 30,
+                splashColor: PaletteAssistant.alpha(Theme.of(context).colorScheme.secondary),
+                iconSize: textStyle?.fontSize,
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: value))
+                      .then((_) => ToastManager.instance.successToast("Copied Text", Theme.of(context)))
+                      .catchError((_) => ToastManager.instance.errorToast("Unable to copy text", Theme.of(context)));
+                },
+                icon: const Icon(Icons.copy),
+              ),
             )
           ],
         ),

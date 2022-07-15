@@ -31,6 +31,12 @@ class GroupService {
 // PUBLIC METHODS
 // ----------------------------------------------------------------------------------------------------------------
 
+  List<GroupModel> getUsersGroups({
+    required String userId,
+  }) {
+    return [];
+  }
+
 // void createNewGroup({
 //   required UserModel owner,
 //   required String name,

@@ -21,7 +21,7 @@ class GoogleAuthButton extends StatelessWidget {
           color: Theme.of(context).colorScheme.onTertiary,
         ),
       ),
-      onPressed: () => context.read<UserCredService>().attemptAuth(UserCredAuthType.google, context),
+      onPressed: () => context.read<UserCredService>().attemptAuth(UserCredAuthType.google, null, context),
       style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
           backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.tertiary)),
       icon: Image.asset(

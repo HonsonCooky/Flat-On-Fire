@@ -31,10 +31,9 @@ class EditableTextEntryWidget extends StatelessWidget {
           controller: controller,
           decoration: InputDecoration(
             hintText: value,
-            hintStyle: textStyle,
-            contentPadding: const EdgeInsets.all(5),
+            hintStyle: Theme.of(context).inputDecorationTheme.hintStyle?.copyWith(fontSize: textStyle?.fontSize),
           ),
-          style: textStyle?.copyWith(fontWeight: FontWeight.normal),
+          style: textStyle?.copyWith(fontSize: textStyle?.fontSize, fontWeight: FontWeight.normal),
         ),
       ],
     );

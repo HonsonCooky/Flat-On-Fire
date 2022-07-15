@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class SignupTabWidget extends StatefulWidget {
@@ -15,8 +14,17 @@ class SignupTabWidget extends StatefulWidget {
 }
 
 class _SignupTabWidgetState extends State<SignupTabWidget> {
-  final ImagePicker _picker = ImagePicker();
-  XFile? _pickedImage;
+  final List<String> _profileTitles = [
+    "Dis you?",
+    "Ya so handsome",
+    "Felt cute...",
+    "This is me!",
+    "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧",
+    "(◕‿◕✿)",
+    "This dude! \n(☞ﾟ∀ﾟ)☞",
+    "So pretty! \n(;´༎ຶД༎ຶ`)"
+  ];
+  File? _currentImage;
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +85,7 @@ class _SignupTabWidgetState extends State<SignupTabWidget> {
           ElevatedButton.icon(
             icon: const Icon(Icons.person_add),
             label: const Text("CREATE ACCOUNT"),
-            onPressed: () => content.attemptAuth(UserCredAuthType.signup, context),
+            onPressed: () => content.attemptAuth(UserCredAuthType.signup, _currentImage?.path, context),
           ),
 
           HorizontalOrLineWidget(
@@ -98,60 +106,23 @@ class _SignupTabWidgetState extends State<SignupTabWidget> {
       ),
     );
   }
+  
+  void _updateCurrentImage(File? file) {
+    setState(() => _currentImage = file);
+  }
 
   Widget _profilePicture() {
     TextStyle? textStyle = Theme.of(context).textTheme.labelMedium;
-    double fontSize = textStyle?.fontSize != null ? textStyle!.fontSize! * 3 : 20;
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        _profileImage(fontSize),
-        _editProfileImage(fontSize),
-      ],
-    );
-  }
-
-  Widget _profileImage(double fontSize) {
-    return GestureDetector(
-      onTap: () {
-        if (_pickedImage == null) return;
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return FullImageDialogWidget(
-              title: "Profile Picture",
-              image: Image.file(File(_pickedImage!.path)),
-            );
-          },
-        );
-      },
-      child: CircleAvatar(
-        radius: fontSize,
-        foregroundImage: _pickedImage != null ? FileImage(File(_pickedImage!.path)) : null,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        child: Icon(
-          Icons.image,
-          size: fontSize,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
+    return ProfilePicture(
+      placeholder: Icon(
+        Icons.image,
+        color: Theme.of(context).colorScheme.onSurface,
+        size: textStyle?.fontSize != null ? textStyle!.fontSize! * 3 : 20,
       ),
-    );
-  }
-
-  Widget _editProfileImage(fontSize) {
-    return Positioned(
-      top: fontSize * 1.2,
-      left: MediaQuery.of(context).size.width / 2 - 10,
-      child: ElevatedButton(
-        onPressed: () async {
-          _pickedImage = await _picker.pickImage(source: ImageSource.gallery);
-          setState(() {});
-        },
-        style: ElevatedButton.styleFrom(
-          shape: const CircleBorder(),
-        ),
-        child: const Icon(Icons.add_a_photo),
-      ),
+      currentImage: _currentImage,
+      updateCurrentImage: _updateCurrentImage,
+      profileTitles: _profileTitles,
+      textStyle: Theme.of(context).textTheme.labelMedium,
     );
   }
 }

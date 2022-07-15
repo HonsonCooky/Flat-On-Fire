@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class GroupsPage extends StatefulWidget {
   const GroupsPage({Key? key}) : super(key: key);
@@ -55,7 +56,9 @@ class _GroupsPageState extends State<GroupsPage> {
   }
 
   Widget _userGroupsList(UserModel userModel) {
-    // if (userModel.groups == null || userModel.groups!.isEmpty) return _noGroups();
+    List<GroupModel> usersGroups = FirestoreService().groupService.getUsersGroups(userId: userModel.uid!);
+
+    if (usersGroups.isEmpty) return _noGroups();
     return const SizedBox();
   }
 
@@ -79,14 +82,20 @@ class _GroupsPageState extends State<GroupsPage> {
             SizedBox(
               height: MediaQuery.of(context).size.height / 40,
             ),
-            ElevatedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.table_view),
-              label: const Text("Create Group"),
-            ),
+            _createGroupButton(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _createGroupButton() {
+    return ElevatedButton.icon(
+      onPressed: () {
+        GoRouter.of(context).push(AppPageEnum.groupsCreate.toPath);
+      },
+      icon: const Icon(Icons.table_view),
+      label: const Text("Create Group"),
     );
   }
 }

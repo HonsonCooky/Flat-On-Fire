@@ -87,14 +87,15 @@ class ThemeModel {
     inputDecorationTheme: const InputDecorationTheme(
       labelStyle: TextStyle(fontSize: textFieldLabelSize),
       hintStyle: TextStyle(fontSize: textFieldLabelSize),
-      floatingLabelStyle: TextStyle(fontSize: textFieldLabelSize),
+      floatingLabelStyle: TextStyle(fontSize: textFieldLabelSize, fontWeight: FontWeight.w600),
       border: OutlineInputBorder(borderSide: BorderSide.none),
-      errorBorder: OutlineInputBorder(borderSide: BorderSide(width: 1)),
+      focusedBorder: OutlineInputBorder(borderSide: BorderSide(width: 3)),
+      errorBorder: OutlineInputBorder(borderSide: BorderSide(width: 2)),
       errorStyle: TextStyle(fontSize: captionSize),
       filled: true,
       alignLabelWithHint: true,
       isDense: true,
-      contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+      contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
     ),
     tabBarTheme: const TabBarTheme(
       labelStyle: TextStyle(
@@ -107,6 +108,9 @@ class ThemeModel {
         fontFamily: "Ubuntu",
       ),
       indicatorSize: TabBarIndicatorSize.tab,
+      indicator: BoxDecoration(
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+      ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
@@ -177,22 +181,28 @@ class ThemeModel {
       selectionHandleColor: PaletteModel.lightTertiary,
     ),
     inputDecorationTheme: _base.inputDecorationTheme.copyWith(
-      labelStyle: _base.inputDecorationTheme.labelStyle?.copyWith(color: PaletteModel.lightOnSurface),
-      hintStyle: _base.inputDecorationTheme.hintStyle?.copyWith(color: PaletteModel.lightOnSurface),
-      floatingLabelStyle: _base.inputDecorationTheme.floatingLabelStyle?.copyWith(color: PaletteModel.lightSecondary),
+      labelStyle: _base.inputDecorationTheme.hintStyle?.copyWith(
+        color: PaletteAssistant.alpha(PaletteModel.lightOnSurface),
+      ),
+      hintStyle: _base.inputDecorationTheme.hintStyle?.copyWith(
+        color: PaletteAssistant.alpha(PaletteModel.lightOnSurface),
+      ),
+      floatingLabelStyle: _base.inputDecorationTheme.floatingLabelStyle?.copyWith(color: PaletteModel.lightOnSurface),
       focusColor: PaletteModel.lightOnBackground,
       iconColor: PaletteModel.lightOnSurface,
       fillColor: PaletteModel.lightSurface,
       errorBorder: _base.inputDecorationTheme.errorBorder?.copyWith(
-        borderSide: BorderSide(color: PaletteModel.lightOnError, width: 1),
+        borderSide: _base.inputDecorationTheme.focusedBorder?.borderSide.copyWith(color: PaletteModel.lightOnError),
+      ),
+      focusedBorder: _base.inputDecorationTheme.focusedBorder?.copyWith(
+        borderSide: _base.inputDecorationTheme.focusedBorder?.borderSide.copyWith(color: PaletteModel.lightTertiary),
       ),
       errorStyle: _base.inputDecorationTheme.errorStyle?.copyWith(color: PaletteModel.lightOnError),
     ),
     tabBarTheme: _base.tabBarTheme.copyWith(
       labelColor: PaletteModel.lightOnSecondary,
       unselectedLabelColor: PaletteModel.lightOnPrimary,
-      indicator: BoxDecoration(
-        borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+      indicator: (_base.tabBarTheme.indicator as BoxDecoration).copyWith(
         color: PaletteModel.lightSecondary,
       ),
     ),
@@ -254,29 +264,35 @@ class ThemeModel {
       selectionHandleColor: PaletteModel.darkTertiary,
     ),
     inputDecorationTheme: _base.inputDecorationTheme.copyWith(
-      labelStyle: _base.inputDecorationTheme.labelStyle?.copyWith(color: PaletteModel.darkOnSurface),
-      hintStyle: _base.inputDecorationTheme.hintStyle?.copyWith(color: PaletteModel.darkOnSurface),
-      floatingLabelStyle: _base.inputDecorationTheme.floatingLabelStyle?.copyWith(color: PaletteModel.darkSecondary),
+      labelStyle: _base.inputDecorationTheme.hintStyle?.copyWith(
+        color: PaletteAssistant.alpha(PaletteModel.darkOnSurface),
+      ),
+      hintStyle: _base.inputDecorationTheme.hintStyle?.copyWith(
+        color: PaletteAssistant.alpha(PaletteModel.darkOnSurface),
+      ),
+      floatingLabelStyle: _base.inputDecorationTheme.hintStyle?.copyWith(color: PaletteModel.darkOnSurface),
       focusColor: PaletteModel.darkOnBackground,
       iconColor: PaletteModel.darkOnSurface,
       fillColor: PaletteModel.darkSurface,
       errorBorder: _base.inputDecorationTheme.errorBorder?.copyWith(
-        borderSide: BorderSide(color: PaletteModel.darkOnError, width: 1),
+        borderSide: _base.inputDecorationTheme.focusedBorder?.borderSide.copyWith(color: PaletteModel.darkOnError),
+      ),
+      focusedBorder: _base.inputDecorationTheme.focusedBorder?.copyWith(
+        borderSide: _base.inputDecorationTheme.focusedBorder?.borderSide.copyWith(color: PaletteModel.darkTertiary),
       ),
       errorStyle: _base.inputDecorationTheme.errorStyle?.copyWith(color: PaletteModel.darkOnError),
     ),
     tabBarTheme: _base.tabBarTheme.copyWith(
-      labelColor: PaletteModel.darkOnPrimary,
-      unselectedLabelColor: PaletteAssistant.alpha(PaletteModel.darkOnPrimary),
-      indicator: BoxDecoration(
-        borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+      labelColor: PaletteModel.darkOnSecondary,
+      unselectedLabelColor: PaletteModel.darkOnPrimary,
+      indicator: (_base.tabBarTheme.indicator as BoxDecoration).copyWith(
         color: PaletteModel.darkSecondary,
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: _base.elevatedButtonTheme.style?.copyWith(
           overlayColor:
-              MaterialStateProperty.resolveWith((states) => PaletteAssistant.alpha(PaletteModel.darkOnSecondary, 0.3)),
+          MaterialStateProperty.resolveWith((states) => PaletteAssistant.alpha(PaletteModel.darkOnSecondary, 0.3)),
           foregroundColor: MaterialStateProperty.resolveWith((states) => PaletteModel.darkOnSecondary),
           backgroundColor: MaterialStateProperty.resolveWith((states) => PaletteModel.darkSecondary)),
     ),

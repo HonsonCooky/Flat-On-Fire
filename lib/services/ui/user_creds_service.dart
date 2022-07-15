@@ -45,7 +45,7 @@ class UserCredService extends ChangeNotifier {
     return emailErr == null && nameErr == null && passErr == null && confErr == null;
   }
 
-  void attemptAuth(UserCredAuthType authType, BuildContext context) async {
+  void attemptAuth(UserCredAuthType authType, String? avatarLocalFilePath, BuildContext context) async {
     switch (authType) {
       case UserCredAuthType.login:
         var check = _preflightChecks(false);
@@ -71,6 +71,7 @@ class UserCredService extends ChangeNotifier {
                 email: email.text,
                 name: name.text,
                 password: pass.text,
+                avatarLocalFilePath: avatarLocalFilePath,
               );
           if (authVal != AuthService.successfulOperation) {
             ToastManager.instance.errorToast(authVal, theme);

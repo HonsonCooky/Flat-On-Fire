@@ -4,3 +4,4 @@ export 'home_page.dart';
 export 'loading_page.dart';
 export 'settings_page.dart';
 export 'unknown_route_page.dart';
+export 'groups_pages/_groups_pages_bucket.dart';

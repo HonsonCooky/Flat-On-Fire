@@ -1,7 +1,8 @@
+import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
 
 class FofTextField extends StatefulWidget {
-  final String? labelText;
+  final String labelText;
   final String? errorText;
   final void Function()? onTap;
   final TextEditingController? controller;
@@ -11,7 +12,7 @@ class FofTextField extends StatefulWidget {
 
   const FofTextField({
     Key? key,
-    this.labelText,
+    required this.labelText,
     this.errorText,
     this.onTap,
     this.controller,
@@ -41,21 +42,28 @@ class _FofTextFieldState extends State<FofTextField> {
             onTap: widget.onTap,
             obscureText: widget.canObscure ? _isObscure : false,
             decoration: InputDecoration(
-              fillColor: widget.fillColor,
               labelText: widget.labelText,
               errorText: widget.errorText,
+            ).applyDefaults(
+              Theme.of(context).inputDecorationTheme.copyWith(
+                    fillColor: widget.fillColor,
+                  ),
             ),
             controller: widget.controller,
             style: widget.style,
           ),
           widget.canObscure
-              ? IconButton(
-                  iconSize: iconSize,
-                  icon: Icon(!_isObscure ? Icons.visibility : Icons.visibility_off),
-                  splashRadius: widget.style?.fontSize ?? Theme.of(context).textTheme.labelMedium?.fontSize ?? 30,
-                  onPressed: () {
-                    setState(() => _isObscure = !_isObscure);
-                  },
+              ? Material(
+                  color: Colors.transparent,
+                  child: IconButton(
+                    iconSize: iconSize,
+                    icon: Icon(!_isObscure ? Icons.visibility : Icons.visibility_off),
+                    splashRadius: widget.style?.fontSize ?? Theme.of(context).textTheme.labelMedium?.fontSize ?? 30,
+                    splashColor: PaletteAssistant.alpha(Theme.of(context).colorScheme.secondary),
+                    onPressed: () {
+                      setState(() => _isObscure = !_isObscure);
+                    },
+                  ),
                 )
               : const SizedBox()
         ],

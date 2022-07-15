@@ -9,6 +9,7 @@ enum AppPageEnum {
   home,
   chores,
   groups,
+  groupsCreate,
   tables,
   settings,
   error,
@@ -29,6 +30,8 @@ extension AppPageExtension on AppPageEnum {
         return '/chores';
       case AppPageEnum.groups:
         return '/groups';
+      case AppPageEnum.groupsCreate:
+        return "/groups/create";
       case AppPageEnum.tables:
         return '/tables';
       case AppPageEnum.settings:
@@ -54,6 +57,8 @@ extension AppPageExtension on AppPageEnum {
         return "chores";
       case AppPageEnum.groups:
         return "groups";
+      case AppPageEnum.groupsCreate:
+        return "create group";
       case AppPageEnum.tables:
         return "tables";
       case AppPageEnum.settings:
@@ -83,7 +88,7 @@ List<String> routeNamesFromList(List<AppPageEnum>? from) {
 
 int currentAppRouteIndex(BuildContext context) {
   var loc = GoRouter.of(context).location;
-  var page = visibleAppRoutes.firstWhere((element) => element.toPath == loc, orElse: () => AppPageEnum.splash);
+  var page = visibleAppRoutes.firstWhere((element) => loc.startsWith(element.toPath), orElse: () => AppPageEnum.splash);
   return visibleAppRoutes.indexOf(page);
 }
 

@@ -55,7 +55,7 @@ class _LoginTabWidgetState extends State<LoginTabWidget> {
           ElevatedButton.icon(
             label: const Text("LOGIN"),
             icon: const Icon(Icons.login),
-            onPressed: () => content.attemptAuth(UserCredAuthType.login, context),
+            onPressed: () => content.attemptAuth(UserCredAuthType.login, null, context),
           ),
 
           HorizontalOrLineWidget(

@@ -31,6 +31,12 @@ class WrapperAppPage extends StatelessWidget {
     return AppBar(
       toolbarHeight: (textStyle?.fontSize ?? 10) * 2,
       title: Text(fromPath(GoRouter.of(context).location), style: textStyle),
+      leading: !GoRouter.of(context).canPop()
+          ? null
+          : IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
       elevation: 0,
     );
   }

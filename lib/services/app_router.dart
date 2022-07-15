@@ -1,5 +1,5 @@
 import 'package:flat_on_fire/_app_bucket.dart';
-import 'package:flat_on_fire/screens/groups_page.dart';
+import 'package:flat_on_fire/screens/groups_pages/groups_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,7 +9,7 @@ class AppRouter {
   GoRouter get router => _goRouter;
 
   AppRouter(this.appService);
-
+  
   late final GoRouter _goRouter = GoRouter(
     refreshListenable: appService,
     initialLocation: AppPageEnum.auth.toPath,
@@ -43,10 +43,14 @@ class AppRouter {
       GoRoute(
         path: AppPageEnum.groups.toPath,
         name: AppPageEnum.groups.toName,
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const GroupsPage(),
-        ),
+        pageBuilder: (context, state) => MaterialPage(key: state.pageKey, child: const GroupsPage()),
+        routes: [
+          GoRoute(
+            path: AppPageEnum.groupsCreate.toPath.replaceFirst("${AppPageEnum.groups.toPath}/", ""),
+            name: AppPageEnum.groupsCreate.toName,
+            pageBuilder: (context, state) => MaterialPage(key: state.pageKey, child: const CreateGroupPage()),
+          ),
+        ]
       ),
       // TABLES
       GoRoute(
