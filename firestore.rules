@@ -6,16 +6,19 @@ service cloud.firestore {
             allow read, write: if request.auth.uid == uid;
         }
 
-        match /groups/gid {
-            allow create: if request.auth.uid == uid;
+        match /groups/{gid} {
+            allow create: if request.auth.uid != null;
+            allow read: if request.auth != null && hasAccessToGroup(gid, ["owner", "writer", "reader"]);
+            allow update: if request.auth != null && hasAccessToGroup(gid, ["owner", "writer"]);
+            allow delete: if request.auth != null && hasAccessToGroup(gid, ["owner"]);
             
             match /members/{uid} {
-                allow delete, update: if request.auth.uid == uid; 
+                allow delete, update: if request.auth.uid == uid;
             }
         }
 
         function hasAccessToGroup(teamId, role) {
-            return get(/databases/$(database)/documents/teams/$(teamId)/memberships/$(request.auth.uid)).data.role ==
+            return get(/databases/$(database)/documents/groups/$(teamId)/members/$(request.auth.uid)).data.role in
                    role;
         }
     }

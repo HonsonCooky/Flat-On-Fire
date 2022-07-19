@@ -19,7 +19,7 @@ class ErrorPage extends StatelessWidget {
             Text("Error: $error"),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pushNamed(AppPageEnum.home.toName);
+                Navigator.of(context).pushNamed(AppPageEnum.home.toPath);
               },
               child: const Text("Back to Home"),
             ),

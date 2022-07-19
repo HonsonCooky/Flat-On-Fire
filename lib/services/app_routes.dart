@@ -17,6 +17,31 @@ enum AppPageEnum {
 
 /// PAGE ENUMS TO STRING INTERPRETATIONS FOR DIFFERENT THINGS
 extension AppPageExtension on AppPageEnum {
+  String get toPath {
+    switch (this) {
+      case AppPageEnum.splash:
+        return '/splash';
+      case AppPageEnum.auth:
+        return '/auth';
+      case AppPageEnum.home:
+        return '/home';
+      case AppPageEnum.chores:
+        return '/chores';
+      case AppPageEnum.groups:
+        return '/groups';
+      case AppPageEnum.groupsCreate:
+        return '/groups/create';
+      case AppPageEnum.tables:
+        return '/tables';
+      case AppPageEnum.settings:
+        return '/settings';
+      case AppPageEnum.error:
+        return '/err';
+      case AppPageEnum.onBoarding:
+        return '/onBoarding';
+    }
+  }
+
   String get toName {
     switch (this) {
       case AppPageEnum.splash:
@@ -45,7 +70,7 @@ extension AppPageExtension on AppPageEnum {
   }
 
   String get toTitle {
-    return toName.capitalize();
+    return toName.title();
   }
 }
 
@@ -53,22 +78,15 @@ List<AppPageEnum> get visibleAppRoutes {
   return [AppPageEnum.home, AppPageEnum.chores, AppPageEnum.groups, AppPageEnum.tables, AppPageEnum.settings];
 }
 
-List<String> routeNamesFromList(List<AppPageEnum>? from) {
-  from ??= visibleAppRoutes;
-  return from.map((e) => e.toTitle).toList();
+int curBaseRouteIndex(BuildContext context) {
+  if (ModalRoute.of(context)?.settings.name == null) return -1;
+  var curPage = curAppPage(context);
+  var baseName = "/${curPage.toPath.split("/")[1]}";
+  return visibleAppRoutes.indexWhere((element) => element.toPath.startsWith(baseName));
 }
 
-int currentAppRouteIndex(BuildContext context) {
-  if(ModalRoute.of(context)?.settings.name == null) return -1;
-  var loc = ModalRoute.of(context)!.settings.name!;
-  var page = visibleAppRoutes.firstWhere((element) => loc.startsWith(element.toName), orElse: () => AppPageEnum.splash);
-  return visibleAppRoutes.indexOf(page);
-}
-
-String fromPath(String path) {
-  try {
-    return AppPageEnum.values.singleWhere((element) => element.toName == path).toTitle;
-  } catch (_) {
-    return "Unknown Route";
-  }
+AppPageEnum curAppPage(BuildContext context) {
+  if (ModalRoute.of(context)?.settings.name == null) return AppPageEnum.splash;
+  var name = ModalRoute.of(context)!.settings.name!;
+  return AppPageEnum.values.singleWhere((element) => element.toPath == name);
 }

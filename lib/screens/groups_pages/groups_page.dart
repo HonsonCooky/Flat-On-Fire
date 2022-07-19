@@ -98,7 +98,7 @@ class _GroupsPageState extends State<GroupsPage> {
   Widget _createGroupButton() {
     return ElevatedButton.icon(
       onPressed: () {
-        Navigator.of(context).pushNamed(AppPageEnum.groupsCreate.toName);
+        Navigator.of(context).pushNamed(AppPageEnum.groupsCreate.toPath);
       },
       icon: const Icon(Icons.table_view),
       label: const Text("Create New Group"),

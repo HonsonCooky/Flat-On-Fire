@@ -34,8 +34,8 @@ class _WrapperAppPageState extends State<WrapperAppPage> {
         );
     return AppBar(
       toolbarHeight: (textStyle?.fontSize ?? 10) * 2,
-      title: Text(ModalRoute.of(context)?.settings.name?.title() ?? "", style: textStyle),
-      leading: !Navigator.of(context).canPop()
+      title: Text(curAppPage(context).toTitle, style: textStyle),
+      leading: curAppPage(context).toPath.split("/").length <= 2
           ? null
           : IconButton(
               icon: const Icon(Icons.arrow_back),

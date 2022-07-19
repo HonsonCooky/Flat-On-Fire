@@ -49,7 +49,7 @@ class _AppState extends State<App> {
             theme: ThemeModel.light,
             darkTheme: ThemeModel.dark,
             themeMode: themeMode,
-            initialRoute: AppPageEnum.splash.toName,
+            initialRoute: AppPageEnum.splash.toPath,
             routes: appRouter,
             navigatorKey: _navigator,
             scaffoldMessengerKey: ToastManager.instance.rootScaffoldMessengerKey,
@@ -63,9 +63,9 @@ class _AppState extends State<App> {
     if (_navigator.currentContext == null) return;
 
     if (_appService.loginState) {
-      _navigator.currentState!.popAndPushNamed(AppPageEnum.home.toName);
+      _navigator.currentState!.popAndPushNamed(AppPageEnum.home.toPath);
     } else if (!_appService.loginState) {
-      _navigator.currentState!.popAndPushNamed(AppPageEnum.auth.toName);
+      _navigator.currentState!.popAndPushNamed(AppPageEnum.auth.toPath);
     }
   }
 }

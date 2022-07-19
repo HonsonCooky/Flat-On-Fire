@@ -13,7 +13,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    selectedIndex = currentAppRouteIndex(context);
+    selectedIndex = curBaseRouteIndex(context);
     return Drawer(
       backgroundColor: Theme.of(context).colorScheme.surface,
       child: _drawerContent(),
@@ -106,7 +106,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           selectedIndex == i ? Theme.of(context).colorScheme.onSecondary : Theme.of(context).colorScheme.onSurface,
       onTap: () {
         Navigator.of(context).pop();
-        Navigator.of(context).popAndPushNamed(page.toName);
+        Navigator.of(context).popUntil((route) => false);
+        Navigator.of(context).pushNamed(page.toPath);
       },
     );
   }

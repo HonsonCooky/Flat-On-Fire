@@ -2,7 +2,7 @@ import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
 
 var appRouter = AppPageEnum.values.asNameMap().map((key, value) {
-  String k = value.toName;
+  String k = value.toPath;
   Widget v;
   switch (value) {
     case AppPageEnum.splash:
@@ -28,7 +28,7 @@ var appRouter = AppPageEnum.values.asNameMap().map((key, value) {
       break;
     // case AppPageEnum.chores:
     // case AppPageEnum.tables:
-    case AppPageEnum.onBoarding:
+    // case AppPageEnum.onBoarding:
     default:
       k = "Unknown";
       v = UnknownPageRoute(name: k);
