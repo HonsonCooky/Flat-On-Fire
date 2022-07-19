@@ -38,9 +38,13 @@ class UserService {
     var doc = await FirebaseFirestore.instance.doc(path).get(const GetOptions(source: Source.server));
     return doc.exists;
   }
+  
+  String? getUserId(){
+    return FirebaseAuth.instance.currentUser?.uid;
+  }
 
   /// Get the UserModel from Firestore
-  Future<DocumentSnapshot<UserModel>>? getUser() {
+  Future<DocumentSnapshot<UserModel>?> getUser() async {
     if (FirebaseAuth.instance.currentUser == null) return null;
     return _userDocument().getCacheFirst();
   }

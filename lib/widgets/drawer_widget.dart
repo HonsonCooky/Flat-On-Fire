@@ -1,6 +1,5 @@
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({Key? key}) : super(key: key);
@@ -106,8 +105,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       iconColor:
           selectedIndex == i ? Theme.of(context).colorScheme.onSecondary : Theme.of(context).colorScheme.onSurface,
       onTap: () {
-        Navigator.pop(context);
-        GoRouter.of(context).go(page.toPath);
+        Navigator.of(context).pop();
+        Navigator.of(context).popAndPushNamed(page.toName);
       },
     );
   }

@@ -54,10 +54,7 @@ class _SettingPageState extends State<SettingsPage> {
           physics: const BouncingScrollPhysics(),
           children: [
             _spacer(),
-            _accountSettings(textStyle),
-            _appSettings(textStyle),
-            _spacer(),
-            _futureSaveButton(textStyle),
+            _settingsContent(textStyle),
             _spacer(),
             _deleteBtn(),
             _logoutBtn(),
@@ -82,17 +79,32 @@ class _SettingPageState extends State<SettingsPage> {
   // ACCOUNT SETTINGS
   // ----------------------------------------------------------------------------------------------------------------
 
-  Widget _accountSettings(TextStyle? textStyle) {
+  Widget _settingsContent(TextStyle? textStyle) {
     return FutureBuilder(
       future: FirestoreService().userService.getUser(),
-      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>?> snapshot) {
         if (snapshot.hasData && snapshot.data?.data() != null) {
           UserModel um = snapshot.data!.data()!;
-          return _accountSuccess(um, textStyle);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _accountSuccess(um, textStyle),
+              _appSettings(textStyle),
+              _spacer(),
+              _futureSaveButton(textStyle, um),
+            ],
+          );
         } else if (snapshot.hasData || snapshot.hasError) {
           return _accountError(textStyle);
         }
-        return _awaitingAccountInformation(textStyle);
+        return const AwaitingInformationWidget(
+          texts: [
+            "Finding account information",
+            "Looking for you",
+            "Where you at?",
+          ],
+        );
       },
     );
   }
@@ -100,13 +112,6 @@ class _SettingPageState extends State<SettingsPage> {
   Widget _accountError(TextStyle? textStyle) {
     return Text(
       "Unable to retrieve account information at this time",
-      style: textStyle,
-    );
-  }
-
-  Widget _awaitingAccountInformation(TextStyle? textStyle) {
-    return LoadingTextWidget(
-      text: "... finding account information",
       style: textStyle,
     );
   }
@@ -173,12 +178,13 @@ class _SettingPageState extends State<SettingsPage> {
         userModel.profile.name.initials(),
         style: textStyle?.copyWith(
           color: Theme.of(context).colorScheme.onSurface,
-          fontSize: textStyle.fontSize != null ? textStyle.fontSize! * 3 : 20,
+          fontSize: Theme.of(context).textTheme.labelMedium?.fontSize != null
+              ? Theme.of(context).textTheme.labelMedium!.fontSize! * 3
+              : 20,
         ),
       ),
       subLoc: UserService.userKey,
       uid: userModel.uid,
-      textStyle: textStyle,
     );
   }
 
@@ -239,18 +245,8 @@ class _SettingPageState extends State<SettingsPage> {
   // SAVE FEATURE
   // ----------------------------------------------------------------------------------------------------------------
 
-  Widget _futureSaveButton(TextStyle? textStyle) {
-    return FutureBuilder(
-      future: FirestoreService().userService.getUser(),
-      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
-        if (snapshot.hasData && snapshot.data?.data() != null) {
-          return _saveButton(snapshot.data!.data()!);
-        } else if (snapshot.hasData || snapshot.hasError) {
-          return const SizedBox();
-        }
-        return LoadingSpinnerWidget(textStyle?.fontSize ?? 20);
-      },
-    );
+  Widget _futureSaveButton(TextStyle? textStyle, UserModel userModel) {
+    return _saveButton(userModel);
   }
 
   void _onSaveFinish() {

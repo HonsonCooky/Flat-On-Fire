@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
   Widget _welcomeTextFuture() {
     return FutureBuilder(
       future: FirestoreService().userService.getUser(),
-      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>?> snapshot) {
         if (snapshot.hasData && snapshot.data?.data() != null) {
           return _homePageBodyWithUserInformation(snapshot.data!.data()!);
         } else if (snapshot.hasData || snapshot.hasError) {

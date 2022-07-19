@@ -17,17 +17,15 @@ class _AwaitingInformationWidgetState extends State<AwaitingInformationWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Center(
-        child: LoadingTextWidget(
-          onNext: (i, b) {
-            int newRand = Random().nextInt(widget.texts.length);
-            if (newRand == random) newRand = (newRand + 1) % widget.texts.length;
-            setState(() => random = newRand);
-          },
-          text: "... ${widget.texts[random]}",
-          style: Theme.of(context).textTheme.labelMedium,
-        ),
+    return Center(
+      child: LoadingTextWidget(
+        onNext: (i, b) {
+          int newRand = Random().nextInt(widget.texts.length);
+          if (newRand == random) newRand = (newRand + 1) % widget.texts.length;
+          setState(() => random = newRand);
+        },
+        text: "... ${widget.texts[random]}",
+        style: Theme.of(context).textTheme.labelMedium,
       ),
     );
   }

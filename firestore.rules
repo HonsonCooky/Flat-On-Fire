@@ -6,40 +6,17 @@ service cloud.firestore {
             allow read, write: if request.auth.uid == uid;
         }
 
-        match /groups/{path=**} {
-            allow read: if userCanReadDoc(request.auth.uid, resource);
-            allow update: if userCanUpdateDoc(request.auth.uid, resource);
-            allow delete: if userCanDeleteDoc(request.auth.uid, resource);
-            allow create: if userCanCreateDoc(request.auth.uid, request);
+        match /groups/gid {
+            allow create: if request.auth.uid == uid;
+            
+            match /members/{uid} {
+                allow delete, update: if request.auth.uid == uid; 
+            }
         }
 
-        match /tables/{path=**} {
-            allow read: if userCanReadDoc(request.auth.uid, resource);
-            allow update: if userCanUpdateDoc(request.auth.uid, resource);
-            allow delete: if userCanDeleteDoc(request.auth.uid, resource);
-            allow create: if userCanCreateDoc(request.auth.uid, request);
-        }
-
-        // Validate that uid in resource's "users" field, has an existing authorization of 
-        // "owner", "writer", or "reader".
-        function userCanReadDoc(uid, resource) {
-            return resource.data.users[uid] in ["owner", "writer", "reader"];
-        }
-        
-        // Validate that uid in resource's "users" field, has an existing authorization of
-        // "owner" or "writer". You cannot give yourself this access level.
-        function userCanUpdateDoc(uid, resource) {
-            return resource.data.users[uid] in ["owner", "writer"];
-        }
-
-        // Validate that uid in resource's "users" field, has an existing authorization of "owner".
-        function userCanDeleteDoc(uid, resource) {
-            return resource.data.users[uid] in ["owner"];
-        }
-        
-        // Validate that uid in resource's "users" field, has an existing authorization of "owner".
-        function userCanCreateDoc(uid, request) {
-            return request.resource.data.users[uid] in ["owner"];
+        function hasAccessToGroup(teamId, role) {
+            return get(/databases/$(database)/documents/teams/$(teamId)/memberships/$(request.auth.uid)).data.role ==
+                   role;
         }
     }
 }

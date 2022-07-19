@@ -1,6 +1,5 @@
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 /// ALL POTENTIAL APP PAGES
 enum AppPageEnum {
@@ -18,33 +17,6 @@ enum AppPageEnum {
 
 /// PAGE ENUMS TO STRING INTERPRETATIONS FOR DIFFERENT THINGS
 extension AppPageExtension on AppPageEnum {
-  String get toPath {
-    switch (this) {
-      case AppPageEnum.splash:
-        return '/splash';
-      case AppPageEnum.auth:
-        return '/auth';
-      case AppPageEnum.home:
-        return '/home';
-      case AppPageEnum.chores:
-        return '/chores';
-      case AppPageEnum.groups:
-        return '/groups';
-      case AppPageEnum.groupsCreate:
-        return "/groups/create";
-      case AppPageEnum.tables:
-        return '/tables';
-      case AppPageEnum.settings:
-        return '/settings';
-      case AppPageEnum.error:
-        return '/error';
-      case AppPageEnum.onBoarding:
-        return '/start';
-      default:
-        return '/';
-    }
-  }
-
   String get toName {
     switch (this) {
       case AppPageEnum.splash:
@@ -58,7 +30,7 @@ extension AppPageExtension on AppPageEnum {
       case AppPageEnum.groups:
         return "groups";
       case AppPageEnum.groupsCreate:
-        return "create group";
+        return "create new group";
       case AppPageEnum.tables:
         return "tables";
       case AppPageEnum.settings:
@@ -87,14 +59,15 @@ List<String> routeNamesFromList(List<AppPageEnum>? from) {
 }
 
 int currentAppRouteIndex(BuildContext context) {
-  var loc = GoRouter.of(context).location;
-  var page = visibleAppRoutes.firstWhere((element) => loc.startsWith(element.toPath), orElse: () => AppPageEnum.splash);
+  if(ModalRoute.of(context)?.settings.name == null) return -1;
+  var loc = ModalRoute.of(context)!.settings.name!;
+  var page = visibleAppRoutes.firstWhere((element) => loc.startsWith(element.toName), orElse: () => AppPageEnum.splash);
   return visibleAppRoutes.indexOf(page);
 }
 
 String fromPath(String path) {
   try {
-    return AppPageEnum.values.singleWhere((element) => element.toPath == path).toTitle;
+    return AppPageEnum.values.singleWhere((element) => element.toName == path).toTitle;
   } catch (_) {
     return "Unknown Route";
   }

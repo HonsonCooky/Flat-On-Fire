@@ -16,11 +16,15 @@ class FirestoreService {
   // ----------------------------------------------------------------------------------------------------------------
   // COMMON COMPONENTS
   // ----------------------------------------------------------------------------------------------------------------
-  
+
   final UserService userService = UserService();
   final GroupService groupService = GroupService();
 
   DocumentReference<Map<String, dynamic>> getDoc(String path) {
     return FirebaseFirestore.instance.doc(path);
+  }
+
+  String genUuidForCollection(String collectionPath) {
+    return FirebaseFirestore.instance.collection(collectionPath).doc().id;
   }
 }

@@ -9,7 +9,6 @@ class ProfilePicture extends StatefulWidget {
   final List<String>? profileTitles;
   final File? currentImage;
   final void Function(File? file)? updateCurrentImage;
-  final TextStyle? textStyle;
 
   final Widget placeholder;
   final String? subLoc;
@@ -23,7 +22,6 @@ class ProfilePicture extends StatefulWidget {
     this.updateCurrentImage,
     this.subLoc,
     this.uid,
-    this.textStyle,
   }) : super(key: key);
 
   @override
@@ -36,13 +34,15 @@ class _ProfilePictureState extends State<ProfilePicture> {
 
   @override
   Widget build(BuildContext context) {
-    double fontSize = widget.textStyle?.fontSize != null ? widget.textStyle!.fontSize! * 3 : 20;
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        _profileAvatar(fontSize, context),
-        _editProfileButton(fontSize, context),
-      ],
+    double fontSize = (Theme.of(context).textTheme.labelMedium?.fontSize ?? 20) * 3;
+    return Center(
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          _profileAvatar(fontSize, context),
+          _editProfileButton(fontSize, context),
+        ],
+      ),
     );
   }
 
@@ -95,8 +95,8 @@ class _ProfilePictureState extends State<ProfilePicture> {
   Widget _editProfileButton(fontSize, BuildContext context) {
     return widget.updateCurrentImage != null
         ? Positioned(
-            top: fontSize * 1.2,
-            left: MediaQuery.of(context).size.width / 2 - 10,
+            top: fontSize * 1.3,
+            left: fontSize,
             child: ElevatedButton(
               onPressed: () async {
                 var pickedImage = await _picker.pickImage(source: ImageSource.gallery);

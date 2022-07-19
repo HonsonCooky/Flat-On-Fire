@@ -1,7 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class GroupsPage extends StatefulWidget {
   const GroupsPage({Key? key}) : super(key: key);
@@ -20,6 +18,8 @@ class _GroupsPageState extends State<GroupsPage> {
 
   Widget _groupsBody() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _userGroups(),
       ],
@@ -27,39 +27,45 @@ class _GroupsPageState extends State<GroupsPage> {
   }
 
   Widget _userGroups() {
-    return FutureBuilder(
-      future: FirestoreService().userService.getUser(),
-      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<UserModel>> snapshot) {
-        if (snapshot.hasData && snapshot.data?.data() != null) {
-          return _userGroupsList(snapshot.data!.data()!);
-        } else if (snapshot.hasData || snapshot.hasError) {
-          return _userGroupsError();
-        }
-        return const AwaitingInformationWidget(texts: [
-          "Group information loading",
-          "Playing pickup 52",
-          "Asking the server nicely",
-        ]);
-      },
-    );
+    var userId = FirestoreService().userService.getUserId();
+    if (userId != null) {
+      return _userGroupsList(userId);
+    }
+    return _userGroupsError();
   }
 
   Widget _userGroupsError() {
     return Expanded(
       child: Center(
         child: Text(
-          "Unable to retrieve information",
+          "Unable to retrieve user information",
           style: Theme.of(context).textTheme.labelMedium,
         ),
       ),
     );
   }
 
-  Widget _userGroupsList(UserModel userModel) {
-    List<GroupModel> usersGroups = FirestoreService().groupService.getUsersGroups(userId: userModel.uid!);
-
-    if (usersGroups.isEmpty) return _noGroups();
-    return const SizedBox();
+  Widget _userGroupsList(String userId) {
+    return FutureBuilder(
+      future: FirestoreService().groupService.getUsersGroups(userId: userId),
+      builder: (BuildContext context, AsyncSnapshot<List<MemberModel>?> snapshot) {
+        if (snapshot.hasData) {
+          return Container(
+            height: 100,
+            color: Colors.blue,
+          );
+        } else if (snapshot.hasData || snapshot.hasError) {
+          return _noGroups();
+        }
+        return const AwaitingInformationWidget(
+          texts: [
+            "Group information loading",
+            "Playing pickup 52",
+            "Asking the server nicely",
+          ],
+        );
+      },
+    );
   }
 
   Widget _noGroups() {
@@ -92,10 +98,10 @@ class _GroupsPageState extends State<GroupsPage> {
   Widget _createGroupButton() {
     return ElevatedButton.icon(
       onPressed: () {
-        GoRouter.of(context).push(AppPageEnum.groupsCreate.toPath);
+        Navigator.of(context).pushNamed(AppPageEnum.groupsCreate.toName);
       },
       icon: const Icon(Icons.table_view),
-      label: const Text("Create Group"),
+      label: const Text("Create New Group"),
     );
   }
 }

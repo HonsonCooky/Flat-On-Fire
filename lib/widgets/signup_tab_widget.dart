@@ -106,23 +106,23 @@ class _SignupTabWidgetState extends State<SignupTabWidget> {
       ),
     );
   }
-  
+
   void _updateCurrentImage(File? file) {
     setState(() => _currentImage = file);
   }
 
   Widget _profilePicture() {
-    TextStyle? textStyle = Theme.of(context).textTheme.labelMedium;
     return ProfilePicture(
       placeholder: Icon(
         Icons.image,
         color: Theme.of(context).colorScheme.onSurface,
-        size: textStyle?.fontSize != null ? textStyle!.fontSize! * 3 : 20,
+        size: Theme.of(context).textTheme.labelMedium?.fontSize != null
+            ? Theme.of(context).textTheme.labelMedium!.fontSize! * 3
+            : 20,
       ),
       currentImage: _currentImage,
       updateCurrentImage: _updateCurrentImage,
       profileTitles: _profileTitles,
-      textStyle: Theme.of(context).textTheme.labelMedium,
     );
   }
 }

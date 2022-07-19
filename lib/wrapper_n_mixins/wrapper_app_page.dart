@@ -1,14 +1,18 @@
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-class WrapperAppPage extends StatelessWidget {
+class WrapperAppPage extends StatefulWidget {
   final Widget child;
   final bool? resizeToAvoidBottomInset;
 
   const WrapperAppPage({Key? key, required this.child, this.resizeToAvoidBottomInset = false}) : super(key: key);
 
+  @override
+  State<StatefulWidget> createState() => _WrapperAppPageState();
+}
+
+class _WrapperAppPageState extends State<WrapperAppPage> {
   @override
   Widget build(BuildContext context) {
     final viewState = context.watch<AppService>().viewState;
@@ -18,8 +22,8 @@ class WrapperAppPage extends StatelessWidget {
         drawer: const DrawerWidget(),
         drawerEdgeDragWidth: MediaQuery.of(context).size.width / 3,
         drawerScrimColor: Theme.of(context).colorScheme.tertiary,
-        body: viewState == ViewState.busy ? _loading(context) : child,
-        resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+        body: viewState == ViewState.busy ? _loading(context) : widget.child,
+        resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset,
       ),
     );
   }
@@ -30,12 +34,14 @@ class WrapperAppPage extends StatelessWidget {
         );
     return AppBar(
       toolbarHeight: (textStyle?.fontSize ?? 10) * 2,
-      title: Text(fromPath(GoRouter.of(context).location), style: textStyle),
-      leading: !GoRouter.of(context).canPop()
+      title: Text(ModalRoute.of(context)?.settings.name?.title() ?? "", style: textStyle),
+      leading: !Navigator.of(context).canPop()
           ? null
           : IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+              },
             ),
       elevation: 0,
     );
