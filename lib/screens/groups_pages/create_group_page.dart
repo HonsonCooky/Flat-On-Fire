@@ -82,21 +82,24 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
         try {
           await FirestoreService().groupService.createNewGroup(
                 name: _name.text,
+                avatarLocalFilePath: _currentImage?.path,
                 syncFuncs: FirebaseSyncFuncs(
                   () {
-                    ToastManager.instance.successToast("Save successful", Theme.of(context));
+                    ToastManager.instance.successToast("Group creation successful", Theme.of(context));
+                    Navigator.of(context).pop();
                   },
                   () {
-                    ToastManager.instance.successToast("Local save successful", Theme.of(context));
+                    ToastManager.instance.successToast("Local group creation successful", Theme.of(context));
+                    Navigator.of(context).pop();
                   },
-                  () {
-                    ToastManager.instance.errorToast("Unable to create group at this time", Theme.of(context));
+                  (e) {
+                    ToastManager.instance.errorToast("Unable to create group at this time.\n$e", Theme.of(context));
                   },
                   () {},
                 ),
               );
         } catch (e) {
-          ToastManager.instance.errorToast("Unable to save changes at this time", Theme.of(context));
+          ToastManager.instance.errorToast("Unable to create group at this time.\n$e", Theme.of(context));
         } finally {
           if (mounted) context.read<AppService>().viewState = ViewState.ideal;
         }

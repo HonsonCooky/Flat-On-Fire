@@ -49,7 +49,7 @@ class CloudStorageService {
     // Get local file
     var imageFile = await _getLocalAvatarFile(subFolder: subFolder, uid: uid);
     if (imageFile.existsSync()) return imageFile;
-    if (cacheOnly == true) return null;
+    if (cacheOnly) return null;
     return _getCloudAvatarFile(subFolder: subFolder, uid: uid);
   }
 
@@ -91,7 +91,7 @@ class CloudStorageService {
       throw Exception("Unable to save avatar without a reference");
     }
 
-    _setAvatarFileCloud(subFolder: subFolder, uid: uid, file: file);
+    await _setAvatarFileCloud(subFolder: subFolder, uid: uid, file: file);
   }
 
   Future<File> _setAvatarFileLocalFromPath({

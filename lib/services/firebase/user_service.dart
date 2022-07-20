@@ -121,8 +121,8 @@ class UserService {
     batch.update(_userDocument(), userUpdate);
     batch.commit().then((_) {
       syncFuncs?.onSuccess();
-    }).catchError((_) {
-      syncFuncs?.onError();
+    }).catchError((e) {
+      syncFuncs?.onError(e);
     });
 
     syncFuncs?.onLocalSuccess();

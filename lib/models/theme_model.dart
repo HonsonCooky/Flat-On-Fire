@@ -35,7 +35,7 @@ class ThemeModel {
         fontFamily: "Ubuntu",
       ),
       headlineSmall: TextStyle(
-        fontSize: 10,
+        fontSize: 16,
         fontFamily: "Ubuntu",
       ),
 
@@ -83,6 +83,9 @@ class ThemeModel {
         fontFamily: "Ubuntu",
         fontWeight: FontWeight.normal,
       ),
+    ),
+    cardTheme: const CardTheme(
+      elevation: 0,
     ),
     inputDecorationTheme: const InputDecorationTheme(
       labelStyle: TextStyle(fontSize: textFieldLabelSize),
@@ -152,6 +155,7 @@ class ThemeModel {
       surface: PaletteModel.lightSurface,
       onSurface: PaletteModel.lightOnSurface,
     ),
+    cardTheme: _base.cardTheme.copyWith(color: PaletteModel.lightSurface),
     textTheme: _base.textTheme.copyWith(
       displayLarge: _base.textTheme.displayLarge?.copyWith(color: PaletteModel.lightOnBackground),
       displayMedium: _base.textTheme.displayMedium?.copyWith(
@@ -164,7 +168,9 @@ class ThemeModel {
       headlineMedium: _base.textTheme.headlineMedium?.copyWith(
         color: PaletteAssistant.alpha(PaletteModel.lightOnBackground),
       ),
-      headlineSmall: _base.textTheme.headlineSmall?.copyWith(color: PaletteModel.lightOnBackground),
+      headlineSmall: _base.textTheme.headlineSmall?.copyWith(
+        color: PaletteAssistant.alpha(PaletteModel.lightOnBackground),
+      ),
       titleLarge: _base.textTheme.titleLarge?.copyWith(color: PaletteModel.lightOnBackground),
       titleMedium: _base.textTheme.titleMedium?.copyWith(color: PaletteModel.lightOnPrimary),
       titleSmall: _base.textTheme.titleSmall?.copyWith(color: PaletteModel.lightOnBackground),
@@ -175,6 +181,7 @@ class ThemeModel {
       labelMedium: _base.textTheme.labelMedium?.copyWith(color: PaletteModel.lightOnPrimary),
       labelSmall: _base.textTheme.labelSmall?.copyWith(color: PaletteModel.lightOnBackground),
     ),
+    splashColor: PaletteModel.lightTertiary,
     textSelectionTheme: TextSelectionThemeData(
       cursorColor: PaletteModel.lightSecondary,
       selectionColor: PaletteAssistant.alpha(PaletteModel.lightPrimary, 0.4),
@@ -241,6 +248,7 @@ class ThemeModel {
       surface: PaletteModel.darkSurface,
       onSurface: PaletteModel.darkOnSurface,
     ),
+    cardTheme: _base.cardTheme.copyWith(color: PaletteModel.darkSurface),
     textTheme: _base.textTheme.copyWith(
       displayLarge: _base.textTheme.displayLarge?.copyWith(color: PaletteModel.darkOnBackground),
       displayMedium: _base.textTheme.displayMedium?.copyWith(color: PaletteModel.darkOnBackground),
@@ -292,10 +300,11 @@ class ThemeModel {
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: _base.elevatedButtonTheme.style?.copyWith(
           overlayColor:
-          MaterialStateProperty.resolveWith((states) => PaletteAssistant.alpha(PaletteModel.darkOnSecondary, 0.3)),
+              MaterialStateProperty.resolveWith((states) => PaletteAssistant.alpha(PaletteModel.darkOnSecondary, 0.3)),
           foregroundColor: MaterialStateProperty.resolveWith((states) => PaletteModel.darkOnSecondary),
           backgroundColor: MaterialStateProperty.resolveWith((states) => PaletteModel.darkSecondary)),
     ),
+    splashColor: PaletteModel.darkTertiary,
     textButtonTheme: TextButtonThemeData(
       style: _base.textButtonTheme.style
           ?.copyWith(foregroundColor: MaterialStateProperty.resolveWith((states) => PaletteModel.darkOnBackground)),

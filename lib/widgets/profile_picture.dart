@@ -81,7 +81,13 @@ class _ProfilePictureState extends State<ProfilePicture> {
     if (_loadAttempted || widget.subLoc == null || widget.uid == null) return _placeholder(fontSize, context);
 
     CloudStorageService().getAvatarFile(subFolder: widget.subLoc!, uid: widget.uid!, cacheOnly: true).then((value) {
-      if (widget.updateCurrentImage != null) widget.updateCurrentImage!(value);
+      if (widget.updateCurrentImage != null) {
+        widget.updateCurrentImage!(value);
+      } else {
+        setState(() {});
+      }
+    }).catchError((_) {
+      setState(() {});
     });
 
     _loadAttempted = true;

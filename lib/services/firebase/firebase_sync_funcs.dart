@@ -3,7 +3,7 @@ import 'package:flat_on_fire/_app_bucket.dart';
 class FirebaseSyncFuncs {
   final void Function()? _onSuccess;
   final void Function()? _onLocalSuccess;
-  final void Function()? _onError;
+  final void Function(String? error)? _onError;
   final void Function() _onFinish;
 
   FirebaseSyncFuncs(this._onSuccess, this._onLocalSuccess, this._onError, this._onFinish);
@@ -26,8 +26,8 @@ class FirebaseSyncFuncs {
     }
   }
 
-  void onError() {
-    if (_onError != null) _onError!();
+  void onError(String? error) {
+    if (_onError != null) _onError!(error);
     _onFinish();
   }
 }

@@ -15,6 +15,7 @@ class _AppState extends State<App> {
   late AuthService _authService;
   late UserCredService _userCredService;
   final GlobalKey<NavigatorState> _navigator = GlobalKey<NavigatorState>();
+  bool? _localLoginState;
 
   @override
   void initState() {
@@ -60,10 +61,14 @@ class _AppState extends State<App> {
   }
 
   void _loginListener() {
-    if (_navigator.currentContext == null) return;
+    if (_navigator.currentContext == null || _localLoginState == _appService.loginState) return;
+
+    setState(() {
+      _localLoginState = _appService.loginState;
+    });
 
     if (_appService.loginState) {
-      _navigator.currentState!.popAndPushNamed(AppPageEnum.home.toPath);
+      _navigator.currentState!.popAndPushNamed(AppPageEnum.groups.toPath);
     } else if (!_appService.loginState) {
       _navigator.currentState!.popAndPushNamed(AppPageEnum.auth.toPath);
     }
@@ -78,8 +83,8 @@ extension StringExtension on String {
   String capitalize() {
     return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
   }
-  
-  String title(){
+
+  String title() {
     return split(" ").map((e) => e.capitalize()).toList().join(" ");
   }
 

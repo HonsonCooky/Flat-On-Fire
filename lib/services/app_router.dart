@@ -20,6 +20,9 @@ var appRouter = AppPageEnum.values.asNameMap().map((key, value) {
     case AppPageEnum.groupsCreate:
       v = const CreateGroupPage();
       break;
+    case AppPageEnum.groupOverview:
+      v = const GroupOverviewPage();
+      break;
     case AppPageEnum.settings:
       v = const SettingsPage();
       break;
@@ -30,7 +33,6 @@ var appRouter = AppPageEnum.values.asNameMap().map((key, value) {
     // case AppPageEnum.tables:
     // case AppPageEnum.onBoarding:
     default:
-      k = "Unknown";
       v = UnknownPageRoute(name: k);
   }
   return MapEntry(k, (context) => v);

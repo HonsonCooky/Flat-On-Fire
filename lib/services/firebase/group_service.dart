@@ -40,24 +40,23 @@ class GroupService {
 // PUBLIC METHODS
 // ----------------------------------------------------------------------------------------------------------------
 
+  Future<DocumentSnapshot<GroupModel>> getGroup({required String groupId}) {
+    return _groupDocument(groupId).getCacheFirst();
+  }
+
   Future<List<MemberModel>> getUsersGroups({
     required String userId,
   }) async {
-    try {
-      var groupsQuery = FirebaseFirestore.instance
-          .collectionGroup(memberKey)
-          .where("userId", isEqualTo: userId)
-          .withConverter<MemberModel>(
-        fromFirestore: (snapshot, _) => MemberModel.fromJson(snapshot.data()!),
-        toFirestore: (settingsModel, _) => settingsModel.toJson(),
-      )
-          .limit(10);
-      var queryRes = await groupsQuery.get();
-      return queryRes.docs.map((e) => e.data()).toList();
-    } catch (e) {
-      // print(e);
-      rethrow;
-    }
+    var groupsQuery = FirebaseFirestore.instance
+        .collectionGroup(memberKey)
+        .where("userId", isEqualTo: userId)
+        .withConverter<MemberModel>(
+          fromFirestore: (snapshot, _) => MemberModel.fromJson(snapshot.data()!),
+          toFirestore: (settingsModel, _) => settingsModel.toJson(),
+        )
+        .limit(10);
+    var queryRes = await groupsQuery.get();
+    return queryRes.docs.map((e) => e.data()).toList();
   }
 
   Future<void> createNewGroup({
@@ -65,19 +64,41 @@ class GroupService {
     String? avatarLocalFilePath,
     FirebaseSyncFuncs? syncFuncs,
   }) async {
+    // Get owner (current user)
     var user = await FirestoreService().userService.getUser();
     if (user == null || user.data() == null) {
-      syncFuncs?.onError();
+      syncFuncs?.onError(null);
       return;
     }
     UserModel userModel = user.data()!;
+
+    // Setup a new UID for the group (needs to be in the group document)
     String uid = FirestoreService().genUuidForCollection(groupKey);
+
+    if (avatarLocalFilePath != null) {
+      await CloudStorageService().setAvatarFile(
+        subFolder: groupKey,
+        uid: uid,
+        imagePath: avatarLocalFilePath,
+      );
+    }
+
     var batch = FirebaseFirestore.instance.batch();
-    batch.set(_groupDocument(uid), GroupModel(uid: uid, groupName: name));
+    batch.set(
+        _groupDocument(uid),
+        GroupModel(
+          uid: uid,
+          groupName: name,
+          avatarPath: CloudStorageService().avatarFireStorageLoc(
+            groupKey,
+            uid,
+          ),
+        ));
     batch.set(
       _memberDocument(uid, user.data()!.uid!),
       MemberModel(
         groupName: name,
+        groupId: uid,
         role: Authorization.owner,
         userProfile: userModel.profile,
         userId: userModel.uid!,
@@ -85,8 +106,44 @@ class GroupService {
     );
     batch.commit().then((_) {
       syncFuncs?.onSuccess();
-    }).catchError((_) {
-      syncFuncs?.onError();
+    }).catchError((e) {
+      syncFuncs?.onError(e);
+    });
+
+    syncFuncs?.onLocalSuccess();
+  }
+
+  /// Update a user + the user profile in the firestore
+  void updateGroup({
+    required String groupId,
+    required Map<String, dynamic> update,
+    FirebaseSyncFuncs? syncFuncs,
+  }) async {
+    String? avatarLocalFilePath = update["group"]["avatarPath"];
+
+    if (avatarLocalFilePath != null) {
+      CloudStorageService().setAvatarFile(
+        subFolder: groupKey,
+        uid: groupId,
+        imagePath: avatarLocalFilePath,
+      );
+    }
+
+    Map<String, dynamic> groupUpdate = update["group"];
+    Map<String, dynamic> added = update["addedMembers"];
+    Map<String, dynamic> removed = update["removedMembers"];
+    var batch = FirebaseFirestore.instance.batch();
+    batch.update(_groupDocument(groupId), groupUpdate);
+    added.forEach((key, value) {
+      batch.set(_memberDocument(groupId, key), value);
+    });
+    removed.forEach((key, value) {
+      batch.delete(_memberDocument(groupId, key));
+    });
+    batch.commit().then((_) {
+      syncFuncs?.onSuccess();
+    }).catchError((e) {
+      syncFuncs?.onError(e);
     });
 
     syncFuncs?.onLocalSuccess();

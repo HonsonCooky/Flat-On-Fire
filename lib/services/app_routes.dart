@@ -9,6 +9,7 @@ enum AppPageEnum {
   chores,
   groups,
   groupsCreate,
+  groupOverview,
   tables,
   settings,
   error,
@@ -31,6 +32,8 @@ extension AppPageExtension on AppPageEnum {
         return '/groups';
       case AppPageEnum.groupsCreate:
         return '/groups/create';
+      case AppPageEnum.groupOverview:
+        return '/groups/overview';
       case AppPageEnum.tables:
         return '/tables';
       case AppPageEnum.settings:
@@ -56,6 +59,8 @@ extension AppPageExtension on AppPageEnum {
         return "groups";
       case AppPageEnum.groupsCreate:
         return "create new group";
+      case AppPageEnum.groupOverview:
+        return "group overview";
       case AppPageEnum.tables:
         return "tables";
       case AppPageEnum.settings:

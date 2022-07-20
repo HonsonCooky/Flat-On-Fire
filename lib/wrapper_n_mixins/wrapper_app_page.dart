@@ -13,6 +13,16 @@ class WrapperAppPage extends StatefulWidget {
 }
 
 class _WrapperAppPageState extends State<WrapperAppPage> {
+  dynamic _getArguments() {
+    return ModalRoute.of(context)?.settings.arguments as dynamic;
+  }
+
+  String? _groupPathName() {
+    String? groupName = _getArguments()?.groupName;
+    if (groupName != null) return "Group: ${groupName.title()}";
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final viewState = context.watch<AppService>().viewState;
@@ -32,10 +42,14 @@ class _WrapperAppPageState extends State<WrapperAppPage> {
     TextStyle? textStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
           color: Theme.of(context).colorScheme.onSurface,
         );
+
+    var title = _groupPathName() ?? curAppPage(context).toTitle;
+    var isBase = curAppPage(context).toPath.split("/").length <= 2;
+
     return AppBar(
       toolbarHeight: (textStyle?.fontSize ?? 10) * 2,
-      title: Text(curAppPage(context).toTitle, style: textStyle),
-      leading: curAppPage(context).toPath.split("/").length <= 2
+      title: Text(title, style: textStyle),
+      leading: isBase
           ? null
           : IconButton(
               icon: const Icon(Icons.arrow_back),

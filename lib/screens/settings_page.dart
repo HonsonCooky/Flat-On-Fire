@@ -15,7 +15,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingPageState extends State<SettingsPage> {
   final _name = TextEditingController();
-  final List<String> profileTitles = [
+  final List<String> _profileTitles = [
     "Dis you?",
     "Ya so handsome",
     "Felt cute...",
@@ -51,7 +51,6 @@ class _SettingPageState extends State<SettingsPage> {
     return WrapperPadding(
       child: WrapperOverflowRemoved(
         child: ListView(
-          physics: const BouncingScrollPhysics(),
           children: [
             _spacer(),
             _settingsContent(textStyle),
@@ -87,12 +86,11 @@ class _SettingPageState extends State<SettingsPage> {
           UserModel um = snapshot.data!.data()!;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _accountSuccess(um, textStyle),
               _appSettings(textStyle),
               _spacer(),
-              _futureSaveButton(textStyle, um),
+              _saveButton(um),
             ],
           );
         } else if (snapshot.hasData || snapshot.hasError) {
@@ -117,9 +115,8 @@ class _SettingPageState extends State<SettingsPage> {
   }
 
   Widget _accountSuccess(UserModel um, TextStyle? textStyle) {
-    return ListView(
-      padding: EdgeInsets.zero,
-      shrinkWrap: true,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _profilePicture(um, textStyle),
         SizedBox(height: textStyle?.fontSize),
@@ -166,12 +163,14 @@ class _SettingPageState extends State<SettingsPage> {
         _currentImage = file;
         _newImage = true;
       });
+    } else {
+      setState(() {});
     }
   }
 
   Widget _profilePicture(UserModel userModel, TextStyle? textStyle) {
     return ProfilePicture(
-      profileTitles: profileTitles,
+      profileTitles: _profileTitles,
       currentImage: _currentImage,
       updateCurrentImage: _updateCurrentImage,
       placeholder: Text(
@@ -210,6 +209,7 @@ class _SettingPageState extends State<SettingsPage> {
 
   Widget _appSettings(TextStyle? textStyle) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         HorizontalOrLineWidget(
           label: "App",
@@ -245,10 +245,6 @@ class _SettingPageState extends State<SettingsPage> {
   // SAVE FEATURE
   // ----------------------------------------------------------------------------------------------------------------
 
-  Widget _futureSaveButton(TextStyle? textStyle, UserModel userModel) {
-    return _saveButton(userModel);
-  }
-
   void _onSaveFinish() {
     setState(() => _saving = false);
   }
@@ -268,16 +264,24 @@ class _SettingPageState extends State<SettingsPage> {
               ).toJson(),
             },
             syncFuncs: FirebaseSyncFuncs(
-              () => ToastManager.instance.successToast("Save successful", Theme.of(context)),
-              () => ToastManager.instance.infoToast("Local save successful", Theme.of(context)),
-              () => ToastManager.instance.errorToast("Unable to save changes at this time", Theme.of(context)),
+              () {
+                ToastManager.instance.successToast("Save successful", Theme.of(context));
+                setState(() {
+                  _name.text = "";
+                });
+              },
+              () {
+                ToastManager.instance.infoToast("Local save successful", Theme.of(context));
+                setState(() {
+                  _name.text = "";
+                });
+              },
+              (e) => ToastManager.instance.errorToast("Unable to save changes at this time.\n$e", Theme.of(context)),
               _onSaveFinish,
             ),
           );
         } catch (e) {
           ToastManager.instance.errorToast("Unable to save changes at this time", Theme.of(context));
-        } finally {
-          context.read<AppService>().viewState = ViewState.ideal;
         }
       },
       style: Theme.of(context).elevatedButtonTheme.style?.copyWith(

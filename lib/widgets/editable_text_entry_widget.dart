@@ -23,7 +23,7 @@ class EditableTextEntryWidget extends StatelessWidget {
       children: [
         Text(
           title,
-          style: textStyle?.copyWith(fontWeight: FontWeight.bold, fontSize: (textStyle?.fontSize ?? 10) - 2),
+          style: textStyle?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 5),
         TextField(
