@@ -11,6 +11,8 @@ class GroupsPage extends StatefulWidget {
 }
 
 class _GroupsPageState extends State<GroupsPage> {
+  bool _initialClick = true;
+
   _navigateToCreatePage() {
     Navigator.of(context).pushNamed(AppPageEnum.groupsCreate.toPath).then(
       (value) {
@@ -48,7 +50,7 @@ class _GroupsPageState extends State<GroupsPage> {
       future: FirestoreService().groupService.getUsersGroups(userId: userId),
       builder: (BuildContext context, AsyncSnapshot<List<MemberModel>?> snapshot) {
         if (snapshot.hasData) {
-          return _groupsList(snapshot.data);
+          return _groupsList(userId, snapshot.data);
         } else if (snapshot.hasData || snapshot.hasError) {
           return _userGroupsError();
         }
@@ -63,16 +65,26 @@ class _GroupsPageState extends State<GroupsPage> {
     );
   }
 
-  Widget _groupsList(List<MemberModel>? groupMemberships) {
-    if (groupMemberships == null || groupMemberships.isEmpty) return _noGroups();
-    groupMemberships.sort((a, b) => a.groupName.compareTo(b.groupName));
-    return _listGroups(groupMemberships);
+  void _goToGroup(String userId, MemberModel membership) {
+    setState(() => _initialClick = false);
+    Navigator.of(context)
+        .pushNamed(AppPageEnum.groupOverview.toPath, arguments: membership)
+        .then((value) => FirestoreService().groupService.getUsersGroups(userId: userId));
   }
 
-  Widget _listGroups(List<MemberModel> groupMemberships) {
+  Widget _groupsList(String userId, List<MemberModel>? groupMemberships) {
+    if (groupMemberships == null || groupMemberships.isEmpty) return _noGroups();
+    if (groupMemberships.length == 1 && _initialClick) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _goToGroup(userId, groupMemberships[0]));
+    }
+    groupMemberships.sort((a, b) => a.groupName.compareTo(b.groupName));
+    return _listGroups(userId, groupMemberships);
+  }
+
+  Widget _listGroups(String userId, List<MemberModel> groupMemberships) {
     return RefreshIndicator(
       onRefresh: () {
-        return Future(() => setState(() {}));
+        return FirestoreService().groupService.getUsersGroups(userId: userId);
       },
       child: WrapperOverflowRemoved(
         child: Stack(
@@ -85,9 +97,7 @@ class _GroupsPageState extends State<GroupsPage> {
               child: ListView.builder(
                 itemCount: groupMemberships.length,
                 itemBuilder: (context, i) => ListTile(
-                  onTap: () {
-                    Navigator.of(context).pushNamed(AppPageEnum.groupOverview.toPath, arguments: groupMemberships[i]);
-                  },
+                  onTap: () => _goToGroup(userId, groupMemberships[i]),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   title: Text(
                     groupMemberships[i].groupName,

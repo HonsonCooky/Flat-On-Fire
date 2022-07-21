@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class GroupOverviewPage extends StatefulWidget {
   const GroupOverviewPage({Key? key}) : super(key: key);
@@ -60,7 +61,7 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
   Widget _groupError() {
     return Center(
       child: Text(
-        "Unable to retrieve user information",
+        "Unable to retrieve group information",
         style: Theme.of(context).textTheme.labelMedium,
       ),
     );
@@ -149,11 +150,58 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
             textStyle: textStyle,
           ),
         ),
+        SizedBox(height: textStyle?.fontSize),
+        HorizontalOrLineWidget(
+          label: "Members",
+          padding: 30,
+          color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
+        ),
+        _members(groupModel.uid!),
+        SizedBox(
+          height: MediaQuery.of(context).size.height / 20,
+        ),
+        _saveButton(groupModel),
         SizedBox(
           height: MediaQuery.of(context).size.height / 10,
         ),
-        _saveButton(groupModel),
+        _deleteBtn(groupModel.uid!),
       ],
+    );
+  }
+
+  Widget _members(String groupId) {
+    return FutureBuilder(
+        future: FirestoreService().groupService.getGroupMembers(groupId: groupId),
+        builder: (BuildContext context, AsyncSnapshot<List<MemberModel>?> snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            List<MemberModel> data = snapshot.data!;
+            if (data.isEmpty) return const Text("No Users");
+            return ListView.builder(
+                shrinkWrap: true,
+                itemCount: data.length,
+                itemBuilder: (context, i) {
+                  return ListTile(
+                    title: Text(data[i].userProfile.name, ),
+                    dense: true,
+                  );
+                });
+          } else if (snapshot.hasData || snapshot.hasError) {
+            return _memberError();
+          }
+          return const AwaitingInformationWidget(texts: [
+            "Gathering the troops",
+            "Uniform inspection",
+            "Taking hits, and taking names",
+          ]);
+        });
+  }
+
+  Widget _memberError() {
+    return Center(
+      child: Text(
+        "Unable to retrieve member information",
+        style: Theme.of(context).textTheme.labelMedium,
+      ),
     );
   }
 
@@ -169,11 +217,13 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
           FirestoreService().groupService.updateGroup(
                 groupId: gm.uid!,
                 update: {
-                  "group": {
-                    "avatarPath": null,
-                  },
-                  "addedMembers": {},
-                  "removedMembers": {},
+                  "group": GroupModel(
+                    uid: gm.uid,
+                    groupName: _name.text.isEmpty ? gm.groupName : _name.text,
+                    avatarPath: _newImage ? _currentImage?.path : gm.avatarPath,
+                  ).toJson(),
+                  "addedMembers": <String, MemberModel>{},
+                  "removedMembers": <String, MemberModel>{},
                 },
                 syncFuncs: FirebaseSyncFuncs(
                   () {
@@ -215,6 +265,25 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
         Icons.save,
         color: Theme.of(context).colorScheme.onPrimary,
       ),
+    );
+  }
+
+  Widget _deleteBtn(String groupId) {
+    return ElevatedButton.icon(
+      onPressed: () async {
+        context.read<AppService>().viewState = ViewState.busy;
+        FirestoreService().groupService.deleteGroup(groupId: groupId).then((value) {
+          context.read<AppService>().viewState = ViewState.ideal;
+          Navigator.of(context).pop();
+        }).catchError(
+          (e) {
+            context.read<AppService>().viewState = ViewState.ideal;
+            ToastManager.instance.errorToast(e, Theme.of(context));
+          },
+        );
+      },
+      label: const Text("DELETE GROUP"),
+      icon: const Icon(Icons.delete),
     );
   }
 }

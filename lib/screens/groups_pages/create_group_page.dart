@@ -15,7 +15,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
   final _name = TextEditingController();
   File? _currentImage;
   String? _errorText;
-
+  bool _creatingGroup = false;
 
   @override
   void dispose() {
@@ -71,7 +71,10 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
   Widget _createGroupButton() {
     return ElevatedButton.icon(
       icon: const Icon(Icons.group_add),
-      label: const Text("CREATE GROUP"),
+      label: _creatingGroup
+          ? LoadingSpinnerWidget(Theme.of(context).textTheme.labelMedium?.fontSize ?? 20)
+          : const Text("CREATE "
+              "GROUP"),
       onPressed: () async {
         if (_name.text.isEmpty) {
           setState(() => _errorText = "Group name required");

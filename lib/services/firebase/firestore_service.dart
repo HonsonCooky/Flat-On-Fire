@@ -24,6 +24,10 @@ class FirestoreService {
     return FirebaseFirestore.instance.doc(path);
   }
 
+  CollectionReference<Map<String, dynamic>> getCol(String path){
+    return FirebaseFirestore.instance.collection(path);
+  }
+
   String genUuidForCollection(String collectionPath) {
     return FirebaseFirestore.instance.collection(collectionPath).doc().id;
   }

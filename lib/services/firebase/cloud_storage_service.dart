@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
@@ -47,10 +48,13 @@ class CloudStorageService {
   /// [cacheOnly] is false by default, but if set to true, only the local file will be searched for.
   Future<File?> getAvatarFile({required String subFolder, required String uid, bool cacheOnly = false}) async {
     // Get local file
+    if (!cacheOnly && await AppService.networkConnected()) {
+      var groupFile = await _getCloudAvatarFile(subFolder: subFolder, uid: uid);
+      if (groupFile?.existsSync() == true) return groupFile;
+    }
     var imageFile = await _getLocalAvatarFile(subFolder: subFolder, uid: uid);
     if (imageFile.existsSync()) return imageFile;
-    if (cacheOnly) return null;
-    return _getCloudAvatarFile(subFolder: subFolder, uid: uid);
+    return null;
   }
 
   Future<File> _getLocalAvatarFile({required String subFolder, required String uid}) async {
@@ -107,7 +111,9 @@ class CloudStorageService {
   }
 
   Future _setAvatarFileCloud({required String subFolder, required String uid, required File file}) async {
-    await _storageRef.child(avatarFireStorageLoc(subFolder, uid)).putFile(file);
+    if (await AppService.networkConnected()) {
+      await _storageRef.child(avatarFireStorageLoc(subFolder, uid)).putFile(file);
+    }
   }
 
   // ----------------------------------------------------------------------------------------------------------------
@@ -120,10 +126,13 @@ class CloudStorageService {
     required String subFolder,
     required String uid,
   }) async {
-    var localAvatar = File(await _avatarLocalLoc(subFolder, uid));
-    if (localAvatar.existsSync()) localAvatar.delete(recursive: true);
-
-    var path = avatarFireStorageLoc(subFolder, uid);
-    await _storageRef.child(path).delete();
+    try {
+      var localAvatar = File(await _avatarLocalLoc(subFolder, uid));
+      if (localAvatar.existsSync()) localAvatar.delete(recursive: true);
+    } catch (_) {}
+    try {
+      var path = avatarFireStorageLoc(subFolder, uid);
+      await _storageRef.child(path).delete();
+    } catch (_) {}
   }
 }

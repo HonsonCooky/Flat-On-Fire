@@ -38,8 +38,8 @@ class UserService {
     var doc = await FirebaseFirestore.instance.doc(path).get(const GetOptions(source: Source.server));
     return doc.exists;
   }
-  
-  String? getUserId(){
+
+  String? getUserId() {
     return FirebaseAuth.instance.currentUser?.uid;
   }
 
@@ -103,20 +103,20 @@ class UserService {
   void updateUser({
     required Map<String, dynamic> update,
     FirebaseSyncFuncs? syncFuncs,
-  }) {
+  }) async {
     String? avatarLocalFilePath = update["profile"]["avatarPath"];
     var uid = FirebaseAuth.instance.currentUser!.uid;
 
     // Upload user picture
     if (avatarLocalFilePath != null) {
-      CloudStorageService().setAvatarFile(
+      await CloudStorageService().setAvatarFile(
         subFolder: userKey,
         uid: uid,
         imagePath: avatarLocalFilePath,
       );
     }
 
-    Map<String, dynamic> userUpdate = update;    
+    Map<String, dynamic> userUpdate = update;
     var batch = FirebaseFirestore.instance.batch();
     batch.update(_userDocument(), userUpdate);
     batch.commit().then((_) {
@@ -132,12 +132,29 @@ class UserService {
   Future<void> deleteUser() async {
     // Delete the profile picture first
     var uid = FirebaseAuth.instance.currentUser!.uid;
-    try {
-      CloudStorageService().deleteAvatarFile(subFolder: userKey, uid: uid);
-    } catch (_) {}
+    CloudStorageService().deleteAvatarFile(subFolder: userKey, uid: uid);
 
     var batch = FirebaseFirestore.instance.batch();
     batch.delete(_userDocument());
+    await _removeFromGroups(batch);
     await batch.commit();
+  }
+
+  Future _removeFromGroups(WriteBatch batch) async {
+    var memberships = await FirestoreService()
+        .groupService
+        .getUserReferenceGroups(userId: FirebaseAuth.instance.currentUser!.uid)
+        .get();
+    for (var membership in memberships.docs) {
+      batch.delete(membership.reference);
+      await _deleteGroupIfGoingToBeEmpty(membership.data().groupId, batch);
+    }
+  }
+
+  Future _deleteGroupIfGoingToBeEmpty(String groupId, WriteBatch batch) async {
+    var members = await FirestoreService().groupService.getGroupMembers(groupId: groupId);
+    if (members.length == 1) {
+      FirestoreService().groupService.deleteGroup(groupId: groupId, b: batch);
+    }
   }
 }
