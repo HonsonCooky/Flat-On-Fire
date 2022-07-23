@@ -68,7 +68,7 @@ class _AppState extends State<App> {
     });
 
     if (_appService.loginState) {
-      _navigator.currentState!.popAndPushNamed(AppPageEnum.groups.toPath);
+      _navigator.currentState!.popAndPushNamed(AppPageEnum.settings.toPath);
     } else if (!_appService.loginState) {
       _navigator.currentState!.popAndPushNamed(AppPageEnum.auth.toPath);
     }

@@ -52,7 +52,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
     );
   }
 
-  void _updateCurrentImage(File? file) {
+  void _updateCurrentImage(File? file, bool delete, _) {
     setState(() => _currentImage = file);
   }
 
@@ -64,6 +64,9 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
         Icons.image,
         color: Theme.of(context).colorScheme.onSurface,
         size: (Theme.of(context).textTheme.labelMedium?.fontSize ?? 20) * 3,
+      ),
+      options: ProfileOptions(
+        editMode: ProfileEditMode.icon
       ),
     );
   }

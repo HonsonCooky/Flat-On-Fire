@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class FullImageDialogWidget extends StatelessWidget {
   final Image image;
   final String title;
+  final List<Widget>? actions;
 
-  const FullImageDialogWidget({Key? key, required this.image, required this.title}) : super(key: key);
+  const FullImageDialogWidget({Key? key, required this.image, required this.title, this.actions}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,9 +14,16 @@ class FullImageDialogWidget extends StatelessWidget {
         Navigator.of(context).pop();
       },
       child: AlertDialog(
-        title: Text(title),
-        content: image,
+        title: Text(
+          title,
+          textAlign: TextAlign.center,
+        ),
+        content: ClipRRect(
+          borderRadius: BorderRadius.circular(5),
+          child: image,
+        ),
         actions: [
+          ...?actions,
           _cancelButton(context),
         ],
       ),

@@ -8,6 +8,7 @@ class BooleanSwitcherWidget extends StatelessWidget {
   final String explanation;
   final void Function(bool)? onChanged;
   final TextStyle? textStyle;
+  final bool editMode;
 
   const BooleanSwitcherWidget({
     Key? key,
@@ -17,6 +18,7 @@ class BooleanSwitcherWidget extends StatelessWidget {
     required this.explanation,
     this.onChanged,
     this.textStyle,
+    this.editMode = false,
   }) : super(key: key);
 
   @override
@@ -47,9 +49,8 @@ class BooleanSwitcherWidget extends StatelessWidget {
         ),
         contentPadding: EdgeInsets.zero,
         dense: true,
-        visualDensity: VisualDensity.compact,
         value: isOn,
-        onChanged: onChanged,
+        onChanged: editMode ? onChanged : null,
       ),
     );
   }

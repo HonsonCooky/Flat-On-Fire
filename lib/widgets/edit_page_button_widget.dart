@@ -21,7 +21,7 @@ class EditPageButtonWidget extends StatelessWidget {
               onPressed: () {
                 editFn(!editMode);
               },
-              icon: const Icon(Icons.edit),
+              icon: editMode ? const Icon(Icons.close) : const Icon(Icons.edit),
               color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
               iconSize: Theme.of(context).textTheme.labelMedium?.fontSize,
               splashRadius: Theme.of(context).textTheme.labelMedium?.fontSize,

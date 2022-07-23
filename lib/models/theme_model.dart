@@ -123,6 +123,7 @@ class ThemeModel {
         ),
       ),
     ),
+    switchTheme: const SwitchThemeData(),
     textButtonTheme: TextButtonThemeData(
       style: ButtonStyle(
         textStyle: MaterialStateProperty.resolveWith(
@@ -224,6 +225,26 @@ class ThemeModel {
       style: _base.textButtonTheme.style
           ?.copyWith(foregroundColor: MaterialStateProperty.resolveWith((states) => PaletteModel.lightOnBackground)),
     ),
+    switchTheme: SwitchThemeData(
+      thumbColor: MaterialStateProperty.resolveWith<Color>((states) {
+        if (states.contains(MaterialState.disabled)) {
+          return PaletteModel.lightSurface;
+        }
+        if (states.contains(MaterialState.selected)){
+          return PaletteModel.lightTertiary;
+        }
+        return PaletteModel.lightSecondary;
+      }),
+      trackColor:  MaterialStateProperty.resolveWith<Color>((states) {
+        if (states.contains(MaterialState.disabled)) {
+          return PaletteAssistant.darken(PaletteModel.lightSurface);
+        }
+        if (states.contains(MaterialState.selected)){
+          return PaletteAssistant.alpha(PaletteModel.lightTertiary);
+        }
+        return PaletteAssistant.alpha(PaletteModel.lightSecondary);
+      }),
+    ),
     dialogBackgroundColor: PaletteModel.lightSurface,
   );
 
@@ -308,6 +329,26 @@ class ThemeModel {
     textButtonTheme: TextButtonThemeData(
       style: _base.textButtonTheme.style
           ?.copyWith(foregroundColor: MaterialStateProperty.resolveWith((states) => PaletteModel.darkOnBackground)),
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: MaterialStateProperty.resolveWith<Color>((states) {
+        if (states.contains(MaterialState.disabled)) {
+          return PaletteModel.darkSurface;
+        }
+        if (states.contains(MaterialState.selected)){
+          return PaletteModel.darkTertiary;
+        }
+        return PaletteModel.darkSecondary;
+      }),
+      trackColor:  MaterialStateProperty.resolveWith<Color>((states) {
+        if (states.contains(MaterialState.disabled)) {
+          return PaletteAssistant.lighten(PaletteModel.darkSurface);
+        }
+        if (states.contains(MaterialState.selected)){
+          return PaletteAssistant.alpha(PaletteModel.darkTertiary);
+        }
+        return PaletteAssistant.alpha(PaletteModel.darkSecondary);
+      }),
     ),
     dialogBackgroundColor: PaletteModel.darkSurface,
   );

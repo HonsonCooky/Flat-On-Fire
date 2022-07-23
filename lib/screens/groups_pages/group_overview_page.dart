@@ -27,6 +27,7 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
   File? _currentImage;
   bool _newImage = false;
   bool _saving = false;
+  bool _editMode = false;
 
   @override
   Widget build(BuildContext context) {
@@ -72,20 +73,25 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
     return _groupInformation(groupModel);
   }
 
-  void _updateCurrentImage(File? file) {
-    if (file != null) {
+  void _updateCurrentImage(File? file, bool delete, bool isNew) {
+    if (file != null || delete) {
       setState(() {
         _currentImage = file;
-        _newImage = true;
+        _newImage = isNew;
       });
-    } else {
-      setState(() {});
     }
   }
 
   Widget _profilePicture(GroupModel groupModel, TextStyle? textStyle) {
     return ProfilePicture(
-      profileTitles: _profileTitles,
+      options: ProfileOptions(
+        profileTitles: _profileTitles,
+        editMode: _editMode ? ProfileEditMode.fullScreen : null,
+        imageRef: ProfileImageRef(
+          subLoc: GroupService.groupKey,
+          uid: groupModel.uid!,
+        )
+      ),
       currentImage: _currentImage,
       updateCurrentImage: _updateCurrentImage,
       placeholder: Text(
@@ -97,8 +103,6 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
               : 20,
         ),
       ),
-      subLoc: GroupService.groupKey,
-      uid: groupModel.uid,
     );
   }
 

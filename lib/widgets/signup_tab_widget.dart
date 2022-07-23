@@ -107,7 +107,7 @@ class _SignupTabWidgetState extends State<SignupTabWidget> {
     );
   }
 
-  void _updateCurrentImage(File? file) {
+  void _updateCurrentImage(File? file, bool delete, _) {
     setState(() => _currentImage = file);
   }
 
@@ -120,9 +120,12 @@ class _SignupTabWidgetState extends State<SignupTabWidget> {
             ? Theme.of(context).textTheme.labelMedium!.fontSize! * 3
             : 20,
       ),
+      options: ProfileOptions(
+        profileTitles: _profileTitles,
+        editMode: ProfileEditMode.icon,
+      ),
       currentImage: _currentImage,
       updateCurrentImage: _updateCurrentImage,
-      profileTitles: _profileTitles,
     );
   }
 }

@@ -36,7 +36,7 @@ class _FofTextFieldState extends State<FofTextField> {
         vertical: ((widget.style?.fontSize ?? Theme.of(context).textTheme.labelMedium?.fontSize) ?? 10) / 3,
       ),
       child: Stack(
-        alignment: Alignment.centerRight,
+        alignment: widget.errorText == null ? Alignment.centerRight: Alignment.topRight,
         children: [
           TextField(
             onTap: widget.onTap,

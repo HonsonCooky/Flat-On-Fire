@@ -16,45 +16,38 @@ class UneditableTextEntryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Stack(
+      alignment: Alignment.centerRight,
       children: [
-        Text(
-          title,
-          style: textStyle?.copyWith(fontWeight: FontWeight.bold),
+        TextField(
+          enabled: false,
+          decoration: InputDecoration(
+            labelText: title,
+            labelStyle: textStyle?.copyWith(fontWeight: FontWeight.bold),
+            floatingLabelBehavior: FloatingLabelBehavior.always,
+            hintText: value,
+            hintStyle: Theme.of(context).inputDecorationTheme.hintStyle?.copyWith(
+                  fontSize: textStyle?.fontSize,
+                  color: textStyle?.color,
+                  fontWeight: FontWeight.normal,
+                ),
+          ),
+          style: textStyle?.copyWith(fontWeight: FontWeight.normal),
         ),
-        const SizedBox(height: 5),
-        Stack(
-          alignment: Alignment.centerRight,
-          children: [
-            TextField(
-              enabled: false,
-              decoration: InputDecoration(
-                hintText: value,
-                hintStyle: Theme.of(context).inputDecorationTheme.hintStyle?.copyWith(
-                      fontSize: textStyle?.fontSize,
-                      color: textStyle?.color,
-                      fontWeight: FontWeight.normal,
-                    ),
-              ),
-              style: textStyle?.copyWith(fontWeight: FontWeight.normal),
-            ),
-            Material(
-              color: Colors.transparent,
-              child: IconButton(
-                splashRadius: textStyle?.fontSize ?? Theme.of(context).textTheme.labelMedium?.fontSize ?? 30,
-                splashColor: PaletteAssistant.alpha(Theme.of(context).colorScheme.secondary),
-                iconSize: textStyle?.fontSize,
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: value))
-                      .then((_) => ToastManager.instance.successToast("Copied Text", Theme.of(context)))
-                      .catchError((_) => ToastManager.instance.errorToast("Unable to copy text", Theme.of(context)));
-                },
-                icon: const Icon(Icons.copy),
-              ),
-            )
-          ],
-        ),
+        Material(
+          color: Colors.transparent,
+          child: IconButton(
+            splashRadius: textStyle?.fontSize ?? Theme.of(context).textTheme.labelMedium?.fontSize ?? 30,
+            splashColor: PaletteAssistant.alpha(Theme.of(context).colorScheme.secondary),
+            iconSize: textStyle?.fontSize,
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: value))
+                  .then((_) => ToastManager.instance.successToast("Copied Text", Theme.of(context)))
+                  .catchError((_) => ToastManager.instance.errorToast("Unable to copy text", Theme.of(context)));
+            },
+            icon: const Icon(Icons.copy),
+          ),
+        )
       ],
     );
   }

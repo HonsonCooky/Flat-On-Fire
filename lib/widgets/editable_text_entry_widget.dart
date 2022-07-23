@@ -20,30 +20,23 @@ class EditableTextEntryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          title,
-          style: textStyle?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 5),
-        TextField(
-          obscureText: !visible,
-          controller: controller,
-          enabled: editMode,
-          decoration: InputDecoration(
-            hintText: value,
-            hintStyle: Theme.of(context).inputDecorationTheme.hintStyle?.copyWith(
-                  fontSize: textStyle?.fontSize,
-                  color: editMode
-                      ? Theme.of(context).inputDecorationTheme.labelStyle?.color
-                      : Theme.of(context).colorScheme.onSurface,
-                ),
-          ),
-          style: textStyle?.copyWith(fontSize: textStyle?.fontSize, fontWeight: FontWeight.normal),
-        ),
-      ],
+    return TextField(
+      obscureText: !visible,
+      controller: controller,
+      enabled: editMode,
+      decoration: InputDecoration(
+        labelText: title,
+        labelStyle: textStyle?.copyWith(fontWeight: FontWeight.bold),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        hintText: value,
+        hintStyle: Theme.of(context).inputDecorationTheme.hintStyle?.copyWith(
+              fontSize: textStyle?.fontSize,
+              color: editMode
+                  ? Theme.of(context).inputDecorationTheme.labelStyle?.color
+                  : Theme.of(context).colorScheme.onSurface,
+            ),
+      ),
+      style: textStyle?.copyWith(fontSize: textStyle?.fontSize, fontWeight: FontWeight.normal),
     );
   }
 }

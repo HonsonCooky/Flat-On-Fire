@@ -22,13 +22,20 @@ class _SettingPageState extends State<SettingsPage> {
     "This is me!",
     "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧",
     "(◕‿◕✿)",
-    "This dude! \n(☞ﾟ∀ﾟ)☞",
-    "So pretty! \n(;´༎ຶД༎ຶ`)"
+    "This dude! (☞ﾟ∀ﾟ)☞",
+    "So pretty! (;´༎ຶД༎ຶ`)"
   ];
   File? _currentImage;
   bool _newImage = false;
   bool _saving = false;
   bool _editMode = false;
+  bool _changesMade = false;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    super.dispose();
+  }
 
   // ----------------------------------------------------------------------------------------------------------------
   // MAIN
@@ -36,6 +43,14 @@ class _SettingPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    _name.addListener(() {
+      if (_name.text.isNotEmpty && !_changesMade) {
+        setState(() {
+          _changesMade = true;
+        });
+      }
+    });
+
     return WrapperAppPage(
       child: RawScrollbar(
         thumbColor: PaletteAssistant.alpha(Theme.of(context).colorScheme.secondary),
@@ -117,7 +132,7 @@ class _SettingPageState extends State<SettingsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _profilePicture(um, textStyle),
+        _profileBanner(um, textStyle),
         SizedBox(height: textStyle?.fontSize),
         HorizontalOrLineWidget(
           label: "Account",
@@ -149,6 +164,7 @@ class _SettingPageState extends State<SettingsPage> {
             value: um.profile.name,
             controller: _name,
             textStyle: textStyle,
+            editMode: _editMode,
           ),
         ),
         SizedBox(height: textStyle?.fontSize),
@@ -156,16 +172,77 @@ class _SettingPageState extends State<SettingsPage> {
     );
   }
 
-  void _updateCurrentImage(File? file) {
-    setState(() {
-      _currentImage = file;
-      _newImage = true;
-    });
+  void _updateCurrentImage(File? file, bool delete, bool isNew) {
+    if (file != null || delete) {
+      setState(() {
+        _currentImage = file;
+        _newImage = isNew;
+        _changesMade = isNew;
+      });
+    }
+  }
+
+  Widget _imSureCancel() {
+    return ElevatedButton.icon(
+      onPressed: () {
+        setState(() {
+          _editMode = false;
+        });
+        Navigator.of(context).pop();
+        _name.clear();
+        context.read<AppService>().viewState = ViewState.busy;
+        Future.delayed(const Duration(milliseconds: 500)).then((_) => context.read<AuthService>().establishSettings());
+      },
+      label: const Text("Remove changes"),
+      icon: const Icon(Icons.delete),
+    );
+  }
+
+  Widget _cancel() {
+    return TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel"));
+  }
+
+  Widget _profileBanner(UserModel userModel, TextStyle? textStyle) {
+    return Stack(
+      alignment: Alignment.topRight,
+      children: [
+        _profilePicture(userModel, textStyle),
+        EditPageButtonWidget(
+            editFn: (editMode) async {
+              if (_changesMade && !editMode) {
+                await showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text("Unsaved changes"),
+                        content: const Text("You haven't saved some changes you made. Are you sure you want to exit "
+                            "editing. All unsaved changes will take no effect."),
+                        actions: [
+                          _imSureCancel(),
+                          _cancel(),
+                        ],
+                      );
+                    });
+              } else {
+                setState(() {
+                  _editMode = editMode;
+                });
+              }
+            },
+            editMode: _editMode),
+      ],
+    );
   }
 
   Widget _profilePicture(UserModel userModel, TextStyle? textStyle) {
     return ProfilePicture(
-      profileTitles: _profileTitles,
+      options: ProfileOptions(
+          profileTitles: _profileTitles,
+          editMode: _editMode ? ProfileEditMode.fullScreen : null,
+          imageRef: ProfileImageRef(
+            subLoc: UserService.userKey,
+            uid: userModel.uid!,
+          )),
       currentImage: _currentImage,
       updateCurrentImage: _updateCurrentImage,
       placeholder: Text(
@@ -177,8 +254,6 @@ class _SettingPageState extends State<SettingsPage> {
               : 20,
         ),
       ),
-      subLoc: UserService.userKey,
-      uid: userModel.uid,
     );
   }
 
@@ -191,8 +266,14 @@ class _SettingPageState extends State<SettingsPage> {
           hints: const ["(Completed)", "(Redo)"],
           isOn: isOnboarded,
           explanation: "Deselecting this value, will take you back through the tutorial when you login again.",
-          onChanged: (b) => appService.onBoarded = b,
+          onChanged: (b) {
+            appService.onBoarded = b;
+            setState(() {
+              _changesMade = true;
+            });
+          },
           textStyle: textStyle,
+          editMode: _editMode,
         );
       },
     );
@@ -212,7 +293,6 @@ class _SettingPageState extends State<SettingsPage> {
           color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
         ),
         _onBoardedChanger(textStyle),
-        SizedBox(height: textStyle?.fontSize),
         _themeChanger(textStyle),
       ],
     );
@@ -229,8 +309,11 @@ class _SettingPageState extends State<SettingsPage> {
               "The theme sets the user interface colors. Dark mode uses dark colors. Light mode used light colors. "
               "Currently, your are in ${isDark ? "dark" : "light"} mode.",
           isOn: isDark,
-          onChanged: (b) => appService.themeMode = b ? ThemeMode.dark : ThemeMode.light,
+          onChanged: (b) {
+            appService.themeMode = b ? ThemeMode.dark : ThemeMode.light;
+          },
           textStyle: textStyle,
+          editMode: _editMode,
         );
       },
     );
@@ -241,7 +324,10 @@ class _SettingPageState extends State<SettingsPage> {
   // ----------------------------------------------------------------------------------------------------------------
 
   void _onSaveFinish() {
-    setState(() => _saving = false);
+    setState(() {
+      _saving = false;
+      _changesMade = false;
+    });
   }
 
   Widget _saveButton(UserModel um) {
@@ -328,9 +414,10 @@ class _SettingPageState extends State<SettingsPage> {
       ),
     );
   }
-  
-  Widget _editButtons(UserModel um){
+
+  Widget _editButtons(UserModel um) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _spacer(),
         _saveButton(um),

@@ -21,7 +21,7 @@ class AuthService extends ChangeNotifier {
   // ----------------------------------------------------------------------------------------------------------------
 
   AuthService(this._appService) {
-    _establishSettings();
+    establishSettings();
   }
 
   // ----------------------------------------------------------------------------------------------------------------
@@ -29,7 +29,7 @@ class AuthService extends ChangeNotifier {
   // ----------------------------------------------------------------------------------------------------------------
 
   /// Establish the baseline settings given the current environment
-  Future<void> _establishSettings() async {
+  Future<void> establishSettings() async {
     bool failed = true;
     try {
       // Attempt to setup app settings based on the user
@@ -92,7 +92,7 @@ class AuthService extends ChangeNotifier {
     var cred = EmailAuthProvider.credential(email: email, password: password);
     try {
       await user.reauthenticateWithCredential(cred);
-      await _establishSettings();
+      await establishSettings();
       return successfulOperation;
     } catch (_) {
       return "Invalid user credentials";
@@ -104,7 +104,7 @@ class AuthService extends ChangeNotifier {
     var cred = await _getGoogleCredentials();
     try {
       await user.reauthenticateWithCredential(cred);
-      await _establishSettings();
+      await establishSettings();
       return successfulOperation;
     } catch (_) {
       return "Invalid user credentials";
@@ -141,7 +141,7 @@ class AuthService extends ChangeNotifier {
       _failedAttempt();
       return "Authentication Failed";
     } finally {
-      await _establishSettings();
+      await establishSettings();
     }
   }
 
@@ -172,7 +172,7 @@ class AuthService extends ChangeNotifier {
       _failedAttempt();
       return "Signup Failed";
     } finally {
-      await _establishSettings();
+      await establishSettings();
     }
   }
 
@@ -210,7 +210,7 @@ class AuthService extends ChangeNotifier {
       _failedAttempt();
       return "Google Authentication Failed";
     } finally {
-      await _establishSettings();
+      await establishSettings();
     }
   }
 
@@ -221,7 +221,7 @@ class AuthService extends ChangeNotifier {
 
     try {
       await FirebaseAuth.instance.signOut();
-      await _establishSettings();
+      await establishSettings();
       return successfulOperation;
     } catch (e, s) {
       _failedAttempt();
@@ -261,7 +261,7 @@ class AuthService extends ChangeNotifier {
       await FirestoreService().userService.deleteUser();
       await FirebaseAuth.instance.currentUser?.delete();
 
-      await _establishSettings();
+      await establishSettings();
       return successfulOperation;
     } catch (e, s) {
       _failedAttempt();
