@@ -34,7 +34,7 @@ class UneditableTextEntryWidget extends StatelessWidget {
                 hintStyle: Theme.of(context).inputDecorationTheme.hintStyle?.copyWith(
                       fontSize: textStyle?.fontSize,
                       color: textStyle?.color,
-                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.normal,
                     ),
               ),
               style: textStyle?.copyWith(fontWeight: FontWeight.normal),

@@ -150,13 +150,7 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
             textStyle: textStyle,
           ),
         ),
-        SizedBox(height: textStyle?.fontSize),
-        HorizontalOrLineWidget(
-          label: "Members",
-          padding: 30,
-          color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
-        ),
-        _members(groupModel.uid!),
+        _members(groupModel.uid!, textStyle),
         SizedBox(
           height: MediaQuery.of(context).size.height / 20,
         ),
@@ -169,31 +163,83 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
     );
   }
 
-  Widget _members(String groupId) {
+  Widget _members(String groupId, TextStyle? textStyle) {
     return FutureBuilder(
         future: FirestoreService().groupService.getGroupMembers(groupId: groupId),
         builder: (BuildContext context, AsyncSnapshot<List<MemberModel>?> snapshot) {
+          Widget child;
+          List<MemberModel>? data;
           if (snapshot.hasData && snapshot.data != null) {
-            List<MemberModel> data = snapshot.data!;
-            if (data.isEmpty) return const Text("No Users");
-            return ListView.builder(
-                shrinkWrap: true,
-                itemCount: data.length,
-                itemBuilder: (context, i) {
-                  return ListTile(
-                    title: Text(data[i].userProfile.name, ),
-                    dense: true,
-                  );
-                });
+            data = snapshot.data!;
+            if (data.isEmpty) {
+              child = const Text("No Users");
+            } else {
+              child = _membersList(data);
+            }
           } else if (snapshot.hasData || snapshot.hasError) {
-            return _memberError();
+            child = _memberError();
+          } else {
+            child = const AwaitingInformationWidget(texts: [
+              "Gathering the troops",
+              "Uniform inspection",
+              "Taking hits, and taking names",
+            ]);
           }
-          return const AwaitingInformationWidget(texts: [
-            "Gathering the troops",
-            "Uniform inspection",
-            "Taking hits, and taking names",
-          ]);
+          return Column(
+            children: [
+              SizedBox(height: textStyle?.fontSize),
+              HorizontalOrLineWidget(
+                label: "Members",
+                padding: 30,
+                color: PaletteAssistant.alpha(Theme.of(context).colorScheme.onBackground),
+              ),
+              child,
+            ],
+          );
         });
+  }
+
+
+  Widget _membersList(List<MemberModel> data) {
+    data.sort((a, b) => a.role.index - b.role.index);
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: data.length,
+      itemBuilder: (context, i) {
+        return ListTile(
+          title: AutoScrollText(
+            text: data[i].userProfile.name,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+          ),
+          subtitle: Text(
+            data[i].role.name,
+            style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          leading: FutureBuilder(
+            future: CloudStorageService().getAvatarFile(
+              subFolder: UserService.userKey,
+              uid: data[i].userId,
+            ),
+            builder: (context, AsyncSnapshot<File?> snapshot) {
+              return CircleAvatar(
+                radius: Theme.of(context).textTheme.labelMedium?.fontSize,
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                foregroundImage: snapshot.hasData && snapshot.data != null ? FileImage(snapshot.data!) : null,
+                child: Text(
+                  data[i].userProfile.name.initials(),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
+                ),
+              );
+            },
+          ),
+          dense: true,
+        );
+      },
+    );
   }
 
   Widget _memberError() {

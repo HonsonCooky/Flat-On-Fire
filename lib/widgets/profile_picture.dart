@@ -9,6 +9,7 @@ class ProfilePicture extends StatefulWidget {
   final List<String>? profileTitles;
   final File? currentImage;
   final void Function(File? file)? updateCurrentImage;
+  final bool editMode;
 
   final Widget placeholder;
   final String? subLoc;
@@ -22,6 +23,7 @@ class ProfilePicture extends StatefulWidget {
     this.updateCurrentImage,
     this.subLoc,
     this.uid,
+    this.editMode = false,
   }) : super(key: key);
 
   @override
@@ -40,7 +42,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
         clipBehavior: Clip.none,
         children: [
           _profileAvatar(fontSize, context),
-          _editProfileButton(fontSize, context),
+          widget.editMode ? _editProfileButton(fontSize, context) : const SizedBox(),
         ],
       ),
     );
@@ -80,7 +82,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
   Widget _loadCachedAvatar(double fontSize, BuildContext context) {
     if (_loadAttempted || widget.subLoc == null || widget.uid == null) return _placeholder(fontSize, context);
 
-    CloudStorageService().getAvatarFile(subFolder: widget.subLoc!, uid: widget.uid!, cacheOnly: true).then((value) {
+    CloudStorageService().getAvatarFile(subFolder: widget.subLoc!, uid: widget.uid!).then((value) {
       if (widget.updateCurrentImage != null) {
         widget.updateCurrentImage!(value);
       } else {

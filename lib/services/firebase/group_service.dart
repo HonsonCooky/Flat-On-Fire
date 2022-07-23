@@ -68,7 +68,9 @@ class GroupService {
     required String userId,
   }) async {
     var groupsQuery = getUserReferenceGroups(userId: userId).limit(10);
-    var queryRes = await AppService.networkConnected() ? await groupsQuery.get() : await groupsQuery.getCacheFirst();
+    var queryRes = await AppService.networkConnected()
+        ? await groupsQuery.get()
+        : await groupsQuery.getCacheFirst();
     return queryRes.docs.map((e) => e.data()).toList();
   }
 
@@ -197,7 +199,7 @@ class GroupService {
     required Map<String, dynamic> update,
     required WriteBatch batch,
   }) async {
-    var groupName = update["groupName"];
+    var groupName = update["group"]["groupName"];
     if (groupName == null) return;
 
     var members = await FirestoreService()
@@ -218,13 +220,8 @@ class GroupService {
 // ----------------------------------------------------------------------------------------------------------------
 // DELETE METHODS
 // ----------------------------------------------------------------------------------------------------------------
-  Future<void> deleteGroup({required String groupId, WriteBatch? b}) async {
+  Future<void> deleteGroup({required String groupId}) async {
     await CloudStorageService().deleteAvatarFile(subFolder: groupKey, uid: groupId);
-
-    if (b != null) {
-      b.delete(groupDocument(groupId));
-      return;
-    }
 
     var members = await _members(groupId).get();
     var batch = FirebaseFirestore.instance.batch();

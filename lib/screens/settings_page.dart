@@ -28,6 +28,7 @@ class _SettingPageState extends State<SettingsPage> {
   File? _currentImage;
   bool _newImage = false;
   bool _saving = false;
+  bool _editMode = false;
 
   // ----------------------------------------------------------------------------------------------------------------
   // MAIN
@@ -55,7 +56,6 @@ class _SettingPageState extends State<SettingsPage> {
             _spacer(),
             _settingsContent(textStyle),
             _spacer(),
-            _deleteBtn(),
             _logoutBtn(),
             _spacer(),
           ],
@@ -89,8 +89,7 @@ class _SettingPageState extends State<SettingsPage> {
             children: [
               _accountSuccess(um, textStyle),
               _appSettings(textStyle),
-              _spacer(),
-              _saveButton(um),
+              _editMode ? _editButtons(um) : const SizedBox(),
             ],
           );
         } else if (snapshot.hasData || snapshot.hasError) {
@@ -158,14 +157,10 @@ class _SettingPageState extends State<SettingsPage> {
   }
 
   void _updateCurrentImage(File? file) {
-    if (file != null) {
-      setState(() {
-        _currentImage = file;
-        _newImage = true;
-      });
-    } else {
-      setState(() {});
-    }
+    setState(() {
+      _currentImage = file;
+      _newImage = true;
+    });
   }
 
   Widget _profilePicture(UserModel userModel, TextStyle? textStyle) {
@@ -331,6 +326,16 @@ class _SettingPageState extends State<SettingsPage> {
         Icons.logout,
         color: Theme.of(context).colorScheme.onTertiary,
       ),
+    );
+  }
+  
+  Widget _editButtons(UserModel um){
+    return Column(
+      children: [
+        _spacer(),
+        _saveButton(um),
+        _deleteBtn(),
+      ],
     );
   }
 

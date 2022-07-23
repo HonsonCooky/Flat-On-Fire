@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as im;
 import 'package:path_provider/path_provider.dart';
 
 class CloudStorageService {
@@ -35,8 +36,9 @@ class CloudStorageService {
     var file = File(await _avatarLocalLoc(subFolder, uid));
     http.Response response = await http.get(Uri.parse(imageUrl));
     file.createSync(recursive: true);
-    await file.writeAsBytes(response.bodyBytes);
-    return file;
+    im.Image image = im.decodeImage(response.bodyBytes)!;
+    im.Image shrink = im.copyResize(image, width: 400);
+    return await file.writeAsBytes(im.encodeJpg(shrink, quality: 85));
   }
 
   // ----------------------------------------------------------------------------------------------------------------
@@ -46,14 +48,20 @@ class CloudStorageService {
   /// Get the file pointer to some avatar in the Firebase Storage.
   /// [subFolder] and [uid] are used to identify the avatar.
   /// [cacheOnly] is false by default, but if set to true, only the local file will be searched for.
-  Future<File?> getAvatarFile({required String subFolder, required String uid, bool cacheOnly = false}) async {
+  Future<File?> getAvatarFile({required String subFolder, required String uid, bool cacheFirst = true}) async {
     // Get local file
-    if (!cacheOnly && await AppService.networkConnected()) {
+    if (!cacheFirst && await AppService.networkConnected()) {
       var groupFile = await _getCloudAvatarFile(subFolder: subFolder, uid: uid);
-      if (groupFile?.existsSync() == true) return groupFile;
+      if (groupFile != null && groupFile.existsSync()) return groupFile;
     }
+    
     var imageFile = await _getLocalAvatarFile(subFolder: subFolder, uid: uid);
     if (imageFile.existsSync()) return imageFile;
+    
+    if (cacheFirst && await AppService.networkConnected()) {
+      var groupFile = await _getCloudAvatarFile(subFolder: subFolder, uid: uid);
+      if (groupFile != null && groupFile.existsSync()) return groupFile;
+    }
     return null;
   }
 
@@ -103,10 +111,12 @@ class CloudStorageService {
     required String uid,
     required String imagePath,
   }) async {
-    var image = File(imagePath);
+    var imageFile = File(imagePath);
     var saveLoc = File(await _avatarLocalLoc(subFolder, uid));
     saveLoc.createSync(recursive: true);
-    await saveLoc.writeAsBytes(image.readAsBytesSync());
+    im.Image image = im.decodeImage(imageFile.readAsBytesSync())!;
+    im.Image shrink = im.copyResize(image, width: 400);
+    await saveLoc.writeAsBytes(im.encodeJpg(shrink, quality: 85));
     return saveLoc;
   }
 

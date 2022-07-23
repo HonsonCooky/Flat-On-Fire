@@ -83,6 +83,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
 
         context.read<AppService>().viewState = ViewState.busy;
         try {
+          setState(() => _creatingGroup = true);
           await FirestoreService().groupService.createNewGroup(
                 name: _name.text,
                 avatarLocalFilePath: _currentImage?.path,
@@ -98,7 +99,9 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                   (e) {
                     ToastManager.instance.errorToast("Unable to create group at this time.\n$e", Theme.of(context));
                   },
-                  () {},
+                  () {
+                    setState(() => _creatingGroup = false);
+                  },
                 ),
               );
         } catch (e) {

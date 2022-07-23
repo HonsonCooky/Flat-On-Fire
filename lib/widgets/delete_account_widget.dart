@@ -34,11 +34,10 @@ class _DeleteAccountAlertWidgetState extends State<DeleteAccountAlertWidget> {
   }
 
   Widget _deleteButton() {
-    return TextButton(
-      child: Text(
-        "Delete my account",
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onError),
-      ),
+    return ElevatedButton(
+      style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+            backgroundColor: MaterialStateProperty.resolveWith((states) => Theme.of(context).colorScheme.onError),
+          ),
       onPressed: () async {
         Navigator.of(context).pop();
         var theme = Theme.of(context); // Get before async gap
@@ -47,6 +46,10 @@ class _DeleteAccountAlertWidgetState extends State<DeleteAccountAlertWidget> {
           ToastManager.instance.errorToast(deleteText, theme);
         }
       },
+      child: Text(
+        "Delete my account",
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.error),
+      ),
     );
   }
 }

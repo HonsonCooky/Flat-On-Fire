@@ -18,9 +18,21 @@ class _WrapperAppPageState extends State<WrapperAppPage> {
   }
 
   String? _groupPathName() {
-    String? groupName = _getArguments()?.groupName;
-    if (groupName != null) return "Group: ${groupName.title()}";
-    return null;
+    try {
+      String? groupName = _getArguments()?.groupName;
+      return "Group: ${groupName!.title()}";
+    } catch (e) {
+      return null;
+    }
+  }
+
+  String? _userPathName() {
+    try {
+      String? userName = _getArguments()["profile"]?.name;
+      return "User: ${userName!.title().split(" ")[0]}";
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
@@ -43,12 +55,13 @@ class _WrapperAppPageState extends State<WrapperAppPage> {
           color: Theme.of(context).colorScheme.onSurface,
         );
 
-    var title = _groupPathName() ?? curAppPage(context).toTitle;
+    var title = _groupPathName() ?? _userPathName() ?? curAppPage(context).toTitle;
     var isBase = curAppPage(context).toPath.split("/").length <= 2;
 
     return AppBar(
       toolbarHeight: (textStyle?.fontSize ?? 10) * 2,
-      title: Text(title, style: textStyle),
+      title: WrapperOverflowRemoved(
+          child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: Text(title, style: textStyle))),
       leading: isBase
           ? null
           : IconButton(

@@ -266,7 +266,7 @@ class AuthService extends ChangeNotifier {
     } catch (e, s) {
       _failedAttempt();
       await FirebaseCrashlytics.instance.recordError(e, s);
-      return "Something went wrong. Unable to delete user.";
+      return "Unable to delete user.\n$e";
     }
   }
 }

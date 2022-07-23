@@ -4,24 +4,40 @@ import 'package:flat_on_fire/_app_bucket.dart';
 
 class UserService {
   static const userKey = "users";
+  static const publicKey = "public";
+  static const profileKey = "profile";
 
 // ----------------------------------------------------------------------------------------------------------------
 // PRIVATE ASSISTANT METHODS
 // ----------------------------------------------------------------------------------------------------------------
 
   /// Get the path to a users PRIVATE information.
-  String _userPath(String? uid, String exception) {
-    if (uid == null) throw Exception(exception);
+  String _userPath(String? uid) {
+    if (uid == null) throw Exception("Unauthorized access to user information");
     return "$userKey/$uid";
+  }
+
+  String _userProfilePath(String? uid) {
+    if (uid == null) throw Exception("Unauthorized access to user information");
+    return "$userKey/$uid/$publicKey/$profileKey";
   }
 
   /// Access to the PRIVATE user information
   DocumentReference<UserModel> _userDocument() {
-    var path = _userPath(FirebaseAuth.instance.currentUser?.uid, "Unauthorized access to user information");
+    var path = _userPath(FirebaseAuth.instance.currentUser?.uid);
     var doc = FirestoreService().getDoc(path);
     return doc.withConverter<UserModel>(
       fromFirestore: (snapshot, _) => UserModel.fromJson(snapshot.data()!),
-      toFirestore: (settingsModel, _) => settingsModel.toJson(),
+      toFirestore: (model, _) => model.toJson(),
+    );
+  }
+
+  DocumentReference<UserProfileModel> _userProfileDocument() {
+    var path = _userProfilePath(FirebaseAuth.instance.currentUser?.uid);
+    var doc = FirestoreService().getDoc(path);
+    return doc.withConverter<UserProfileModel>(
+      fromFirestore: (snapshot, _) => UserProfileModel.fromJson(snapshot.data()!),
+      toFirestore: (model, _) => model.toJson(),
     );
   }
 
@@ -31,10 +47,7 @@ class UserService {
 
   /// Determine if the logged in user, has existing documentation.
   Future<bool> userDocExists() async {
-    var path = _userPath(
-      FirebaseAuth.instance.currentUser?.uid,
-      "Unauthorized access to public user information",
-    );
+    var path = _userPath(FirebaseAuth.instance.currentUser?.uid);
     var doc = await FirebaseFirestore.instance.doc(path).get(const GetOptions(source: Source.server));
     return doc.exists;
   }
@@ -61,16 +74,6 @@ class UserService {
     try {
       var uid = uc.user!.uid;
 
-      // Upload user picture
-      if (avatarFileUrl != null || avatarLocalFilePath != null) {
-        await CloudStorageService().setAvatarFile(
-          subFolder: userKey,
-          uid: uid,
-          imagePath: avatarLocalFilePath,
-          imageUrl: avatarFileUrl,
-        );
-      }
-
       // Upload profile
       UserProfileModel userProfileModel = UserProfileModel(
         name: name,
@@ -91,7 +94,19 @@ class UserService {
       // Batch create
       var batch = FirebaseFirestore.instance.batch();
       batch.set<UserModel>(_userDocument(), userModel);
-      await batch.commit();
+      batch.set(_userProfileDocument(), userProfileModel);
+      await batch.commit().then(
+        (value) async {
+          if (avatarFileUrl != null || avatarLocalFilePath != null) {
+            await CloudStorageService().setAvatarFile(
+              subFolder: userKey,
+              uid: uid,
+              imagePath: avatarLocalFilePath,
+              imageUrl: avatarFileUrl,
+            );
+          }
+        },
+      );
     } catch (e) {
       // Failed attempt. Remove user from firebase authentication
       await uc.user?.delete();
@@ -107,25 +122,42 @@ class UserService {
     String? avatarLocalFilePath = update["profile"]["avatarPath"];
     var uid = FirebaseAuth.instance.currentUser!.uid;
 
-    // Upload user picture
-    if (avatarLocalFilePath != null) {
-      await CloudStorageService().setAvatarFile(
-        subFolder: userKey,
-        uid: uid,
-        imagePath: avatarLocalFilePath,
-      );
-    }
-
-    Map<String, dynamic> userUpdate = update;
     var batch = FirebaseFirestore.instance.batch();
-    batch.update(_userDocument(), userUpdate);
-    batch.commit().then((_) {
+    batch.update(_userDocument(), update);
+    batch.update(_userProfileDocument(), update["profile"]);
+
+    await _updateMyMemberships(update["profile"], batch);
+
+    batch.commit().then((_) async {
+      if (avatarLocalFilePath != null) {
+        await CloudStorageService().setAvatarFile(
+          subFolder: userKey,
+          uid: uid,
+          imagePath: avatarLocalFilePath,
+        );
+      }
       syncFuncs?.onSuccess();
     }).catchError((e) {
       syncFuncs?.onError(e);
     });
 
     syncFuncs?.onLocalSuccess();
+  }
+
+  Future<void> _updateMyMemberships(dynamic profile, WriteBatch batch) async {
+    if (profile == null) return;
+
+    var memberships = await FirestoreService()
+        .groupService
+        .getUserReferenceGroups(userId: FirebaseAuth.instance.currentUser!.uid)
+        .get();
+
+    for (var membership in memberships.docs) {
+      batch.update(
+        membership.reference,
+        {"userProfile": profile},
+      );
+    }
   }
 
   /// Delete the firebase
@@ -136,6 +168,7 @@ class UserService {
 
     var batch = FirebaseFirestore.instance.batch();
     batch.delete(_userDocument());
+    batch.delete(_userProfileDocument());
     await _removeFromGroups(batch);
     await batch.commit();
   }
@@ -146,15 +179,36 @@ class UserService {
         .getUserReferenceGroups(userId: FirebaseAuth.instance.currentUser!.uid)
         .get();
     for (var membership in memberships.docs) {
-      batch.delete(membership.reference);
-      await _deleteGroupIfGoingToBeEmpty(membership.data().groupId, batch);
+      if (await _handleMemberDelete(membership.data().groupId, batch)) {
+        batch.delete(membership.reference);
+      }
     }
   }
 
-  Future _deleteGroupIfGoingToBeEmpty(String groupId, WriteBatch batch) async {
+  Future<bool> _handleMemberDelete(String groupId, WriteBatch batch) async {
     var members = await FirestoreService().groupService.getGroupMembers(groupId: groupId);
     if (members.length == 1) {
-      FirestoreService().groupService.deleteGroup(groupId: groupId, b: batch);
+      FirestoreService().groupService.deleteGroup(groupId: groupId);
+      return false;
+    } else {
+      _handoverOwnershipCheck(members);
+      return true;
     }
+  }
+
+  Future _handoverOwnershipCheck(List<MemberModel> members) async {
+    try {
+      var me = members.firstWhere((element) => element.userId == FirebaseAuth.instance.currentUser!.uid);
+      if (me.role == Authorization.owner) {
+        // Get number of owners
+        var ownerCount =
+            members.where((element) => element.role == Authorization.owner && element.userId != me.userId).length;
+
+        // If no other owners, throw error
+        if (ownerCount == 0) {
+          throw Exception("You have not passed ownership of group(s) over to others yet.");
+        }
+      }
+    } catch (_) {}
   }
 }

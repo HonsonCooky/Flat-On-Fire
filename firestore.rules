@@ -4,6 +4,10 @@ service cloud.firestore {
         match /users/{uid}/{path=**} {
             // Read and write if owner of document
             allow read, write: if request.auth.uid == uid;
+            
+            match /public/profile {
+                allow read: if request.auth != null;
+            }
         }
 
         match /{document=**}/members/{uid} {

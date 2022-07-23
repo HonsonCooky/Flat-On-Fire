@@ -6,6 +6,7 @@ class EditableTextEntryWidget extends StatelessWidget {
   final TextEditingController controller;
   final TextStyle? textStyle;
   final bool visible;
+  final bool editMode;
 
   const EditableTextEntryWidget({
     Key? key,
@@ -14,6 +15,7 @@ class EditableTextEntryWidget extends StatelessWidget {
     required this.controller,
     required this.textStyle,
     this.visible = true,
+    this.editMode = false,
   }) : super(key: key);
 
   @override
@@ -29,9 +31,15 @@ class EditableTextEntryWidget extends StatelessWidget {
         TextField(
           obscureText: !visible,
           controller: controller,
+          enabled: editMode,
           decoration: InputDecoration(
             hintText: value,
-            hintStyle: Theme.of(context).inputDecorationTheme.hintStyle?.copyWith(fontSize: textStyle?.fontSize),
+            hintStyle: Theme.of(context).inputDecorationTheme.hintStyle?.copyWith(
+                  fontSize: textStyle?.fontSize,
+                  color: editMode
+                      ? Theme.of(context).inputDecorationTheme.labelStyle?.color
+                      : Theme.of(context).colorScheme.onSurface,
+                ),
           ),
           style: textStyle?.copyWith(fontSize: textStyle?.fontSize, fontWeight: FontWeight.normal),
         ),

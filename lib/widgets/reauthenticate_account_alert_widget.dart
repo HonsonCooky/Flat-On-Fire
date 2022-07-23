@@ -38,7 +38,7 @@ class _ReauthenticateAccountAlertWidgetState extends State<ReauthenticateAccount
   // set up the buttons
   Widget _cancelButton() {
     return TextButton(
-      child: const Text("Cancel"),
+      child: const Text("CANCEL"),
       onPressed: () {
         Navigator.of(context).pop();
       },

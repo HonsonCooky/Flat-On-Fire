@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class GroupsPage extends StatefulWidget {
   const GroupsPage({Key? key}) : super(key: key);
@@ -11,8 +12,6 @@ class GroupsPage extends StatefulWidget {
 }
 
 class _GroupsPageState extends State<GroupsPage> {
-  bool _initialClick = true;
-
   _navigateToCreatePage() {
     Navigator.of(context).pushNamed(AppPageEnum.groupsCreate.toPath).then(
       (value) {
@@ -66,7 +65,6 @@ class _GroupsPageState extends State<GroupsPage> {
   }
 
   void _goToGroup(String userId, MemberModel membership) {
-    setState(() => _initialClick = false);
     Navigator.of(context)
         .pushNamed(AppPageEnum.groupOverview.toPath, arguments: membership)
         .then((value) => FirestoreService().groupService.getUsersGroups(userId: userId));
@@ -74,17 +72,16 @@ class _GroupsPageState extends State<GroupsPage> {
 
   Widget _groupsList(String userId, List<MemberModel>? groupMemberships) {
     if (groupMemberships == null || groupMemberships.isEmpty) return _noGroups();
-    if (groupMemberships.length == 1 && _initialClick) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _goToGroup(userId, groupMemberships[0]));
-    }
     groupMemberships.sort((a, b) => a.groupName.compareTo(b.groupName));
     return _listGroups(userId, groupMemberships);
   }
 
   Widget _listGroups(String userId, List<MemberModel> groupMemberships) {
     return RefreshIndicator(
-      onRefresh: () {
-        return FirestoreService().groupService.getUsersGroups(userId: userId);
+      onRefresh: () async {
+        context.read<AppService>().viewState = ViewState.busy;
+        Future.delayed(const Duration(milliseconds: 500))
+            .then((value) => context.read<AppService>().viewState = ViewState.ideal);
       },
       child: WrapperOverflowRemoved(
         child: Stack(
@@ -99,11 +96,9 @@ class _GroupsPageState extends State<GroupsPage> {
                 itemBuilder: (context, i) => ListTile(
                   onTap: () => _goToGroup(userId, groupMemberships[i]),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  title: Text(
-                    groupMemberships[i].groupName,
+                  title: AutoScrollText(
+                    text: groupMemberships[i].groupName,
                     style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   subtitle: Text(
                     groupMemberships[i].role.name,
@@ -112,8 +107,10 @@ class _GroupsPageState extends State<GroupsPage> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   leading: FutureBuilder(
-                    future: CloudStorageService()
-                        .getAvatarFile(subFolder: GroupService.groupKey, uid: groupMemberships[i].groupId),
+                    future: CloudStorageService().getAvatarFile(
+                      subFolder: GroupService.groupKey,
+                      uid: groupMemberships[i].groupId,
+                    ),
                     builder: (context, AsyncSnapshot<File?> snapshot) {
                       return CircleAvatar(
                         radius: Theme.of(context).textTheme.displayMedium?.fontSize,
