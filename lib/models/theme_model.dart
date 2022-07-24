@@ -135,6 +135,10 @@ class ThemeModel {
         ),
       ),
     ),
+    listTileTheme: ListTileThemeData(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      contentPadding: const EdgeInsets.all(5),
+    ),
   );
 
   /// LIGHT THEME
@@ -230,16 +234,16 @@ class ThemeModel {
         if (states.contains(MaterialState.disabled)) {
           return PaletteModel.lightSurface;
         }
-        if (states.contains(MaterialState.selected)){
+        if (states.contains(MaterialState.selected)) {
           return PaletteModel.lightTertiary;
         }
         return PaletteModel.lightSecondary;
       }),
-      trackColor:  MaterialStateProperty.resolveWith<Color>((states) {
+      trackColor: MaterialStateProperty.resolveWith<Color>((states) {
         if (states.contains(MaterialState.disabled)) {
           return PaletteAssistant.darken(PaletteModel.lightSurface);
         }
-        if (states.contains(MaterialState.selected)){
+        if (states.contains(MaterialState.selected)) {
           return PaletteAssistant.alpha(PaletteModel.lightTertiary);
         }
         return PaletteAssistant.alpha(PaletteModel.lightSecondary);
@@ -335,16 +339,16 @@ class ThemeModel {
         if (states.contains(MaterialState.disabled)) {
           return PaletteModel.darkSurface;
         }
-        if (states.contains(MaterialState.selected)){
+        if (states.contains(MaterialState.selected)) {
           return PaletteModel.darkTertiary;
         }
         return PaletteModel.darkSecondary;
       }),
-      trackColor:  MaterialStateProperty.resolveWith<Color>((states) {
+      trackColor: MaterialStateProperty.resolveWith<Color>((states) {
         if (states.contains(MaterialState.disabled)) {
           return PaletteAssistant.lighten(PaletteModel.darkSurface);
         }
-        if (states.contains(MaterialState.selected)){
+        if (states.contains(MaterialState.selected)) {
           return PaletteAssistant.alpha(PaletteModel.darkTertiary);
         }
         return PaletteAssistant.alpha(PaletteModel.darkSecondary);

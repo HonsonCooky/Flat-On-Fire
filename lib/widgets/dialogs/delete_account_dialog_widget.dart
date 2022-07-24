@@ -2,14 +2,14 @@ import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class DeleteAccountAlertWidget extends StatefulWidget {
-  const DeleteAccountAlertWidget({Key? key}) : super(key: key);
+class DeleteAccountDialogWidget extends StatefulWidget {
+  const DeleteAccountDialogWidget({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _DeleteAccountAlertWidgetState();
+  State<StatefulWidget> createState() => _DeleteAccountDialogWidgetState();
 }
 
-class _DeleteAccountAlertWidgetState extends State<DeleteAccountAlertWidget> {
+class _DeleteAccountDialogWidgetState extends State<DeleteAccountDialogWidget> {
   @override
   Widget build(BuildContext context) {
     // set up the AlertDialog
@@ -26,7 +26,7 @@ class _DeleteAccountAlertWidgetState extends State<DeleteAccountAlertWidget> {
   // set up the buttons
   Widget _cancelButton() {
     return TextButton(
-      child: const Text("Cancel"),
+      child: const Text("CANCEL"),
       onPressed: () {
         Navigator.of(context).pop();
       },
@@ -47,7 +47,7 @@ class _DeleteAccountAlertWidgetState extends State<DeleteAccountAlertWidget> {
         }
       },
       child: Text(
-        "Delete my account",
+        "DELETE MY ACCOUNT",
         style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.error),
       ),
     );

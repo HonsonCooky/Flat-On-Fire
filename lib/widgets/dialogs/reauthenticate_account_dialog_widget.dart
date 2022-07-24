@@ -2,16 +2,16 @@ import 'package:flat_on_fire/_app_bucket.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ReauthenticateAccountAlertWidget extends StatefulWidget {
+class ReauthenticateAccountDialogWidget extends StatefulWidget {
   final void Function() successfulAuthentication;
 
-  const ReauthenticateAccountAlertWidget({Key? key, required this.successfulAuthentication}) : super(key: key);
+  const ReauthenticateAccountDialogWidget({Key? key, required this.successfulAuthentication}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _ReauthenticateAccountAlertWidgetState();
+  State<StatefulWidget> createState() => _ReauthenticateAccountDialogWidgetState();
 }
 
-class _ReauthenticateAccountAlertWidgetState extends State<ReauthenticateAccountAlertWidget> {
+class _ReauthenticateAccountDialogWidgetState extends State<ReauthenticateAccountDialogWidget> {
   var email = TextEditingController();
   var password = TextEditingController();
   String? emailErr;

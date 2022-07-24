@@ -28,23 +28,35 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
   bool _newImage = false;
   bool _saving = false;
   bool _editMode = false;
+  bool _changesMade = false;
+  List<MemberModel> removedUsers = [];
+  List<MemberModel> addedUsers = [];
 
   @override
   Widget build(BuildContext context) {
     var args = ModalRoute.of(context)?.settings.arguments as dynamic;
     var groupId = args?.groupId;
+    var role = args?.role;
+
+    _name.addListener(() {
+      if (_name.text.isNotEmpty && !_changesMade) {
+        setState(() {
+          _changesMade = true;
+        });
+      }
+    });
 
     return WrapperAppPage(
-      child: _groupBody(groupId),
+      child: _groupBody(groupId, role),
     );
   }
 
-  Widget _groupBody(String groupId) {
+  Widget _groupBody(String groupId, Authorization role) {
     return FutureBuilder(
       future: FirestoreService().groupService.getGroup(groupId: groupId),
       builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<GroupModel>> snapshot) {
         if (snapshot.hasData) {
-          return _groupSnapshot(snapshot.data?.data());
+          return _groupSnapshot(snapshot.data?.data(), role);
         } else if (snapshot.hasData || snapshot.hasError) {
           return _groupError();
         }
@@ -68,9 +80,9 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
     );
   }
 
-  Widget _groupSnapshot(GroupModel? groupModel) {
+  Widget _groupSnapshot(GroupModel? groupModel, Authorization role) {
     if (groupModel == null) return _groupError();
-    return _groupInformation(groupModel);
+    return _groupInformation(groupModel, role);
   }
 
   void _updateCurrentImage(File? file, bool delete, bool isNew) {
@@ -78,20 +90,80 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
       setState(() {
         _currentImage = file;
         _newImage = isNew;
+        _changesMade = isNew;
       });
     }
+  }
+
+  Widget _profileBanner(GroupModel groupModel, Authorization role, TextStyle? textStyle) {
+    return Stack(
+      alignment: Alignment.topRight,
+      children: [
+        _profilePicture(groupModel, textStyle),
+        _editPageButton(role),
+      ],
+    );
+  }
+
+  Widget _imSureCancel() {
+    return ElevatedButton.icon(
+      onPressed: () {
+        setState(() {
+          _editMode = false;
+        });
+        Navigator.of(context).pop();
+        _name.clear();
+        context.read<AppService>().viewState = ViewState.busy;
+        Future.delayed(const Duration(milliseconds: 500)).then((_) => context.read<AuthService>().establishSettings());
+      },
+      label: const Text("Remove changes"),
+      icon: const Icon(Icons.delete),
+    );
+  }
+
+  Widget _cancel() {
+    return TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel"));
+  }
+
+  Widget _editPageButton(Authorization role) {
+    if (!(role == Authorization.owner || role == Authorization.write)) {
+      return const SizedBox();
+    }
+    return EditPageButtonWidget(
+      editFn: (editMode) async {
+        if (_changesMade && !editMode) {
+          await showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text("Unsaved changes"),
+                  content: const Text("You haven't saved some changes you made. Are you sure you want to exit "
+                      "editing. All unsaved changes will take no effect."),
+                  actions: [
+                    _imSureCancel(),
+                    _cancel(),
+                  ],
+                );
+              });
+        } else {
+          setState(() {
+            _editMode = editMode;
+          });
+        }
+      },
+      editMode: _editMode,
+    );
   }
 
   Widget _profilePicture(GroupModel groupModel, TextStyle? textStyle) {
     return ProfilePicture(
       options: ProfileOptions(
-        profileTitles: _profileTitles,
-        editMode: _editMode ? ProfileEditMode.fullScreen : null,
-        imageRef: ProfileImageRef(
-          subLoc: GroupService.groupKey,
-          uid: groupModel.uid!,
-        )
-      ),
+          profileTitles: _profileTitles,
+          editMode: _editMode ? ProfileEditMode.fullScreen : null,
+          imageRef: ProfileImageRef(
+            subLoc: GroupService.groupKey,
+            uid: groupModel.uid!,
+          )),
       currentImage: _currentImage,
       updateCurrentImage: _updateCurrentImage,
       placeholder: Text(
@@ -106,7 +178,7 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
     );
   }
 
-  Widget _groupInformation(GroupModel groupModel) {
+  Widget _groupInformation(GroupModel groupModel, Authorization role) {
     return WrapperPadding(
       child: WrapperOverflowRemoved(
         child: RawScrollbar(
@@ -114,20 +186,20 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
           thickness: 5,
           thumbVisibility: true,
           radius: const Radius.circular(2),
-          child: _groupContent(groupModel),
+          child: _groupContent(groupModel, role),
         ),
       ),
     );
   }
 
-  Widget _groupContent(GroupModel groupModel) {
+  Widget _groupContent(GroupModel groupModel, Authorization role) {
     var textStyle = Theme.of(context).textTheme.labelMedium;
     return ListView(
       children: [
         SizedBox(
           height: MediaQuery.of(context).size.height / 40,
         ),
-        _profilePicture(groupModel, textStyle),
+        _profileBanner(groupModel, role, textStyle),
         SizedBox(
           height: MediaQuery.of(context).size.height / 40,
         ),
@@ -138,31 +210,26 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
         ),
         TipWidget(
           explanation: "A unique identifier for your group",
-          child: UneditableTextEntryWidget(
+          child: TextEntryWidget(
             title: "Uuid",
             value: groupModel.uid!,
             textStyle: textStyle,
+            editMode: false,
           ),
         ),
         SizedBox(height: textStyle?.fontSize),
         TipWidget(
           explanation: "The name that others in this app will see",
-          child: EditableTextEntryWidget(
+          child: TextEntryWidget(
             title: "Name",
             value: groupModel.groupName,
             controller: _name,
             textStyle: textStyle,
+            editMode: _editMode,
           ),
         ),
         _members(groupModel.uid!, textStyle),
-        SizedBox(
-          height: MediaQuery.of(context).size.height / 20,
-        ),
-        _saveButton(groupModel),
-        SizedBox(
-          height: MediaQuery.of(context).size.height / 10,
-        ),
-        _deleteBtn(groupModel.uid!),
+        _editButtons(groupModel, role),
       ],
     );
   }
@@ -203,7 +270,6 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
         });
   }
 
-
   Widget _membersList(List<MemberModel> data) {
     data.sort((a, b) => a.role.index - b.role.index);
     return ListView.builder(
@@ -211,6 +277,11 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
       itemCount: data.length,
       itemBuilder: (context, i) {
         return ListTile(
+          tileColor: addedUsers.any((element) => element.userId == data[i].userId)
+              ? PaletteAssistant.alpha(Theme.of(context).colorScheme.tertiary)
+              : removedUsers.any((element) => element.userId == data[i].userId)
+                  ? PaletteAssistant.alpha(Theme.of(context).colorScheme.onError)
+                  : null,
           title: AutoScrollText(
             text: data[i].userProfile.name,
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
@@ -240,7 +311,25 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
               );
             },
           ),
+          trailing: !_editMode
+              ? null
+              : IconButton(
+                  onPressed: () {
+                    if (removedUsers.any((element) => element.userId == data[i].userId)) {
+                      setState(() {
+                        removedUsers.removeWhere((element) => element.userId == data[i].userId);
+                      });
+                    } else {
+                      setState(() {
+                        removedUsers.add(data[i]);
+                      });
+                    }
+                  },
+                  icon: const Icon(Icons.delete),
+                  splashRadius: Theme.of(context).textTheme.labelMedium?.fontSize ?? 30,
+                ),
           dense: true,
+          contentPadding: const EdgeInsets.all(5),
         );
       },
     );
@@ -253,6 +342,21 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
         style: Theme.of(context).textTheme.labelMedium,
       ),
     );
+  }
+
+  Widget _editButtons(GroupModel gm, Authorization role) {
+    return (role == Authorization.owner || role == Authorization.write) && _editMode
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height / 20,
+              ),
+              _saveButton(gm),
+              _deleteBtn(gm.uid!),
+            ],
+          )
+        : const SizedBox();
   }
 
   void _onSaveFinish() {

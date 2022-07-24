@@ -141,25 +141,27 @@ class _SettingPageState extends State<SettingsPage> {
         ),
         TipWidget(
           explanation: "A unique identifier for your account",
-          child: UneditableTextEntryWidget(
+          child: TextEntryWidget(
             title: "Uuid",
             value: um.uid!,
             textStyle: textStyle,
+            editMode: false,
           ),
         ),
         SizedBox(height: textStyle?.fontSize),
         TipWidget(
           explanation: "The email you signed up with",
-          child: UneditableTextEntryWidget(
+          child: TextEntryWidget(
             title: "Email",
             value: FirebaseAuth.instance.currentUser?.email ?? "N/A",
             textStyle: textStyle,
+            editMode: false,
           ),
         ),
         SizedBox(height: textStyle?.fontSize),
         TipWidget(
           explanation: "The name that others in this app will see",
-          child: EditableTextEntryWidget(
+          child: TextEntryWidget(
             title: "Name",
             value: um.profile.name,
             controller: _name,
@@ -207,30 +209,35 @@ class _SettingPageState extends State<SettingsPage> {
       alignment: Alignment.topRight,
       children: [
         _profilePicture(userModel, textStyle),
-        EditPageButtonWidget(
-            editFn: (editMode) async {
-              if (_changesMade && !editMode) {
-                await showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Unsaved changes"),
-                        content: const Text("You haven't saved some changes you made. Are you sure you want to exit "
-                            "editing. All unsaved changes will take no effect."),
-                        actions: [
-                          _imSureCancel(),
-                          _cancel(),
-                        ],
-                      );
-                    });
-              } else {
-                setState(() {
-                  _editMode = editMode;
-                });
-              }
-            },
-            editMode: _editMode),
+        _editPageButton(),
       ],
+    );
+  }
+
+  Widget _editPageButton() {
+    return EditPageButtonWidget(
+      editFn: (editMode) async {
+        if (_changesMade && !editMode) {
+          await showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text("Unsaved changes"),
+                  content: const Text("You haven't saved some changes you made. Are you sure you want to exit "
+                      "editing. All unsaved changes will take no effect."),
+                  actions: [
+                    _imSureCancel(),
+                    _cancel(),
+                  ],
+                );
+              });
+        } else {
+          setState(() {
+            _editMode = editMode;
+          });
+        }
+      },
+      editMode: _editMode,
     );
   }
 
@@ -431,7 +438,7 @@ class _SettingPageState extends State<SettingsPage> {
       context: context,
       barrierColor: Theme.of(context).colorScheme.tertiary,
       builder: (BuildContext context) {
-        return const DeleteAccountAlertWidget();
+        return const DeleteAccountDialogWidget();
       },
     );
   }
@@ -443,7 +450,7 @@ class _SettingPageState extends State<SettingsPage> {
           context: context,
           barrierColor: Theme.of(context).colorScheme.tertiary,
           builder: (BuildContext context) {
-            return ReauthenticateAccountAlertWidget(successfulAuthentication: _successfulAuthentication);
+            return ReauthenticateAccountDialogWidget(successfulAuthentication: _successfulAuthentication);
           },
         );
       },
